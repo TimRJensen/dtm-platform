@@ -1,0 +1,15 @@
+{
+  "name": "ts-dnt-platform",
+  "packageManager": "yarn@3.0.2",
+  "private": true,
+  "scripts": {
+    "start": "parcel ./packages/app/src/index.html"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "parcel": "^2.0.0-rc.0",
+    "typescript": "^4.4.2"
+  }
+}

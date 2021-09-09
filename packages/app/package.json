@@ -1,0 +1,15 @@
+{
+  "name": "app",
+  "packageManager": "yarn@3.0.2",
+  "private": true,
+  "dependencies": {
+    "db": "workspace:packages/db",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17",
+    "@types/react-dom": "^17",
+    "mock-data": "workspace:packages/mock-data"
+  }
+}
