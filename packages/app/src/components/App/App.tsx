@@ -2,13 +2,14 @@
  * Vendor imports.
  */
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { PouchDB, PouchDBProvider } from "db";
-import { HelloWorld } from "../HelloWorld/HelloWorld";
-import { Post } from "../Post/Post";
+import { Blog } from "../Blog/Blog";
+import { HomeView } from "../HomeView/HomeView";
 
 /**
  * App functional component.
@@ -18,19 +19,14 @@ interface Props {
 }
 
 export const App = function (props: Props) {
-  const onUnmount = () => {
-    (async () => props.db.clearView())();
-  };
-  const onUpdate = () => {
-    return onUnmount;
-  };
-
-  //useEffect(onUpdate, []);
-
   return (
     <PouchDBProvider value={props.db}>
-      <HelloWorld msg={"Ave Terra!"} />
-      <Post id={"blog:9"} />
+      <Router>
+        <Switch>
+          <Route exact path="/" component={HomeView} />
+          <Route path="/blogs/:key" component={Blog} />
+        </Switch>
+      </Router>
     </PouchDBProvider>
   );
 };

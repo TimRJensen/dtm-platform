@@ -6,44 +6,35 @@ import { useState, useContext, useEffect } from "react";
 /**
  * Custom imports.
  */
-import { PouchDBContext } from "db";
+import { PostDocument } from "db/src/db";
+
+/**
+ * Helpers.
+ */
+function formatDate(value: number) {
+  return new Date(value).toLocaleDateString("da-DK", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 /**
  * Post functional component.
  */
 interface Props {
-  id: string;
+  doc: PostDocument & { timestamp: number };
 }
 
-export const Post = function (props: Props) {
-  const db = useContext(PouchDBContext);
-  const [content, setContent] = useState("");
-
-  const fetchPost = async () => {
-    const blog = await db.get(props.id);
-
-    if (blog?.type === "blog") {
-      const post = blog.threads[0].posts[0];
-
-      setContent(
-        `${post.content} - ${post.creator.name} ${new Date(
-          post.timestamp
-        ).toLocaleDateString("da-DK", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })}`
-      );
-    }
-  };
-
-  useEffect(() => {
-    fetchPost();
-  }, []);
+export const Post = function Post({ doc }: Props) {
+  const { content, creator, timestamp } = doc;
 
   return (
     <div>
-      <div className={"body"}>{content}</div>
+      <p style={{ display: "inline" }}>{content}</p>
+      <p style={{ display: "inline" }}>{` - ${formatDate(timestamp)} af ${
+        creator.name
+      }`}</p>
     </div>
   );
 };

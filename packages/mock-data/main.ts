@@ -26,6 +26,7 @@ function randomNumber(min = 0, max = 10) {
  * generateDate - Generates a random (past) date within user specified confines.
  */
 interface GenerateDateOptions {
+  target?: Date;
   past?: boolean;
   year?: {
     min: number;
@@ -41,30 +42,49 @@ interface GenerateDateOptions {
   };
 }
 
-function generateDate(options?: GenerateDateOptions) {
-  const now = new Date();
+function generateDate(userOptions?: GenerateDateOptions) {
   const defaults = {
+    target: new Date(),
     past: true,
-    year: { min: 1, max: 5 },
-    month: { min: 1, max: 6 },
-    date: { min: 1, max: 15 },
-    ...options,
+    year: { min: 0, max: 4 },
+    month: { min: 0, max: 5 },
+    date: { min: 0, max: 14 },
+  };
+  const options = {
+    ...defaults,
+    ...userOptions,
   };
 
-  if (defaults.past)
-    now.setFullYear(
-      now.getFullYear() - randomNumber(defaults.year.min, defaults.year.max),
-      now.getMonth() - randomNumber(defaults.month.min, defaults.month.max),
-      now.getDate() - randomNumber(defaults.date.min, defaults.date.max)
+  if (options.past)
+    return new Date(
+      options.target.getFullYear() -
+        randomNumber(options.year.min, options.year.max),
+      options.target.getMonth() -
+        randomNumber(options.month.min, options.month.max),
+      options.target.getDate() -
+        randomNumber(options.date.min, options.date.max)
+    ).getTime();
+  else {
+    const result = new Date(
+      options.target.getFullYear() +
+        randomNumber(options.year.min, options.year.max),
+      options.target.getMonth() +
+        Math.abs(
+          options.target.getMonth() -
+            randomNumber(options.month.min, options.month.max)
+        ),
+      options.target.getDate() +
+        Math.abs(
+          options.target.getDate() -
+            randomNumber(options.date.min, options.date.max)
+        )
     );
-  else
-    now.setFullYear(
-      now.getFullYear() + randomNumber(defaults.year.min, defaults.year.max),
-      now.getMonth() + randomNumber(defaults.month.min, defaults.month.max),
-      now.getDate() + randomNumber(defaults.date.min, defaults.date.max)
-    );
+    const thisYear = defaults.target.getFullYear();
 
-  return now.getTime();
+    if (result.getFullYear() > thisYear) result.setFullYear(thisYear);
+
+    return result.getTime();
+  }
 }
 
 /**
@@ -72,26 +92,37 @@ function generateDate(options?: GenerateDateOptions) {
  */
 interface MockDataOptions {
   numberOfBlogs?: number;
+  numberofUsers?: number;
 }
 
 export const mockData = async function mockData(
   db: PouchDB,
-  options?: MockDataOptions
+  userOptions?: MockDataOptions
 ) {
   const defaults = {
-    numberOfBlogs: 10,
-    ...options,
+    numberOfBlogs: randomNumber(10, 20),
+    numberOfUsers: randomNumber(90, 120),
+  };
+  const options = {
+    ...defaults,
+    ...userOptions,
   };
   const blogs = [];
+  const users: (UserDocument & BaseDocument)[] = [];
 
-  for (let i = 0; i < defaults.numberOfBlogs; i++) {
-    const blog: BlogDocument & BaseDocument = {
-      type: "blog",
-      _id: `blog:${i}`,
-      threads: [],
+  for (let i = 0; i < options.numberOfUsers; i++) {
+    const email = faker.internet.email();
+
+    users.push({
+      type: "user",
+      _id: `user-${email}`,
+      name: faker.name.findName(),
+      email,
       stats: {
-        threads: faker.random.number({ min: 1, max: 5 }),
-        posts: 0,
+        posts: randomNumber(1, 20),
+        upvotes: Math.random() < 0.15 ? randomNumber(0, 75) : 0,
+        downvotes: Math.random() < 0.07 ? randomNumber(0, 30) : 0,
+        infractions: Math.random() < 0.05 ? randomNumber(0, 10) : 0,
       },
       timestamp: generateDate({
         year: { min: 0, max: 2 },
@@ -104,115 +135,114 @@ export const mockData = async function mockData(
         month: { min: 0, max: 11 },
         date: { min: 0, max: 31 },
       }),
+    });
+  }
+
+  for (let i = 0; i < options.numberOfBlogs; i++) {
+    const timestamp = generateDate({
+      year: { min: 0, max: 10 },
+      month: { min: 0, max: 11 },
+      date: { min: 0, max: 31 },
+    });
+    const lastModified = generateDate({
+      target: new Date(timestamp),
+      past: false,
+      year: { min: 0, max: 0 },
+      month: { min: 0, max: 11 },
+      date: { min: 0, max: 31 },
+    });
+    const blog: BlogDocument & BaseDocument = {
+      type: "blog",
+      _id: `blog:${i}`,
+      threads: [],
+      stats: {
+        threads: randomNumber(1, 5),
+        posts: 0,
+      },
+      timestamp,
+      lastModified,
     };
 
+    console.log(new Date(blog.timestamp).getFullYear());
+
     for (let i = 0; i < blog.stats.threads; i++) {
-      const email = faker.internet.email();
-      const key = `${blog._id}#thread:${i}`;
-      const creator: UserDocument & BaseDocument = {
-        type: "user",
-        _id: `user-${email}`,
-        name: faker.name.findName(),
-        email,
-        stats: {
-          posts: faker.random.number({ min: 1, max: 20 }),
-          upvotes:
-            Math.random() < 0.15 ? faker.random.number({ min: 0, max: 75 }) : 0,
-          downvotes:
-            Math.random() < 0.07 ? faker.random.number({ min: 0, max: 75 }) : 0,
-          infractions:
-            Math.random() < 0.05 ? faker.random.number({ min: 0, max: 10 }) : 0,
-        },
-        timestamp: generateDate({
-          year: { min: 0, max: 2 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        }),
-        lastModified: generateDate({
-          past: false,
-          year: { min: 0, max: 0 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        }),
-      };
-      const content: PostDocument & BaseDocument = {
+      const key = `${blog._id}/thread:${i}`;
+      const user = users[randomNumber(0, options.numberOfUsers - 1)];
+      const timestamp = generateDate({
+        target: new Date(blog.timestamp),
+        past: false,
+        year: { min: 0, max: 2 },
+        month: { min: 0, max: 11 },
+        date: { min: 0, max: 31 },
+      });
+      const lastModified = generateDate({
+        target: new Date(timestamp),
+        past: false,
+        year: { min: 0, max: 2 },
+        month: { min: 0, max: 11 },
+        date: { min: 0, max: 31 },
+      });
+      const post: PostDocument & BaseDocument = {
         type: "post",
-        _id: `${key}#post:main`,
-        creator,
-        content: faker.lorem.sentences(
-          faker.random.number({ min: 3, max: 15 })
-        ),
+        _id: `${key}/post:main`,
+        creator: user,
+        content: faker.lorem.sentences(randomNumber(3, 15)),
         stats: {
           infractions: 0,
         },
-        timestamp: generateDate({
-          year: { min: 0, max: 2 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        }),
-        lastModified: generateDate({
-          past: false,
-          year: { min: 0, max: 0 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        }),
+        timestamp,
+        lastModified,
       };
       const thread: ThreadDocument & BaseDocument = {
         type: "thread",
         _id: key,
-        creator,
-        post: content,
-        posts: [],
+        creator: user,
+        post,
+        comments: [],
         stats: {
-          posts: faker.random.number({ min: 1, max: 7 }),
-          upvotes:
-            Math.random() < 0.15 ? faker.random.number({ min: 0, max: 75 }) : 0,
-          downvotes:
-            Math.random() < 0.07 ? faker.random.number({ min: 0, max: 75 }) : 0,
-          infractions:
-            Math.random() < 0.05 ? faker.random.number({ min: 0, max: 10 }) : 0,
+          posts: randomNumber(1, 7),
+          upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
+          downvotes: Math.random() < 0.07 ? randomNumber(0, 5) : 0,
+          infractions: Math.random() < 0.05 ? randomNumber(0, 3) : 0,
         },
-        timestamp: generateDate({
+        timestamp: post.timestamp,
+        lastModified: post.lastModified,
+      };
+
+      for (let i = 0; i < thread.stats.posts; i++) {
+        const timestamp = generateDate({
+          target: new Date(
+            thread.comments.length
+              ? thread.comments[i - 1].timestamp
+              : thread.timestamp
+          ),
+          past: false,
           year: { min: 0, max: 2 },
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
-        }),
-        lastModified: generateDate({
+        });
+        const lastModified = generateDate({
+          target: new Date(timestamp),
           past: false,
           year: { min: 0, max: 0 },
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
-        }),
-      };
+        });
 
-      for (let i = 0; i < thread.stats.posts; i++)
-        thread.posts.push({
+        thread.comments.push({
           type: "post",
           ...{
-            _id: `${key}#post:${i}`,
-            timestamp: generateDate({
-              year: { min: 0, max: 2 },
-              month: { min: 0, max: 11 },
-              date: { min: 0, max: 31 },
-            }),
-            lastModified: generateDate({
-              past: false,
-              year: { min: 0, max: 0 },
-              month: { min: 0, max: 11 },
-              date: { min: 0, max: 31 },
-            }),
+            _id: `${key}/post:${i}`,
+            timestamp,
+            lastModified,
           },
-          creator,
-          content: faker.lorem.sentences(
-            faker.random.number({ min: 3, max: 15 })
-          ),
+          creator: users[randomNumber(0, options.numberOfUsers)],
+          content: faker.lorem.sentences(randomNumber(3, 15)),
           stats: {
-            infractions:
-              Math.random() < 0.05
-                ? faker.random.number({ min: 0, max: 10 })
-                : 0,
+            infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
           },
         });
+      }
 
       blog.threads.push(thread);
     }
