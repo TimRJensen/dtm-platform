@@ -171,19 +171,10 @@ class PouchDBWrapper {
 
       const result = await this.db.query(`customIndex/${key}`);
 
-      console.log(result);
       return result.rows.map((row) => row.key);
     } catch (err) {
       console.log(err, this.query.name);
       return [];
-    }
-  }
-
-  public async destroy() {
-    try {
-      await this.db.destroy();
-    } catch (err) {
-      console.log(err);
     }
   }
 
