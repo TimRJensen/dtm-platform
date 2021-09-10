@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import * as React from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Custom imports.
@@ -18,6 +18,15 @@ interface Props {
 }
 
 export const App = function (props: Props) {
+  const onUnmount = () => {
+    (async () => props.db.clearView())();
+  };
+  const onUpdate = () => {
+    return onUnmount;
+  };
+
+  //useEffect(onUpdate, []);
+
   return (
     <PouchDBProvider value={props.db}>
       <HelloWorld msg={"Ave Terra!"} />

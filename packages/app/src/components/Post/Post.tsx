@@ -23,7 +23,7 @@ export const Post = function (props: Props) {
     const blog = await db.get(props.id);
 
     if (blog?.type === "blog") {
-      const post = blog.threads[2].posts[3];
+      const post = blog.threads[0].posts[0];
 
       setContent(
         `${post.content} - ${post.creator.name} ${new Date(
