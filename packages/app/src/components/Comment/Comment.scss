@@ -1,0 +1,9 @@
+@import "../Post/Post.scss";
+
+.comment {
+  @extend .post;
+  .body {
+    border: 0;
+    background-color: transparent;
+  }
+}

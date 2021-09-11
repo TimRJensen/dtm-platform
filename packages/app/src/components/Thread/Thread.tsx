@@ -8,6 +8,7 @@ import { Fragment } from "react";
  */
 import { ThreadDocument } from "db/src/db";
 import { Post } from "../Post/Post";
+import { Comment } from "../Comment/Comment";
 
 /**
  * Thread functional component.
@@ -21,14 +22,14 @@ export const Thread = function Thread({ doc }: Props) {
 
   return (
     <Fragment>
-      <div style={{ border: "2px solid black" }}>
+      <div>
         <Post doc={doc.post} />
       </div>
       <div>
         {doc.comments.map((comment) => {
           return (
             <div key={comment._id}>
-              <Post doc={comment} />
+              <Comment doc={comment} />
             </div>
           );
         })}

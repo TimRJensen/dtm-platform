@@ -6,8 +6,8 @@ import { useState, useContext, useEffect } from "react";
 /**
  * Custom imports.
  */
-import { PostDocument, BaseDocument } from "db/src/db";
-import "./Post.scss";
+import { BaseDocument, PostDocument } from "db/src/db";
+import "./Comment.scss";
 
 /**
  * Helpers.
@@ -21,20 +21,18 @@ function formatDate(value: number) {
 }
 
 /**
- * Post functional component.
+ * Comment functional component.
  */
 interface Props {
   doc: PostDocument & Pick<BaseDocument, "timestamp">;
 }
 
-export const Post = function Post({ doc }: Props) {
+export const Comment = function Comment({ doc }: Props) {
   const { content, creator, timestamp } = doc;
 
   return (
-    <div className={"post"}>
-      <section className="panel">
-        <a>upvote</a>
-      </section>
+    <div className={"comment"}>
+      <section className="panel"></section>
       <section className="body">
         <div className="content">{content}</div>
         <div className="info">

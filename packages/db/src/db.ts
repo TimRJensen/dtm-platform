@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import PouchDB from "pouchdb";
+import PouchDB from "pouchdb-browser";
 import PouchDbFind from "pouchdb-find";
 
 /**
