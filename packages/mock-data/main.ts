@@ -13,7 +13,7 @@ import {
   PostDocument,
   ThreadDocument,
   UserDocument,
-} from "db/src/db";
+} from "db";
 
 /**
  * randomNumber - Generates a random (int) number within user specified confines.
@@ -119,7 +119,7 @@ export const mockData = async function mockData(
       name: faker.name.findName(),
       email,
       stats: {
-        posts: randomNumber(1, 20),
+        threads: randomNumber(1, 20),
         upvotes: Math.random() < 0.15 ? randomNumber(0, 75) : 0,
         downvotes: Math.random() < 0.07 ? randomNumber(0, 30) : 0,
         infractions: Math.random() < 0.05 ? randomNumber(0, 10) : 0,
@@ -153,69 +153,21 @@ export const mockData = async function mockData(
     });
     const blog: BlogDocument & BaseDocument = {
       type: "blog",
-      _id: `blog:${i}`,
+      _id: `/blog:${i}`,
       threads: [],
       stats: {
         threads: randomNumber(1, 5),
-        posts: 0,
       },
       timestamp,
       lastModified,
     };
 
-    console.log(new Date(blog.timestamp).getFullYear());
-
-    for (let i = 0; i < blog.stats.threads; i++) {
-      const key = `${blog._id}/thread:${i}`;
-      const user = users[randomNumber(0, options.numberOfUsers - 1)];
-      const timestamp = generateDate({
-        target: new Date(blog.timestamp),
-        past: false,
-        year: { min: 0, max: 2 },
-        month: { min: 0, max: 11 },
-        date: { min: 0, max: 31 },
-      });
-      const lastModified = generateDate({
-        target: new Date(timestamp),
-        past: false,
-        year: { min: 0, max: 2 },
-        month: { min: 0, max: 11 },
-        date: { min: 0, max: 31 },
-      });
-      const post: PostDocument & BaseDocument = {
-        type: "post",
-        _id: `${key}/post:main`,
-        creator: user,
-        content: faker.lorem.sentences(randomNumber(3, 15)),
-        stats: {
-          infractions: 0,
-        },
-        timestamp,
-        lastModified,
-      };
-      const thread: ThreadDocument & BaseDocument = {
-        type: "thread",
-        _id: key,
-        creator: user,
-        post,
-        comments: [],
-        stats: {
-          posts: randomNumber(1, 7),
-          upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
-          downvotes: Math.random() < 0.07 ? randomNumber(0, 5) : 0,
-          infractions: Math.random() < 0.05 ? randomNumber(0, 3) : 0,
-        },
-        timestamp: post.timestamp,
-        lastModified: post.lastModified,
-      };
-
-      for (let i = 0; i < thread.stats.posts; i++) {
+    if (blog.stats.threads)
+      for (let i = 0; i < blog.stats.threads; i++) {
+        const key = `${blog._id}/thread:${i}`;
+        const user = users[randomNumber(0, options.numberOfUsers - 1)];
         const timestamp = generateDate({
-          target: new Date(
-            thread.comments.length
-              ? thread.comments[i - 1].timestamp
-              : thread.timestamp
-          ),
+          target: new Date(blog.timestamp),
           past: false,
           year: { min: 0, max: 2 },
           month: { min: 0, max: 11 },
@@ -224,28 +176,75 @@ export const mockData = async function mockData(
         const lastModified = generateDate({
           target: new Date(timestamp),
           past: false,
-          year: { min: 0, max: 0 },
+          year: { min: 0, max: 2 },
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
         });
-
-        thread.comments.push({
+        const post: PostDocument & BaseDocument = {
           type: "post",
-          ...{
-            _id: `${key}/post:${i}`,
-            timestamp,
-            lastModified,
-          },
-          creator: users[randomNumber(0, options.numberOfUsers)],
+          _id: `${key}/post:main`,
+          creator: user,
           content: faker.lorem.sentences(randomNumber(3, 15)),
           stats: {
-            infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
+            infractions: 0,
           },
-        });
-      }
+          timestamp,
+          lastModified,
+        };
+        const thread: ThreadDocument & BaseDocument = {
+          type: "thread",
+          _id: key,
+          creator: user,
+          post,
+          comments: [],
+          stats: {
+            comments: randomNumber(1, 7),
+            upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
+            downvotes: Math.random() < 0.07 ? randomNumber(0, 5) : 0,
+            infractions: Math.random() < 0.05 ? randomNumber(0, 3) : 0,
+          },
+          timestamp: post.timestamp,
+          lastModified: post.lastModified,
+        };
 
-      blog.threads.push(thread);
-    }
+        if (thread.stats.comments)
+          for (let i = 0; i < thread.stats.comments; i++) {
+            const timestamp = generateDate({
+              target: new Date(
+                thread.comments.length
+                  ? thread.comments[i - 1].timestamp
+                  : thread.timestamp
+              ),
+              past: false,
+              year: { min: 0, max: 2 },
+              month: { min: 0, max: 11 },
+              date: { min: 0, max: 31 },
+            });
+            const lastModified = generateDate({
+              target: new Date(timestamp),
+              past: false,
+              year: { min: 0, max: 0 },
+              month: { min: 0, max: 11 },
+              date: { min: 0, max: 31 },
+            });
+
+            thread.comments.push({
+              type: "post",
+              ...{
+                _id: `${key}/post:${i}`,
+                timestamp,
+                lastModified,
+              },
+              creator: users[randomNumber(0, options.numberOfUsers)],
+              content: faker.lorem.sentences(randomNumber(3, 15)),
+              stats: {
+                infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
+              },
+            });
+          }
+
+        blog.threads.push(thread);
+      }
 
     blogs.push(blog);
   }

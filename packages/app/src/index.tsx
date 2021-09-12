@@ -8,8 +8,7 @@ import { render } from "react-dom";
  * Custom imports.
  */
 import { App } from "./components/App/App";
-import { PouchDB } from "db";
-import { GetDocument, AllDocuments } from "db/src/db";
+import { PouchDB, GetDocument, AllDocuments } from "db";
 
 /**
  * App initialization.

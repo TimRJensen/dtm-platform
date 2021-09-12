@@ -1,43 +1,46 @@
 /**
  * Vendor imports.
  */
-import { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 /**
  * Custom import.
  */
-import { PouchDBContext } from "db";
-import { BlogDocument, AllDocuments } from "db/src/db";
+import { PouchDBContext, AllDocuments } from "db";
+import { AppStateContext } from "../../AppState/context";
 import { Thread } from "../Thread/Thread";
+import { PathParams } from "../App/App";
 
 /**
  * Blog functonal component.
  */
 export const Blog = function Blog() {
-  const { key }: { key: string } = useParams();
+  const { blogId } = useParams() as PathParams;
   const db = useContext(PouchDBContext);
-  const [blog, setBlog] = useState({} as AllDocuments);
+  const appState = useContext(AppStateContext);
 
   const fetch = async () => {
-    const blog = await db.get(key);
+    const blog = await db.get(`/${blogId}`);
 
-    if (blog) setBlog(blog);
+    if (blog?.type === "blog")
+      appState.dispatch({ type: "setCurrentBlog", value: blog });
   };
 
   useEffect(() => {
     fetch();
   }, []);
 
-  if (blog.type !== "blog") return null;
+  if (appState.state.currentBlog)
+    return (
+      <Fragment>
+        <div>
+          {appState.state.currentBlog.threads.map((thread) => {
+            return <Thread key={thread._id} doc={thread} />;
+          })}
+        </div>
+      </Fragment>
+    );
 
-  return (
-    <Fragment>
-      <div>
-        {blog.threads.map((thread) => {
-          return <Thread key={thread._id} doc={thread} />;
-        })}
-      </div>
-    </Fragment>
-  );
+  return null;
 };

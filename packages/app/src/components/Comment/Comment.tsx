@@ -6,7 +6,7 @@ import { useState, useContext, useEffect } from "react";
 /**
  * Custom imports.
  */
-import { BaseDocument, PostDocument } from "db/src/db";
+import { BaseDocument, GetDocument, PostDocument } from "db";
 import "./Comment.scss";
 
 /**
@@ -24,24 +24,27 @@ function formatDate(value: number) {
  * Comment functional component.
  */
 interface Props {
-  doc: PostDocument & Pick<BaseDocument, "timestamp">;
+  doc: GetDocument<PostDocument>;
 }
 
 export const Comment = function Comment({ doc }: Props) {
   const { content, creator, timestamp } = doc;
 
   return (
-    <div className={"comment"}>
-      <section className="panel"></section>
-      <section className="body">
+    <section className={"comment"}>
+      <div className="panel"></div>
+      <div className="body">
         <div className="content">{content}</div>
-        <div className="info">
-          <div>
-            <p className="timestamp">{formatDate(timestamp) + " af "}</p>
-            <p className="user">{creator.name}</p>
+        <div className="footer">
+          <span className="controls">
+            <a>rediger</a>
+          </span>
+          <div className="info">
+            <span className="timestamp">{formatDate(timestamp) + " af "}</span>
+            <span className="user">{creator.name}</span>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };

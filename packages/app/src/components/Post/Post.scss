@@ -1,25 +1,21 @@
+@import "../Comment/Comment.scss";
+
 .post {
-  display: flex;
-  justify-content: center;
-
+  @extend .comment;
+  
   .body {
-    width: 50vw;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #cccccc;
     border-radius: 0.33rem;
-    padding: 0.75rem;
-    .info {
-      display: flex;
-      justify-content: right;
-
-      .timestamp,
-      .user {
-        display: inline;
-        margin: 0;
-      }
-    }
   }
 
   .panel {
-    width: 6vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .font-icon {
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 }

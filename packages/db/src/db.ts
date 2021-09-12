@@ -11,15 +11,22 @@ export interface BaseDocument {
   _id: string;
   timestamp: number;
   lastModified: number;
+  stats: {
+    infractions?: number;
+    upvotes?: number;
+    downvotes?: number;
+    comments?: number;
+    threads?: number;
+  };
 }
 
-export type GetDocument<T> = T & BaseDocument;
-
-interface DocumentStats {
-  posts: number;
-  upvotes: number;
-  downvotes: number;
-  infractions: number;
+interface DesignDocument {
+  type: "design";
+  views: {
+    [key: string]: {
+      map: string;
+    };
+  };
 }
 
 interface AppStateDocument {
@@ -31,14 +38,12 @@ export interface UserDocument {
   type: "user";
   name: string;
   email: string;
-  stats: DocumentStats;
 }
 
 export interface PostDocument {
   type: "post";
   creator: UserDocument;
   content: string;
-  stats: Pick<DocumentStats, "infractions">;
 }
 
 export interface ThreadDocument {
@@ -46,25 +51,11 @@ export interface ThreadDocument {
   creator: UserDocument;
   post: GetDocument<PostDocument>;
   comments: GetDocument<PostDocument>[];
-  stats: DocumentStats;
 }
 
 export interface BlogDocument {
   type: "blog";
   threads: GetDocument<ThreadDocument>[];
-  stats: {
-    threads: number;
-    posts: number;
-  };
-}
-
-interface DesignDoc {
-  type: "design";
-  views: {
-    [key: string]: {
-      map: string;
-    };
-  };
 }
 
 export type AllDocuments =
@@ -73,7 +64,13 @@ export type AllDocuments =
   | PostDocument
   | ThreadDocument
   | BlogDocument
-  | DesignDoc;
+  | DesignDocument;
+
+type PutDocument<D> = D extends { type: AllDocuments["type"] } ? D : never;
+
+export type GetDocument<D> = D extends { type: AllDocuments["type"] }
+  ? D & BaseDocument
+  : never;
 
 interface PouchDBWrapperOptions {
   adapter?: "idb" | "leveldb" | "http";
@@ -135,7 +132,43 @@ class PouchDBWrapper {
     return result;
   }
 
-  public async put(key: string, doc: AllDocuments) {
+  public createDoc<T extends AllDocuments>(key: string, doc: PutDocument<T>) {
+    return {
+      ...doc,
+      _id: key,
+      timestamp: Date.now(),
+      lastModified: Date.now(),
+      stats: {
+        ...(doc.type === "user"
+          ? {
+              infractions: 0,
+              upvotes: 0,
+              downvotes: 0,
+              threads: 0,
+              comments: 0,
+            }
+          : doc.type === "post"
+          ? {
+              infractions: 0,
+            }
+          : doc.type === "thread"
+          ? {
+              infractions: 0,
+              upvotes: 0,
+              downvotes: 0,
+              comments: 0,
+            }
+          : doc.type === "blog"
+          ? {
+              threads: 0,
+              comments: 0,
+            }
+          : {}),
+      },
+    };
+  }
+
+  public async put(key: string, doc: PutDocument<AllDocuments>) {
     try {
       const oldDoc = await this.db.get(key);
       const newDoc = { ...oldDoc, ...doc };
@@ -145,13 +178,7 @@ class PouchDBWrapper {
 
       this.db.put({ ...newDoc, lastModified: Date.now() });
     } catch (err) {
-      if ((err as any).status === 404)
-        this.db.put({
-          ...doc,
-          _id: key,
-          timestamp: Date.now(),
-          lastModified: Date.now(),
-        });
+      if ((err as any).status === 404) this.db.put(this.createDoc(key, doc));
       else if ((err as any).status === 409) {
       }
       console.log(err, this.get.name);
@@ -171,6 +198,7 @@ class PouchDBWrapper {
       return await this.db.get(key);
     } catch (err) {
       console.log(err, this.get.name);
+      return undefined;
     }
   }
 
@@ -209,7 +237,7 @@ class PouchDBWrapper {
     });
   }
 
-  public async query(key: string): Promise<GetDocument<AllDocuments>[]> {
+  public async query(key: string) {
     try {
       const result = await this.db.query(`${key}-index/${key}`);
 
@@ -240,3 +268,4 @@ class PouchDBWrapper {
 PouchDB.plugin(PouchDbFind);
 
 export { PouchDBWrapper as PouchDB };
+export { PouchDBContext, PouchDBProvider } from "./context";
