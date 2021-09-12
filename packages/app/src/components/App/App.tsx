@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useEffect, useReducer, useState } from "react";
+import { useReducer } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 /**

@@ -34,9 +34,10 @@ function formatPath(path: string): { blog: number; thread: number } {
  */
 interface Props {
   doc: GetDocument<ThreadDocument>;
+  index: number;
 }
 
-export const Thread = function Thread({ doc }: Props) {
+export const Thread = function Thread({ doc, index }: Props) {
   if (doc) {
     const db = useContext(PouchDBContext);
     const { state, dispatch } = useContext(AppStateContext);
@@ -49,9 +50,10 @@ export const Thread = function Thread({ doc }: Props) {
         setCommenting(false);
         return;
       }
-      // Create a new doc.
-      const key = `${doc._id}/comment${doc.comments.length}`;
-      const newDoc = db.createDoc(key, {
+
+      // Update the db.
+      const key = `${doc._id}/comment${doc.stats.comments}`;
+      doc.comments[key] = db.createDoc(key, {
         type: "post",
         content,
         creator: {
@@ -60,14 +62,12 @@ export const Thread = function Thread({ doc }: Props) {
           email: "john.doe@gmail.com",
         },
       });
-      // Update db.
-      //await db.put(key, newDoc);
+      doc.stats.comments++;
+      state.currentBlog.threads[doc._id] = doc;
+      await db.put(state.currentBlog._id, state.currentBlog);
 
       // Update view.
-      const i = formatPath(doc._id).thread;
-
-      doc.comments = doc.comments.concat(newDoc);
-
+      dispatch({ type: "setCurrentBlog", value: state.currentBlog });
       setCommenting(false);
     };
 
@@ -81,11 +81,10 @@ export const Thread = function Thread({ doc }: Props) {
       }
     }, [commenting]);
 
-    console.log(formatPath(doc._id));
     return (
       <section className="thread">
         <Post doc={doc.post} onCommenting={handleCommenting} />
-        {comments.map((comment) => {
+        {Object.values(comments).map((comment) => {
           return <Comment key={comment._id} doc={comment} />;
         })}
         {commenting ? (

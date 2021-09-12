@@ -18,28 +18,26 @@ import { PathParams } from "../App/App";
 export const Blog = function Blog() {
   const { blogId } = useParams() as PathParams;
   const db = useContext(PouchDBContext);
-  const appState = useContext(AppStateContext);
+  const { state, dispatch } = useContext(AppStateContext);
 
   const fetch = async () => {
-    const blog = await db.get(`/${blogId}`);
+    const response = await db.get(`/${blogId}`);
 
-    if (blog?.type === "blog")
-      appState.dispatch({ type: "setCurrentBlog", value: blog });
+    if (response && response.type === "blog")
+      dispatch({ type: "setCurrentBlog", value: response });
   };
 
   useEffect(() => {
     fetch();
   }, []);
 
-  if (appState.state.currentBlog)
+  if (state.currentBlog)
     return (
-      <Fragment>
-        <div>
-          {appState.state.currentBlog.threads.map((thread) => {
-            return <Thread key={thread._id} doc={thread} />;
-          })}
-        </div>
-      </Fragment>
+      <div>
+        {Object.values(state.currentBlog.threads).map((thread, i) => {
+          return <Thread key={thread._id} doc={thread} index={i} />;
+        })}
+      </div>
     );
 
   return null;

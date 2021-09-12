@@ -1,12 +1,12 @@
 /**
  * Vendor imports.
  */
-import { useState, useContext, useEffect } from "react";
+import {} from "react";
 
 /**
  * Custom imports.
  */
-import { BaseDocument, GetDocument, PostDocument } from "db";
+import { GetDocument, PostDocument } from "db";
 import "./Comment.scss";
 
 /**

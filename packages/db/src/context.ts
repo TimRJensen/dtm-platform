@@ -6,7 +6,7 @@ import { createContext } from "react";
 /**
  * Custom imports.
  */
-import { PouchDB } from "./db";
+import { PouchDB } from "./main";
 
 /**
  * PouchDB context.

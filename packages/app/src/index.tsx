@@ -1,7 +1,6 @@
 /**
  * Vendor imports.
  */
-import * as React from "react";
 import { render } from "react-dom";
 
 /**
@@ -25,12 +24,6 @@ const db = new PouchDB({
             if (thread.stats.upvotes > 0) emit(thread);
       },
     },*/
-    {
-      id: "find-blogs",
-      map: (doc: GetDocument<AllDocuments>) => {
-        if (doc.type === "blog") emit(doc);
-      },
-    },
   ],
 });
 

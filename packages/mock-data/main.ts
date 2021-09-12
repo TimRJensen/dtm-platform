@@ -6,13 +6,14 @@ import faker from "faker";
 /**
  * Custom imports.
  */
-import { PouchDB } from "db";
 import {
+  PouchDB,
   BaseDocument,
   BlogDocument,
   PostDocument,
   ThreadDocument,
   UserDocument,
+  GetDocument,
 } from "db";
 
 /**
@@ -100,7 +101,7 @@ export const mockData = async function mockData(
   userOptions?: MockDataOptions
 ) {
   const defaults = {
-    numberOfBlogs: randomNumber(10, 20),
+    numberOfBlogs: randomNumber(10, 12),
     numberOfUsers: randomNumber(90, 120),
   };
   const options = {
@@ -108,7 +109,7 @@ export const mockData = async function mockData(
     ...userOptions,
   };
   const blogs = [];
-  const users: (UserDocument & BaseDocument)[] = [];
+  const users: GetDocument<UserDocument>[] = [];
 
   for (let i = 0; i < options.numberOfUsers; i++) {
     const email = faker.internet.email();
@@ -151,10 +152,10 @@ export const mockData = async function mockData(
       month: { min: 0, max: 11 },
       date: { min: 0, max: 31 },
     });
-    const blog: BlogDocument & BaseDocument = {
+    const blog: GetDocument<BlogDocument> = {
       type: "blog",
       _id: `/blog:${i}`,
-      threads: [],
+      threads: {},
       stats: {
         threads: randomNumber(1, 5),
       },
@@ -164,7 +165,7 @@ export const mockData = async function mockData(
 
     if (blog.stats.threads)
       for (let i = 0; i < blog.stats.threads; i++) {
-        const key = `${blog._id}/thread:${i}`;
+        const _id = `${blog._id}/thread:${i}`;
         const user = users[randomNumber(0, options.numberOfUsers - 1)];
         const timestamp = generateDate({
           target: new Date(blog.timestamp),
@@ -180,9 +181,9 @@ export const mockData = async function mockData(
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
         });
-        const post: PostDocument & BaseDocument = {
+        const post: GetDocument<PostDocument> = {
           type: "post",
-          _id: `${key}/post:main`,
+          _id: `${_id}/post`,
           creator: user,
           content: faker.lorem.sentences(randomNumber(3, 15)),
           stats: {
@@ -191,12 +192,12 @@ export const mockData = async function mockData(
           timestamp,
           lastModified,
         };
-        const thread: ThreadDocument & BaseDocument = {
+        const thread: GetDocument<ThreadDocument> = {
           type: "thread",
-          _id: key,
+          _id,
           creator: user,
           post,
-          comments: [],
+          comments: {},
           stats: {
             comments: randomNumber(1, 7),
             upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
@@ -227,11 +228,12 @@ export const mockData = async function mockData(
               month: { min: 0, max: 11 },
               date: { min: 0, max: 31 },
             });
+            const _id = `${thread._id}/comment:${i}`;
 
-            thread.comments.push({
+            thread.comments[_id] = {
               type: "post",
               ...{
-                _id: `${key}/post:${i}`,
+                _id,
                 timestamp,
                 lastModified,
               },
@@ -240,15 +242,11 @@ export const mockData = async function mockData(
               stats: {
                 infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
               },
-            });
+            };
           }
-
-        blog.threads.push(thread);
+        blog.threads[_id] = thread;
       }
-
     blogs.push(blog);
   }
-
   await db.putMany(blogs);
-  console.log("data created");
 };

@@ -1,13 +1,13 @@
 /**
  * Vendor imports.
  */
-import { useState, useContext, useEffect, Fragment, MouseEvent } from "react";
+import { MouseEvent } from "react";
 import { Editor, EditorState } from "draft-js";
 
 /**
  * Custom imports.
  */
-import { PostDocument, PouchDBContext, GetDocument } from "db";
+import { PostDocument, GetDocument } from "db";
 import { FontIcon } from "../FontIcon/FontIcon";
 import "./Post.scss";
 

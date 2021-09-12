@@ -27,6 +27,19 @@ export const HomeView = function HomeView() {
     fetch();
   }, []);
 
+  const handleClick = async () => {
+    await db.db.createIndex({
+      index: { fields: ["_id"] },
+    });
+    const response = await db.db.find({
+      selector: {
+        _id: "/blog:0/thread:0",
+      },
+    });
+
+    console.log(response);
+  };
+
   return (
     <div>
       <div>Home</div>
@@ -36,6 +49,7 @@ export const HomeView = function HomeView() {
           <br></br>
         </Fragment>
       ))}
+      <button onClick={handleClick}>Test db</button>
     </div>
   );
 };
