@@ -14,6 +14,7 @@ import {
   ThreadDocument,
   UserDocument,
   GetDocument,
+  AllDocuments,
 } from "db";
 
 /**
@@ -109,7 +110,7 @@ export const mockData = async function mockData(
     ...userOptions,
   };
   const blogs = [];
-  const users: GetDocument<UserDocument>[] = [];
+  const users: GetDocument<AllDocuments, "user">[] = [];
 
   for (let i = 0; i < options.numberOfUsers; i++) {
     const email = faker.internet.email();
@@ -121,6 +122,7 @@ export const mockData = async function mockData(
       email,
       stats: {
         threads: randomNumber(1, 20),
+        comments: randomNumber(1, 80),
         upvotes: Math.random() < 0.15 ? randomNumber(0, 75) : 0,
         downvotes: Math.random() < 0.07 ? randomNumber(0, 30) : 0,
         infractions: Math.random() < 0.05 ? randomNumber(0, 10) : 0,
@@ -152,12 +154,13 @@ export const mockData = async function mockData(
       month: { min: 0, max: 11 },
       date: { min: 0, max: 31 },
     });
-    const blog: GetDocument<BlogDocument> = {
+    const blog: GetDocument<AllDocuments, "blog"> = {
       type: "blog",
       _id: `/blog:${i}`,
       threads: {},
       stats: {
         threads: randomNumber(1, 5),
+        comments: 0,
       },
       timestamp,
       lastModified,
@@ -181,7 +184,7 @@ export const mockData = async function mockData(
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
         });
-        const post: GetDocument<PostDocument> = {
+        const post: GetDocument<AllDocuments, "post"> = {
           type: "post",
           _id: `${_id}/post`,
           creator: user,
@@ -192,7 +195,7 @@ export const mockData = async function mockData(
           timestamp,
           lastModified,
         };
-        const thread: GetDocument<ThreadDocument> = {
+        const thread: GetDocument<AllDocuments, "thread"> = {
           type: "thread",
           _id,
           creator: user,
@@ -202,7 +205,6 @@ export const mockData = async function mockData(
             comments: randomNumber(1, 7),
             upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
             downvotes: Math.random() < 0.07 ? randomNumber(0, 5) : 0,
-            infractions: Math.random() < 0.05 ? randomNumber(0, 3) : 0,
           },
           timestamp: post.timestamp,
           lastModified: post.lastModified,

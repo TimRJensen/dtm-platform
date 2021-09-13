@@ -1,14 +1,19 @@
 /**
  * Vendor imports.
  */
-import { useReducer } from "react";
+import { useReducer, Reducer } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { PouchDB, PouchDBProvider } from "db";
-import { AppState, AppStateProvider, reducer } from "../../AppState/main";
+import {
+  Actions,
+  AppState,
+  AppStateProvider,
+  reducer,
+} from "../../AppState/main";
 import { Blog } from "../Blog/Blog";
 import { HomeView } from "../HomeView/HomeView";
 
@@ -19,10 +24,12 @@ interface Props {
   db: PouchDB;
 }
 
-export type PathParams = { blogId: string };
-
 export const App = function (props: Props) {
-  const [state, dispatch] = useReducer(reducer, {} as AppState);
+  const [state, dispatch] = useReducer<Reducer<AppState, Actions>>(reducer, {
+    user: undefined,
+    currentBlog: undefined,
+    showEditor: undefined,
+  });
 
   return (
     <PouchDBProvider value={props.db}>

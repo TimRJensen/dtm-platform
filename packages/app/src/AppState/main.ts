@@ -2,39 +2,43 @@
  * Vendor imports.
  */
 
-import { BlogDocument, GetDocument } from "db";
-
 /**
  * Custom imports.
  */
+import { AllDocuments, GetDocument } from "db";
 
 /**
  * Types.
  */
 export interface AppState {
-  currentBlog: GetDocument<BlogDocument>;
+  user?: GetDocument<AllDocuments, "user">;
+  currentBlog?: GetDocument<AllDocuments, "blog">;
+  showEditor?: (flag: boolean) => void | undefined;
 }
 
 export type Actions =
-  | { type: "setCurrentBlog"; value: GetDocument<BlogDocument> }
-  | { type: "test"; value: number };
-
-type ExtractActionParameters<A> = A extends { type: Actions["type"] }
-  ? A
-  : never;
-
-type Test = ExtractActionParameters<Actions>;
+  | {
+      type: "setUser";
+      value: GetDocument<AllDocuments, "user"> | undefined;
+    }
+  | {
+      type: "setCurrentBlog";
+      value: GetDocument<AllDocuments, "blog"> | undefined;
+    }
+  | {
+      type: "showEditor";
+      value: (flag: boolean) => void | undefined;
+    };
 
 /**
  * appstate
  */
-export const reducer = function reducer(
-  state: AppState,
-  action: ExtractActionParameters<Actions>
-) {
+export const reducer = function reducer(state: AppState, action: Actions) {
   switch (action.type) {
     case "setCurrentBlog":
-      return { currentBlog: action.value };
+      return { ...state, currentBlog: action.value };
+    case "showEditor":
+      return { ...state, showEditor: action.value };
     default:
       throw new Error();
   }

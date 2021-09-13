@@ -15,7 +15,9 @@ import { PouchDBContext, AllDocuments, GetDocument } from "db";
  */
 export const HomeView = function HomeView() {
   const db = useContext(PouchDBContext);
-  const [blogs, setBlogs] = useState([] as GetDocument<AllDocuments>[]);
+  const [blogs, setBlogs] = useState<
+    GetDocument<AllDocuments, AllDocuments["type"]>[]
+  >([]);
 
   const fetch = async () => {
     const response = await db.find(["type"], { selector: { type: "blog" } });
@@ -28,16 +30,13 @@ export const HomeView = function HomeView() {
   }, []);
 
   const handleClick = async () => {
-    await db.db.createIndex({
-      index: { fields: ["_id"] },
-    });
-    const response = await db.db.find({
-      selector: {
-        _id: "/blog:0/thread:0",
-      },
-    });
+    const doc = await db.get("/blog:0");
 
-    console.log(response);
+    console.log(doc);
+    if (doc && doc.type === "blog") {
+      doc.threads["/blog:0/thread:0"].comments = {};
+      await db.put("/blog:0", doc);
+    }
   };
 
   return (

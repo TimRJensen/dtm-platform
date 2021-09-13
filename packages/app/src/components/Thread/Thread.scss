@@ -1,5 +1,17 @@
+$prefix: thread;
+
 .thread {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: column;
   align-items: center;
+  min-width: 65vw;
+
+  .#{$prefix}-divider {
+    min-width: 65vw;
+    margin: {
+      top: 2rem;
+      bottom: 2rem;
+    }
+    border-top: 1px solid #cccccc;
+  }
 }

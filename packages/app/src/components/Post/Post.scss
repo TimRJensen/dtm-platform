@@ -1,21 +1,47 @@
-@import "../Comment/Comment.scss";
+$post-prefix: post;
+$post-divider-margin: 0.33rem;
 
 .post {
-  @extend .comment;
-  
-  .body {
-    border: 1px solid #cccccc;
-    border-radius: 0.33rem;
+  max-width: 55vw;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #cccccc;
+  border-radius: 0.33rem;
+  padding: 0.75rem;
+
+  .#{$post-prefix}-divider {
+    margin: $post-divider-margin;
+    border-top: #cccccc solid 1px;
   }
 
-  .panel {
+  .#{$post-prefix}-panel {
+    width: 5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    .font-icon {
+    margin-right: 3 * 0.33rem;
+
+    .#{$post-prefix}-font-icon {
       &:hover {
         cursor: pointer;
       }
+    }
+  }
+
+  .#{$post-prefix}-footer {
+    display: flex;
+
+    .#{$post-prefix}-controls {
+      .#{$post-prefix}-link {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+    
+    .#{$post-prefix}-info {
+      flex-grow: 10;
+      text-align: right;
     }
   }
 }

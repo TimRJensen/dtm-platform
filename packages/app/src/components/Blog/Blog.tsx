@@ -1,41 +1,41 @@
 /**
  * Vendor imports.
  */
-import { Fragment, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 /**
  * Custom import.
  */
-import { PouchDBContext, AllDocuments } from "db";
-import { AppStateContext } from "../../AppState/context";
+import { PouchDBContext } from "db";
 import { Thread } from "../Thread/Thread";
-import { PathParams } from "../App/App";
+import { AppStateContext } from "../../AppState/context";
 
 /**
  * Blog functonal component.
  */
 export const Blog = function Blog() {
-  const { blogId } = useParams() as PathParams;
   const db = useContext(PouchDBContext);
   const { state, dispatch } = useContext(AppStateContext);
+  const { blogId } = useParams<{ blogId: string }>();
 
   const fetch = async () => {
-    const response = await db.get(`/${blogId}`);
+    const response = await db.get<"blog">(`/${blogId}`);
 
-    if (response && response.type === "blog")
-      dispatch({ type: "setCurrentBlog", value: response });
+    if (response) dispatch({ type: "setCurrentBlog", value: response });
   };
 
   useEffect(() => {
-    fetch();
+    if (!state.currentBlog) fetch();
+
+    return () => dispatch({ type: "setCurrentBlog", value: undefined });
   }, []);
 
   if (state.currentBlog)
     return (
       <div>
         {Object.values(state.currentBlog.threads).map((thread, i) => {
-          return <Thread key={thread._id} doc={thread} index={i} />;
+          return <Thread key={thread._id} doc={thread} />;
         })}
       </div>
     );

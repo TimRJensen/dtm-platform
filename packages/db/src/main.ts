@@ -11,13 +11,6 @@ export interface BaseDocument {
   _id: string;
   timestamp: number;
   lastModified: number;
-  stats: {
-    infractions?: number;
-    upvotes?: number;
-    downvotes?: number;
-    comments?: number;
-    threads?: number;
-  };
 }
 
 interface DesignDocument {
@@ -38,33 +31,46 @@ export interface UserDocument {
   type: "user";
   name: string;
   email: string;
+  stats: {
+    infractions: number;
+    upvotes: number;
+    downvotes: number;
+    comments: number;
+    threads: number;
+  };
 }
 
 export interface PostDocument {
   type: "post";
   creator: UserDocument;
   content: string;
+  stats: {
+    infractions: number;
+  };
 }
 
 export interface ThreadDocument {
   type: "thread";
   creator: UserDocument;
-  post: GetDocument<PostDocument>;
+  post: GetDocument<PostDocument, "post">;
   comments: {
-    [key: string]: GetDocument<PostDocument>;
+    [key: string]: GetDocument<PostDocument, "post">;
   };
   stats: {
+    comments: number;
     upvotes: number;
     downvotes: number;
-    infractions: number;
-    comments: number;
   };
 }
 
 export interface BlogDocument {
   type: "blog";
   threads: {
-    [key: string]: GetDocument<ThreadDocument>;
+    [key: string]: GetDocument<AllDocuments, "thread">;
+  };
+  stats: {
+    comments: number;
+    threads: number;
   };
 }
 
@@ -76,10 +82,12 @@ export type AllDocuments =
   | BlogDocument
   | DesignDocument;
 
-type PutDocument<D> = D extends { type: AllDocuments["type"] } ? D : never;
-
-export type GetDocument<D> = D extends { type: AllDocuments["type"] }
+export type GetDocument<D, T> = D extends { type: T }
   ? D & BaseDocument
+  : never;
+
+type PutDocument<D, T extends AllDocuments["type"]> = D extends { type: T }
+  ? D
   : never;
 
 interface PouchDBWrapperOptions {
@@ -88,7 +96,7 @@ interface PouchDBWrapperOptions {
   compareEqualityOnPut?: boolean;
   maps?: {
     id: string;
-    map: (doc: GetDocument<AllDocuments>) => void;
+    map: (doc: GetDocument<AllDocuments, AllDocuments["type"]>) => void;
   }[];
 }
 
@@ -96,7 +104,7 @@ interface PouchDBWrapperOptions {
  * PouchDBWrapper - A simple class wrapper for PouchDB.
  */
 class PouchDBWrapper {
-  public db: PouchDB.Database<GetDocument<AllDocuments>>;
+  private db: PouchDB.Database<GetDocument<AllDocuments, AllDocuments["type"]>>;
   private defaults = {
     adapter: "idb",
     autoCompact: true,
@@ -120,9 +128,7 @@ class PouchDBWrapper {
     let result = true;
 
     for (let key in a) {
-      const t = typeof a[key];
-
-      if (typeof a[key] === "object" && typeof b[key] === "object") {
+      if (typeof a[key] === "object" && typeof b[key] === "object")
         if (a[key] === null) result = a[key] === b[key];
         else if (Array.isArray(a[key])) {
           let i = -1;
@@ -132,7 +138,7 @@ class PouchDBWrapper {
           while (++i < a[key].length && result)
             result = this.isEqual(a[key][i], b[key][i]);
         } else result = this.isEqual(a[key], b[key]);
-      } else if (typeof a[key] === "function")
+      else if (typeof a[key] === "function")
         result = a[key].toString() === b[key].toString();
       else result = a[key] === b[key];
 
@@ -142,55 +148,51 @@ class PouchDBWrapper {
     return result;
   }
 
-  public createDoc<T extends AllDocuments>(key: string, doc: PutDocument<T>) {
+  public createDoc<T extends AllDocuments["type"]>(
+    _id: string,
+    doc: PutDocument<AllDocuments, T>
+  ) {
     return {
       ...doc,
-      _id: key,
+      _id,
       timestamp: Date.now(),
       lastModified: Date.now(),
       stats: {
-        ...(doc.type === "user"
-          ? {
-              infractions: 0,
-              upvotes: 0,
-              downvotes: 0,
-              threads: 0,
-              comments: 0,
-            }
-          : doc.type === "post"
-          ? {
-              infractions: 0,
-            }
+        ...(doc.type === "post"
+          ? { infractions: 0 }
           : doc.type === "thread"
+          ? { upvotes: 0, downvotes: 0, comments: 0 }
+          : doc.type === "blog"
+          ? { threads: 0, comments: 0 }
+          : doc.type === "user"
           ? {
               infractions: 0,
               upvotes: 0,
               downvotes: 0,
               comments: 0,
-            }
-          : doc.type === "blog"
-          ? {
               threads: 0,
-              comments: 0,
             }
           : {}),
       },
     };
   }
 
-  public async put(key: string, doc: PutDocument<AllDocuments>) {
+  public async put<T extends AllDocuments["type"]>(
+    _id: string,
+    doc: PutDocument<AllDocuments, T>
+  ) {
     try {
-      const oldDoc = await this.db.get(key);
+      const oldDoc = await this.db.get(_id);
       const newDoc = { ...oldDoc, ...doc };
 
-      this.isEqual(oldDoc, newDoc);
       if (this.options.compareEqualityOnPut && this.isEqual(oldDoc, newDoc))
         return;
 
-      this.db.put({ ...newDoc, lastModified: Date.now() });
+      return this.db.put({ ...newDoc, lastModified: Date.now() });
     } catch (err) {
-      if ((err as any).status === 404) this.db.put(this.createDoc(key, doc));
-      else if ((err as any).status === 409) {
+      if ((err as any).status === 404) {
+        return this.db.put(this.createDoc<T>(_id, doc));
+      } else if ((err as any).status === 409) {
       }
       console.log(err, this.get.name);
     }
@@ -204,9 +206,11 @@ class PouchDBWrapper {
     }
   }
 
-  public async get(key: string) {
+  public async get<T extends AllDocuments["type"]>(
+    _id: string
+  ): Promise<GetDocument<AllDocuments, T> | undefined> {
     try {
-      return await this.db.get(key);
+      return await this.db.get(_id);
     } catch (err) {
       console.log(err, this.get.name);
       return undefined;
@@ -235,22 +239,22 @@ class PouchDBWrapper {
   }
 
   public async addMap(
-    key: string,
-    map: (doc: GetDocument<AllDocuments>) => void
+    _id: string,
+    map: (doc: GetDocument<AllDocuments, AllDocuments["type"]>) => void
   ) {
-    this.put(`_design/${key}-index`, {
+    this.put(`_design/${_id}-index`, {
       type: "design",
       views: {
-        [key]: {
+        [_id]: {
           map: map.toString(),
         },
       },
     });
   }
 
-  public async query(key: string) {
+  public async query(_id: string) {
     try {
-      const result = await this.db.query(`${key}-index/${key}`);
+      const result = await this.db.query(`${_id}-index/${_id}`);
 
       return result.rows.map((row) => row.key);
     } catch (err) {
