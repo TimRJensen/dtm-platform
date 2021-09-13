@@ -1,47 +1,32 @@
-$post-prefix: post;
-$post-divider-margin: 0.33rem;
+@use "../../themes/base";
+$prefix: post;
 
-.post {
-  max-width: 55vw;
+.#{$prefix}.container {
+  @include base.comment(55vw);
   display: flex;
   flex-direction: row;
+  padding: 0.75rem;
   border: 1px solid #cccccc;
   border-radius: 0.33rem;
-  padding: 0.75rem;
 
-  .#{$post-prefix}-divider {
-    margin: $post-divider-margin;
-    border-top: #cccccc solid 1px;
-  }
-
-  .#{$post-prefix}-panel {
-    width: 5vw;
+  .panel {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-right: 3 * 0.33rem;
+    width: 2vw;
 
-    .#{$post-prefix}-font-icon {
+    .#{$prefix}.font-icon {
       &:hover {
         cursor: pointer;
       }
     }
   }
 
-  .#{$post-prefix}-footer {
-    display: flex;
+  .body {
+    width: 53vw;
 
-    .#{$post-prefix}-controls {
-      .#{$post-prefix}-link {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    }
-    
-    .#{$post-prefix}-info {
-      flex-grow: 10;
-      text-align: right;
+    .divider {
+      width: 53vw;
     }
   }
 }

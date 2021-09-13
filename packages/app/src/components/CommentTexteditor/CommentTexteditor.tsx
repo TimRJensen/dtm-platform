@@ -1,8 +1,8 @@
 /**
  * Vendor imports.
  */
-import { useState, forwardRef, Ref, useEffect } from "react";
-import { Editor, EditorState } from "draft-js";
+import { useState, useEffect, useRef } from "react";
+import { ContentState, Editor, EditorState } from "draft-js";
 import "./CommentTexteditor.scss";
 
 /**
@@ -13,55 +13,71 @@ import "./CommentTexteditor.scss";
  * CommentTextbox functional component - wrapper for https://draftjs.org/
  */
 interface Props {
+  show?: boolean;
+  content?: string;
   onSubmit?: (content?: string) => void;
-  ref?: Ref<Editor>;
 }
 
-export const CommentTexteditor = forwardRef(function CommentTexteditor(
-  { onSubmit }: Props,
-  ref: Ref<Editor>
-) {
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  );
+export const CommentTexteditor = function CommentTexteditor({
+  show = true,
+  content,
+  onSubmit,
+}: Props) {
+  if (!show) return null;
 
-  const handleSubmit = () => {
-    if (onSubmit) onSubmit(editorState.getCurrentContent().getPlainText());
-  };
-
-  const handleCancel = () => {
-    if (onSubmit) onSubmit(undefined);
-  };
-
-  const handleClick = () => {
-    if (ref && "current" in ref) ref.current?.focus();
-  };
+  const [editorState, setEditorState] = useState(() => {
+    if (!content) return EditorState.createEmpty();
+    else
+      return EditorState.createWithContent(
+        ContentState.createFromText(content)
+      );
+  });
+  const editorRef = useRef<Editor>(null);
 
   useEffect(() => {
-    const a = document.querySelector(".comment-texteditor-input");
-    console.log(a?.scrollIntoView({ block: "center" }));
+    //editorRef.current?.focus();
+
+    const div = document.querySelector<HTMLDivElement>(".text-editor input");
+
+    if (
+      div &&
+      div.offsetTop + div.offsetHeight > window.scrollY + window.innerHeight
+    ) {
+      window.scrollTo(
+        0,
+        div.offsetTop + div.offsetHeight - window.innerHeight / 2
+      );
+    }
   }, []);
 
   return (
-    <section id="comment-texteditor" className="comment-texteditor">
-      <div className="comment-texteditor-body">
-        <div className="comment-texteditor-input" onClick={handleClick}>
+    <section id="comment-texteditor" className="text-editor container">
+      <div className="body">
+        <div
+          className="text-editor input"
+          onClick={() => editorRef.current?.focus()}
+        >
           <Editor
             editorState={editorState}
             onChange={setEditorState}
-            ref={ref}
+            ref={editorRef}
           />
         </div>
-        <div className="comment-texteditor-footer">
+        <div className="text-editor footer">
           <button
-            className="comment-texteditor-icon submit"
-            onClick={handleSubmit}
+            className="text-editor button submit"
+            onClick={() => {
+              if (onSubmit)
+                onSubmit(editorState.getCurrentContent().getPlainText());
+            }}
           >
             submit
           </button>
           <button
-            className="comment-texteditor-icon cancel"
-            onClick={handleCancel}
+            className="text-editor button cancel"
+            onClick={() => {
+              if (onSubmit) onSubmit(undefined);
+            }}
           >
             cancel
           </button>
@@ -69,4 +85,4 @@ export const CommentTexteditor = forwardRef(function CommentTexteditor(
       </div>
     </section>
   );
-});
+};

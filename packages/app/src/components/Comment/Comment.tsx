@@ -1,13 +1,15 @@
 /**
  * Vendor imports.
  */
-import {} from "react";
+import { useContext, useState, MouseEvent } from "react";
 
 /**
  * Custom imports.
  */
-import { AllDocuments, GetDocument } from "db";
+import { AllDocuments, GetDocument, PouchDBContext } from "db";
 import "./Comment.scss";
+import { CommentTexteditor } from "../CommentTexteditor/CommentTexteditor";
+import { AppStateContext } from "../../AppState/context";
 
 /**
  * Helpers.
@@ -27,23 +29,71 @@ interface Props {
   doc: GetDocument<AllDocuments, "post">;
 }
 
+const useUpdateDoc = function useUpdateDoc(
+  doc: GetDocument<AllDocuments, "post">
+) {
+  const { state, dispatch } = useContext(AppStateContext);
+  const db = useContext(PouchDBContext);
+};
+
 export const Comment = function Comment({ doc }: Props) {
-  const { content, creator, timestamp } = doc;
+  if (!doc) return null;
+
+  const { state, dispatch } = useContext(AppStateContext);
+  const db = useContext(PouchDBContext);
+  const [showEditor, setShowEditor] = useState(false);
+
+  const handleClick = () => {
+    if (state.showEditor) {
+      state.showEditor(false);
+    }
+
+    setShowEditor(true);
+    dispatch({ type: "showEditor", value: setShowEditor });
+  };
+
+  const handleSubmit = async (content?: string) => {
+    const blog = state.currentBlog;
+
+    if (!content || !blog) {
+      setShowEditor(false);
+      return;
+    }
+
+    // Update/mutate the model.
+    doc.content = content;
+
+    //Update the db.
+    await db.put(blog._id, blog);
+
+    // Update the view.
+    dispatch({
+      type: "setCurrentBlog",
+      value: await db.get<"blog">(blog._id),
+    });
+    setShowEditor(false);
+  };
 
   return (
-    <section className="comment">
-      <div className="comment-body">
-        <div className="comment-content">{content}</div>
-        <div className="comment-divider" />
-        <div className="comment-footer">
-          <span className="comment-controls">
-            <a>rediger</a>
+    <section className="comment container">
+      <div className="body">
+        {showEditor ? (
+          <CommentTexteditor content={doc.content} onSubmit={handleSubmit} />
+        ) : (
+          <div className="content">{doc.content}</div>
+        )}
+        <div className="divider" />
+        <div className="footer">
+          <span className="controls">
+            <a className="link" onClick={handleClick}>
+              rediger
+            </a>
           </span>
-          <div className="comment-info">
-            <span className="comment-timestamp">
-              {formatDate(timestamp) + " af "}
+          <div className="info">
+            <span className="timestamp">
+              {formatDate(doc.timestamp) + " af "}
             </span>
-            <span className="comment-user">{creator.name}</span>
+            <span className="user">{doc.creator.name}</span>
           </div>
         </div>
       </div>

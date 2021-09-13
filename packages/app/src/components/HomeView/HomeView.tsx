@@ -30,13 +30,19 @@ export const HomeView = function HomeView() {
   }, []);
 
   const handleClick = async () => {
-    const doc = await db.get("/blog:0");
+    const obj = {
+      a: { a: 1, b: 2 },
+      b: { a: 3, b: 4 },
+      c: { a: "hello world", b: 5 },
+    };
 
-    console.log(doc);
-    if (doc && doc.type === "blog") {
-      doc.threads["/blog:0/thread:0"].comments = {};
-      await db.put("/blog:0", doc);
-    }
+    const arr = Object.values(obj).map((o) => {
+      (o.a = typeof o.a === "string" ? "ave terra" : o.a++), (o.b = o.b + 1);
+
+      return o;
+    });
+    arr[1].b = 15;
+    console.log(obj, arr);
   };
 
   return (
@@ -44,11 +50,11 @@ export const HomeView = function HomeView() {
       <div>Home</div>
       {blogs.map((blog, i) => (
         <Fragment key={`blog-${i}`}>
-          <Link to={`/blogs/blog:${i}`}>{"Blog " + i}</Link>
+          <Link to={`/blogs/blog-${i}`}>{"Blog " + i}</Link>
           <br></br>
         </Fragment>
       ))}
-      <button onClick={handleClick}>Test db</button>
+      <button onClick={handleClick}>Run Test</button>
     </div>
   );
 };

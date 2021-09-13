@@ -1,8 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useContext, useEffect, useRef, useState } from "react";
-import { Editor } from "draft-js";
+import { useContext, useEffect, useState } from "react";
 
 /**
  * Custom imports.
@@ -22,23 +21,24 @@ interface Props {
 }
 
 export const Thread = function Thread({ doc }: Props) {
-  if (doc) {
-    const db = useContext(PouchDBContext);
-    const { state, dispatch } = useContext(AppStateContext);
-    const [showEditor, setShowEditor] = useState(false);
+  if (!doc) return null;
 
-    const handleSubmit = async (content?: string) => {
-      const blog = state.currentBlog;
+  const db = useContext(PouchDBContext);
+  const { state, dispatch } = useContext(AppStateContext);
+  const [showEditor, setShowEditor] = useState(state.showEditor !== undefined);
 
-      if (!content || !blog) {
-        setShowEditor(false);
-        return;
-      }
+  const handleSubmit = async (content?: string) => {
+    const blog = state.currentBlog;
 
-      // Update the db.
-      const _id = `${doc._id}/comment${doc.stats.comments}`;
+    if (!content || !blog) {
+      setShowEditor(false);
+      return;
+    }
 
-      blog.threads[doc._id].comments[_id] = db.createDoc<"post">(_id, {
+    // Update the model.
+    const post = db.createDoc<"post">(
+      `${doc._id}/comment-${doc.stats.comments}`,
+      {
         type: "post",
         content,
         creator: db.createDoc<"user">("/users/john.doe@gmail.com", {
@@ -56,43 +56,37 @@ export const Thread = function Thread({ doc }: Props) {
         stats: {
           infractions: 0,
         },
-      });
-      blog.threads[doc._id].stats.comments++;
-      await db.put<"blog">(blog._id, blog);
-
-      // Update the view.
-      dispatch({
-        type: "setCurrentBlog",
-        value: await db.get<"blog">(blog._id),
-      });
-      setShowEditor(false);
-    };
-
-    const textboxRef = useRef<Editor>(null);
-    useEffect(() => {
-      // Fix focus & scroll.
-      if (textboxRef.current) {
-        textboxRef.current.focus();
-        console.log("A");
       }
-    }, [showEditor]);
-
-    return (
-      <section className="thread">
-        <Post
-          doc={doc.post}
-          showEditor={(flag: boolean) => setShowEditor(flag)}
-        />
-        {Object.values(doc.comments).map((comment) => {
-          return <Comment key={comment._id} doc={comment} />;
-        })}
-        {showEditor ? (
-          <CommentTexteditor onSubmit={handleSubmit} ref={textboxRef} />
-        ) : null}
-        <div className="thread-divider" />
-      </section>
     );
-  }
+    doc.comments[post.key] = post;
+    doc.stats.comments++;
 
-  return null;
+    //Update the db.
+    await db.put(blog._id, blog);
+
+    // Update the view.
+    dispatch({
+      type: "setCurrentBlog",
+      value: await db.get<"blog">(blog._id),
+    });
+    setShowEditor(false);
+  };
+
+  useEffect(() => {
+    console.log(state);
+  });
+
+  return (
+    <section className="thread">
+      <Post
+        doc={doc.post}
+        showEditor={(flag: boolean) => setShowEditor(flag)}
+      />
+      {Object.values(doc.comments).map((comment) => {
+        return <Comment key={comment._id} doc={comment} />;
+      })}
+      <CommentTexteditor onSubmit={handleSubmit} show={showEditor} />
+      <div className="thread-divider" />
+    </section>
+  );
 };

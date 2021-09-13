@@ -13,7 +13,7 @@ import { AllDocuments, GetDocument } from "db";
 export interface AppState {
   user?: GetDocument<AllDocuments, "user">;
   currentBlog?: GetDocument<AllDocuments, "blog">;
-  showEditor?: (flag: boolean) => void | undefined;
+  showEditor?: (flag: boolean) => void;
 }
 
 export type Actions =
@@ -27,7 +27,7 @@ export type Actions =
     }
   | {
       type: "showEditor";
-      value: (flag: boolean) => void | undefined;
+      value: ((flag: boolean) => void) | undefined;
     };
 
 /**

@@ -20,7 +20,7 @@ export const Blog = function Blog() {
   const { blogId } = useParams<{ blogId: string }>();
 
   const fetch = async () => {
-    const response = await db.get<"blog">(`/${blogId}`);
+    const response = await db.get<"blog">(`/blogs/${blogId}`);
 
     if (response) dispatch({ type: "setCurrentBlog", value: response });
   };
@@ -31,14 +31,13 @@ export const Blog = function Blog() {
     return () => dispatch({ type: "setCurrentBlog", value: undefined });
   }, []);
 
-  if (state.currentBlog)
-    return (
-      <div>
-        {Object.values(state.currentBlog.threads).map((thread, i) => {
-          return <Thread key={thread._id} doc={thread} />;
-        })}
-      </div>
-    );
+  if (!state.currentBlog) return null;
 
-  return null;
+  return (
+    <div>
+      {Object.values(state.currentBlog.threads).map((thread, i) => {
+        return <Thread key={thread._id} doc={thread} />;
+      })}
+    </div>
+  );
 };

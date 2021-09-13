@@ -3,12 +3,14 @@
  */
 import PouchDB from "pouchdb-browser";
 import PouchDbFind from "pouchdb-find";
+import { pathToRegexp } from "path-to-regexp";
 
 /**
  * Types.
  */
 export interface BaseDocument {
   _id: string;
+  key: string;
   timestamp: number;
   lastModified: number;
 }
@@ -86,9 +88,7 @@ export type GetDocument<D, T> = D extends { type: T }
   ? D & BaseDocument
   : never;
 
-type PutDocument<D, T extends AllDocuments["type"]> = D extends { type: T }
-  ? D
-  : never;
+type PutDocument<D, T> = D extends { type: T } ? D : never;
 
 interface PouchDBWrapperOptions {
   adapter?: "idb" | "leveldb" | "http";
@@ -152,28 +152,19 @@ class PouchDBWrapper {
     _id: string,
     doc: PutDocument<AllDocuments, T>
   ) {
+    const re = pathToRegexp("/:typeid/:name/:thread?/:post?")
+      .exec(_id)
+      ?.slice(-1);
+
     return {
-      ...doc,
       _id,
+      key: pathToRegexp("/:typeid/:name/:thread?/:post?")
+        .exec(_id)
+        ?.slice(-1)[0] as string,
       timestamp: Date.now(),
       lastModified: Date.now(),
-      stats: {
-        ...(doc.type === "post"
-          ? { infractions: 0 }
-          : doc.type === "thread"
-          ? { upvotes: 0, downvotes: 0, comments: 0 }
-          : doc.type === "blog"
-          ? { threads: 0, comments: 0 }
-          : doc.type === "user"
-          ? {
-              infractions: 0,
-              upvotes: 0,
-              downvotes: 0,
-              comments: 0,
-              threads: 0,
-            }
-          : {}),
-      },
+      stats: {},
+      ...doc,
     };
   }
 
@@ -188,10 +179,10 @@ class PouchDBWrapper {
       if (this.options.compareEqualityOnPut && this.isEqual(oldDoc, newDoc))
         return;
 
-      return this.db.put({ ...newDoc, lastModified: Date.now() });
+      this.db.put({ ...newDoc, lastModified: Date.now() });
     } catch (err) {
       if ((err as any).status === 404) {
-        return this.db.put(this.createDoc<T>(_id, doc));
+        this.db.put(this.createDoc<T>(_id, doc));
       } else if ((err as any).status === 409) {
       }
       console.log(err, this.get.name);

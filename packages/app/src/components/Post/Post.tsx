@@ -32,6 +32,8 @@ interface Props {
 }
 
 export const Post = function Post({ doc, showEditor }: Props) {
+  if (!doc) return null;
+
   const { state, dispatch } = useContext(AppStateContext);
   const { content, creator, timestamp } = doc;
 
@@ -43,11 +45,8 @@ export const Post = function Post({ doc, showEditor }: Props) {
     console.log("Nay!");
   };
 
-  const handleClick = (event: MouseEvent) => {
-    event.preventDefault();
-
+  const handleClick = () => {
     if (state.showEditor) {
-      console.log("A");
       state.showEditor(false);
     }
 
@@ -58,31 +57,29 @@ export const Post = function Post({ doc, showEditor }: Props) {
   };
 
   return (
-    <section className="post">
-      <div className="post-panel">
-        <FontIcon className="post-font-icon" onClick={handleUpvote}>
+    <section className="post container">
+      <div className="panel">
+        <FontIcon className="font-icon" onClick={handleUpvote}>
           expand_less
         </FontIcon>
-        <FontIcon className="post-font-icon" onClick={handleDownvote}>
+        <FontIcon className="font-icon" onClick={handleDownvote}>
           expand_more
         </FontIcon>
       </div>
-      <div className="post-body">
-        <div className="post-content">{content}</div>
-        <div className="post-divider" />
-        <div className="post-footer">
-          <span className="post-controls">
-            <a className="post-link" onClick={handleClick}>
+      <div className="body">
+        <div className="content">{content}</div>
+        <div className="divider" />
+        <div className="footer">
+          <span className="controls">
+            <a className="link" onClick={handleClick}>
               kommenter
             </a>
             <span> - </span>
             <a>rediger</a>
           </span>
-          <div className="post-info">
-            <span className="post-timestamp">
-              {formatDate(timestamp) + " af "}
-            </span>
-            <span className="post-user">{creator.name}</span>
+          <div className="info">
+            <span className="timestamp">{formatDate(timestamp) + " af "}</span>
+            <span className="user">{creator.name}</span>
           </div>
         </div>
       </div>

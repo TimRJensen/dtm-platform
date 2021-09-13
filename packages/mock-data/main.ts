@@ -6,16 +6,7 @@ import faker from "faker";
 /**
  * Custom imports.
  */
-import {
-  PouchDB,
-  BaseDocument,
-  BlogDocument,
-  PostDocument,
-  ThreadDocument,
-  UserDocument,
-  GetDocument,
-  AllDocuments,
-} from "db";
+import { PouchDB, GetDocument, AllDocuments } from "db";
 
 /**
  * randomNumber - Generates a random (int) number within user specified confines.
@@ -117,7 +108,8 @@ export const mockData = async function mockData(
 
     users.push({
       type: "user",
-      _id: `user-${email}`,
+      _id: `/users/${email}`,
+      key: email,
       name: faker.name.findName(),
       email,
       stats: {
@@ -156,7 +148,8 @@ export const mockData = async function mockData(
     });
     const blog: GetDocument<AllDocuments, "blog"> = {
       type: "blog",
-      _id: `/blog:${i}`,
+      _id: `/blogs/blog-${i}`,
+      key: `blog-${i}`,
       threads: {},
       stats: {
         threads: randomNumber(1, 5),
@@ -168,7 +161,7 @@ export const mockData = async function mockData(
 
     if (blog.stats.threads)
       for (let i = 0; i < blog.stats.threads; i++) {
-        const _id = `${blog._id}/thread:${i}`;
+        const _id = `${blog._id}/thread-${i}`;
         const user = users[randomNumber(0, options.numberOfUsers - 1)];
         const timestamp = generateDate({
           target: new Date(blog.timestamp),
@@ -187,6 +180,7 @@ export const mockData = async function mockData(
         const post: GetDocument<AllDocuments, "post"> = {
           type: "post",
           _id: `${_id}/post`,
+          key: "post",
           creator: user,
           content: faker.lorem.sentences(randomNumber(3, 15)),
           stats: {
@@ -198,6 +192,7 @@ export const mockData = async function mockData(
         const thread: GetDocument<AllDocuments, "thread"> = {
           type: "thread",
           _id,
+          key: `thread-${i}`,
           creator: user,
           post,
           comments: {},
@@ -230,23 +225,22 @@ export const mockData = async function mockData(
               month: { min: 0, max: 11 },
               date: { min: 0, max: 31 },
             });
-            const _id = `${thread._id}/comment:${i}`;
-
-            thread.comments[_id] = {
+            const comment = {
               type: "post",
-              ...{
-                _id,
-                timestamp,
-                lastModified,
-              },
+              _id: `${thread._id}/comment-${i}`,
+              key: `comment-${i}`,
+              timestamp,
+              lastModified,
               creator: users[randomNumber(0, options.numberOfUsers)],
               content: faker.lorem.sentences(randomNumber(3, 15)),
               stats: {
                 infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
               },
             };
+            // @ts-ignore
+            thread.comments[comment.key] = comment;
           }
-        blog.threads[_id] = thread;
+        blog.threads[thread.key] = thread;
       }
     blogs.push(blog);
   }
