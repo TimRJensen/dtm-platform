@@ -8,16 +8,14 @@ import { Link } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { PouchDBContext, AllDocuments, GetDocument } from "db";
+import { PouchDBContext, AllDocuments } from "db";
 
 /**
  * HomeView functional component.
  */
 export const HomeView = function HomeView() {
   const db = useContext(PouchDBContext);
-  const [blogs, setBlogs] = useState<
-    GetDocument<AllDocuments, AllDocuments["type"]>[]
-  >([]);
+  const [blogs, setBlogs] = useState<AllDocuments[]>([]);
 
   const fetch = async () => {
     const response = await db.find(["type"], { selector: { type: "blog" } });

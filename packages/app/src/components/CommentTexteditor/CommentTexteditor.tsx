@@ -27,45 +27,35 @@ export const CommentTexteditor = function CommentTexteditor({
 
   const [editorState, setEditorState] = useState(() => {
     if (!content) return EditorState.createEmpty();
-    else
-      return EditorState.createWithContent(
-        ContentState.createFromText(content)
-      );
+
+    return EditorState.createWithContent(ContentState.createFromText(content));
   });
   const editorRef = useRef<Editor>(null);
 
   useEffect(() => {
-    //editorRef.current?.focus();
+    const div = document.querySelector<HTMLDivElement>(".text-editor .input");
 
-    const div = document.querySelector<HTMLDivElement>(".text-editor input");
+    if (div) {
+      const divBottom = div.offsetTop + div.offsetHeight;
 
-    if (
-      div &&
-      div.offsetTop + div.offsetHeight > window.scrollY + window.innerHeight
-    ) {
-      window.scrollTo(
-        0,
-        div.offsetTop + div.offsetHeight - window.innerHeight / 2
-      );
+      if (divBottom > window.scrollY)
+        window.scrollTo(0, divBottom - window.innerHeight / 2);
     }
   }, []);
 
   return (
-    <section id="comment-texteditor" className="text-editor container">
+    <section className="text-editor container">
       <div className="body">
-        <div
-          className="text-editor input"
-          onClick={() => editorRef.current?.focus()}
-        >
+        <div className="input" onClick={() => editorRef.current?.focus()}>
           <Editor
             editorState={editorState}
             onChange={setEditorState}
             ref={editorRef}
           />
         </div>
-        <div className="text-editor footer">
+        <div className="footer">
           <button
-            className="text-editor button submit"
+            className="button submit"
             onClick={() => {
               if (onSubmit)
                 onSubmit(editorState.getCurrentContent().getPlainText());
@@ -74,7 +64,7 @@ export const CommentTexteditor = function CommentTexteditor({
             submit
           </button>
           <button
-            className="text-editor button cancel"
+            className="button cancel"
             onClick={() => {
               if (onSubmit) onSubmit(undefined);
             }}

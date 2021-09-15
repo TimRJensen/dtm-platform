@@ -2,7 +2,7 @@
 $prefix: comment;
 
 .#{$prefix}.container {
-  @include base.comment();
+  @include base.comment(30vw);
   padding-left: 3vw;
 
   .text-editor.container {

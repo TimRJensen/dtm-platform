@@ -26,10 +26,10 @@ interface DesignDocument {
 
 interface AppStateDocument {
   type: "app-state";
-  isPopulated?: boolean;
+  isPopulated: boolean;
 }
 
-export interface UserDocument {
+export interface UserDocument extends BaseDocument {
   type: "user";
   name: string;
   email: string;
@@ -42,7 +42,7 @@ export interface UserDocument {
   };
 }
 
-export interface PostDocument {
+export interface PostDocument extends BaseDocument {
   type: "post";
   creator: UserDocument;
   content: string;
@@ -51,12 +51,12 @@ export interface PostDocument {
   };
 }
 
-export interface ThreadDocument {
+export interface ThreadDocument extends BaseDocument {
   type: "thread";
   creator: UserDocument;
-  post: GetDocument<PostDocument, "post">;
+  post: PostDocument;
   comments: {
-    [key: string]: GetDocument<PostDocument, "post">;
+    [key: string]: PostDocument;
   };
   stats: {
     comments: number;
@@ -65,10 +65,10 @@ export interface ThreadDocument {
   };
 }
 
-export interface BlogDocument {
+export interface BlogDocument extends BaseDocument {
   type: "blog";
   threads: {
-    [key: string]: GetDocument<AllDocuments, "thread">;
+    [key: string]: ThreadDocument;
   };
   stats: {
     comments: number;
@@ -84,11 +84,12 @@ export type AllDocuments =
   | BlogDocument
   | DesignDocument;
 
-export type GetDocument<D, T> = D extends { type: T }
-  ? D & BaseDocument
+type ExcludeKey<K> = K extends keyof BaseDocument ? never : K;
+type PutDocument<T, D = AllDocuments> = D extends {
+  type: T;
+}
+  ? { [K in ExcludeKey<keyof D>]: D[K] }
   : never;
-
-type PutDocument<D, T> = D extends { type: T } ? D : never;
 
 interface PouchDBWrapperOptions {
   adapter?: "idb" | "leveldb" | "http";
@@ -96,7 +97,7 @@ interface PouchDBWrapperOptions {
   compareEqualityOnPut?: boolean;
   maps?: {
     id: string;
-    map: (doc: GetDocument<AllDocuments, AllDocuments["type"]>) => void;
+    map: (doc: DesignDocument) => void;
   }[];
 }
 
@@ -104,7 +105,7 @@ interface PouchDBWrapperOptions {
  * PouchDBWrapper - A simple class wrapper for PouchDB.
  */
 class PouchDBWrapper {
-  private db: PouchDB.Database<GetDocument<AllDocuments, AllDocuments["type"]>>;
+  private db: PouchDB.Database<AllDocuments>;
   private defaults = {
     adapter: "idb",
     autoCompact: true,
@@ -149,41 +150,34 @@ class PouchDBWrapper {
   }
 
   public createDoc<T extends AllDocuments["type"]>(
+    type: T,
     _id: string,
-    doc: PutDocument<AllDocuments, T>
+    doc: PutDocument<T>
   ) {
-    const re = pathToRegexp("/:typeid/:name/:thread?/:post?")
-      .exec(_id)
-      ?.slice(-1);
-
     return {
+      ...doc,
       _id,
+      type,
       key: pathToRegexp("/:typeid/:name/:thread?/:post?")
-        .exec(_id)
-        ?.slice(-1)[0] as string,
+        .exec(_id)!
+        .slice(-1)[0],
       timestamp: Date.now(),
       lastModified: Date.now(),
-      stats: {},
-      ...doc,
     };
   }
 
-  public async put<T extends AllDocuments["type"]>(
-    _id: string,
-    doc: PutDocument<AllDocuments, T>
-  ) {
+  public async put(_id: string, doc: AllDocuments) {
     try {
-      const oldDoc = await this.db.get(_id);
-      const newDoc = { ...oldDoc, ...doc };
+      await this.db.put({
+        ...(await this.db.get(_id)),
+        ...doc,
+        lastModified: Date.now(),
+      });
+    } catch (err: any) {
+      if (err.status === 404)
+        return this.db.put(this.createDoc(doc.type, _id, doc));
 
-      if (this.options.compareEqualityOnPut && this.isEqual(oldDoc, newDoc))
-        return;
-
-      this.db.put({ ...newDoc, lastModified: Date.now() });
-    } catch (err) {
-      if ((err as any).status === 404) {
-        this.db.put(this.createDoc<T>(_id, doc));
-      } else if ((err as any).status === 409) {
+      if ((err as any).status === 409) {
       }
       console.log(err, this.get.name);
     }
@@ -197,9 +191,9 @@ class PouchDBWrapper {
     }
   }
 
-  public async get<T extends AllDocuments["type"]>(
+  public async get<D extends AllDocuments>(
     _id: string
-  ): Promise<GetDocument<AllDocuments, T> | undefined> {
+  ): Promise<D | undefined> {
     try {
       return await this.db.get(_id);
     } catch (err) {
@@ -229,10 +223,7 @@ class PouchDBWrapper {
     }
   }
 
-  public async addMap(
-    _id: string,
-    map: (doc: GetDocument<AllDocuments, AllDocuments["type"]>) => void
-  ) {
+  public async addMap(_id: string, map: (doc: DesignDocument) => void) {
     this.put(`_design/${_id}-index`, {
       type: "design",
       views: {

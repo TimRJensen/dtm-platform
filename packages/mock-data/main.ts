@@ -6,7 +6,14 @@ import faker from "faker";
 /**
  * Custom imports.
  */
-import { PouchDB, GetDocument, AllDocuments } from "db";
+import {
+  BaseDocument,
+  BlogDocument,
+  PostDocument,
+  PouchDB,
+  ThreadDocument,
+  UserDocument,
+} from "db";
 
 /**
  * randomNumber - Generates a random (int) number within user specified confines.
@@ -101,7 +108,7 @@ export const mockData = async function mockData(
     ...userOptions,
   };
   const blogs = [];
-  const users: GetDocument<AllDocuments, "user">[] = [];
+  const users: UserDocument[] = [];
 
   for (let i = 0; i < options.numberOfUsers; i++) {
     const email = faker.internet.email();
@@ -146,7 +153,7 @@ export const mockData = async function mockData(
       month: { min: 0, max: 11 },
       date: { min: 0, max: 31 },
     });
-    const blog: GetDocument<AllDocuments, "blog"> = {
+    const blog: BlogDocument = {
       type: "blog",
       _id: `/blogs/blog-${i}`,
       key: `blog-${i}`,
@@ -177,7 +184,7 @@ export const mockData = async function mockData(
           month: { min: 0, max: 11 },
           date: { min: 0, max: 31 },
         });
-        const post: GetDocument<AllDocuments, "post"> = {
+        const post: PostDocument = {
           type: "post",
           _id: `${_id}/post`,
           key: "post",
@@ -189,7 +196,7 @@ export const mockData = async function mockData(
           timestamp,
           lastModified,
         };
-        const thread: GetDocument<AllDocuments, "thread"> = {
+        const thread: ThreadDocument = {
           type: "thread",
           _id,
           key: `thread-${i}`,

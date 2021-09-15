@@ -1,14 +1,15 @@
 /**
  * Vendor imports.
  */
-import { MouseEvent, useContext } from "react";
+import { useState, useContext } from "react";
 import { Editor, EditorState } from "draft-js";
 
 /**
  * Custom imports.
  */
-import { GetDocument, AllDocuments } from "db";
-import { AppStateContext } from "../../AppState/context";
+import { PostDocument } from "db";
+import { AppStateContext } from "../App/app-state/context";
+import { useShowEditor } from "../App/hooks/main";
 import { FontIcon } from "../FontIcon/FontIcon";
 import "./Post.scss";
 
@@ -27,14 +28,15 @@ function formatDate(value: number) {
  * Post functional component.
  */
 interface Props {
-  doc: GetDocument<AllDocuments, "post">;
-  showEditor?: (flag: boolean) => void;
+  doc: PostDocument;
+  onClick?: (flag: boolean) => void;
 }
 
-export const Post = function Post({ doc, showEditor }: Props) {
+export const Post = function Post({ doc, onClick }: Props) {
   if (!doc) return null;
 
   const { state, dispatch } = useContext(AppStateContext);
+  const { showEditor, handleClick } = useShowEditor(onClick);
   const { content, creator, timestamp } = doc;
 
   const handleUpvote = async () => {
@@ -43,17 +45,6 @@ export const Post = function Post({ doc, showEditor }: Props) {
 
   const handleDownvote = () => {
     console.log("Nay!");
-  };
-
-  const handleClick = () => {
-    if (state.showEditor) {
-      state.showEditor(false);
-    }
-
-    if (showEditor) {
-      showEditor(true);
-      dispatch({ type: "showEditor", value: showEditor });
-    }
   };
 
   return (
@@ -70,16 +61,14 @@ export const Post = function Post({ doc, showEditor }: Props) {
         <div className="content">{content}</div>
         <div className="divider" />
         <div className="footer">
-          <span className="controls">
-            <a className="link" onClick={handleClick}>
-              kommenter
-            </a>
-            <span> - </span>
-            <a>rediger</a>
-          </span>
+          <a className="link" onClick={handleClick}>
+            comment
+          </a>
+          <span className="footer divider">{" - "} </span>
+          <a>edit</a>
           <div className="info">
-            <span className="timestamp">{formatDate(timestamp) + " af "}</span>
-            <span className="user">{creator.name}</span>
+            {`${formatDate(doc.timestamp)} by `}
+            <span className="user">{doc.creator.name}</span>
           </div>
         </div>
       </div>

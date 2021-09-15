@@ -7,9 +7,9 @@ import { useParams } from "react-router-dom";
 /**
  * Custom import.
  */
-import { PouchDBContext } from "db";
+import { BlogDocument, PouchDBContext } from "db";
 import { Thread } from "../Thread/Thread";
-import { AppStateContext } from "../../AppState/context";
+import { AppStateContext } from "../App/app-state/context";
 
 /**
  * Blog functonal component.
@@ -20,7 +20,7 @@ export const Blog = function Blog() {
   const { blogId } = useParams<{ blogId: string }>();
 
   const fetch = async () => {
-    const response = await db.get<"blog">(`/blogs/${blogId}`);
+    const response = await db.get<BlogDocument>(`/blogs/${blogId}`);
 
     if (response) dispatch({ type: "setCurrentBlog", value: response });
   };

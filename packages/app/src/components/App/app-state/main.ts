@@ -5,25 +5,25 @@
 /**
  * Custom imports.
  */
-import { AllDocuments, GetDocument } from "db";
+import { UserDocument, BlogDocument } from "db";
 
 /**
  * Types.
  */
 export interface AppState {
-  user?: GetDocument<AllDocuments, "user">;
-  currentBlog?: GetDocument<AllDocuments, "blog">;
+  user?: UserDocument;
+  currentBlog?: BlogDocument;
   showEditor?: (flag: boolean) => void;
 }
 
 export type Actions =
   | {
       type: "setUser";
-      value: GetDocument<AllDocuments, "user"> | undefined;
+      value: UserDocument | undefined;
     }
   | {
       type: "setCurrentBlog";
-      value: GetDocument<AllDocuments, "blog"> | undefined;
+      value: BlogDocument | undefined;
     }
   | {
       type: "showEditor";

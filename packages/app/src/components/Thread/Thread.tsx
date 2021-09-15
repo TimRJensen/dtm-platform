@@ -6,18 +6,18 @@ import { useContext, useEffect, useState } from "react";
 /**
  * Custom imports.
  */
-import { AllDocuments, GetDocument, PouchDBContext } from "db";
+import { BlogDocument, PouchDBContext, ThreadDocument } from "db";
+import { AppStateContext } from "../App/app-state/context";
 import { Post } from "../Post/Post";
 import { Comment } from "../Comment/Comment";
 import { CommentTexteditor } from "../CommentTexteditor/CommentTexteditor";
 import "./Thread.scss";
-import { AppStateContext } from "../../AppState/context";
 
 /**
  * Thread functional component.
  */
 interface Props {
-  doc: GetDocument<AllDocuments, "thread">;
+  doc: ThreadDocument;
 }
 
 export const Thread = function Thread({ doc }: Props) {
@@ -25,63 +25,46 @@ export const Thread = function Thread({ doc }: Props) {
 
   const db = useContext(PouchDBContext);
   const { state, dispatch } = useContext(AppStateContext);
-  const [showEditor, setShowEditor] = useState(state.showEditor !== undefined);
+  const [showEditor, setShowEditor] = useState(false);
 
   const handleSubmit = async (content?: string) => {
-    const blog = state.currentBlog;
-
-    if (!content || !blog) {
+    if (!content || !state.currentBlog || !state.user) {
       setShowEditor(false);
       return;
     }
 
     // Update the model.
-    const post = db.createDoc<"post">(
+    const post = db.createDoc(
+      "post",
       `${doc._id}/comment-${doc.stats.comments}`,
       {
         type: "post",
         content,
-        creator: db.createDoc<"user">("/users/john.doe@gmail.com", {
-          type: "user",
-          name: "John Doe",
-          email: "john.doe@gmail.com",
-          stats: {
-            infractions: 0,
-            upvotes: 0,
-            downvotes: 0,
-            comments: 0,
-            threads: 0,
-          },
-        }),
-        stats: {
-          infractions: 0,
-        },
+        creator: state.user,
+        stats: { infractions: 0 },
       }
     );
     doc.comments[post.key] = post;
     doc.stats.comments++;
 
     //Update the db.
-    await db.put(blog._id, blog);
+    await db.put(state.currentBlog._id, state.currentBlog);
 
     // Update the view.
     dispatch({
       type: "setCurrentBlog",
-      value: await db.get<"blog">(blog._id),
+      value: await db.get<BlogDocument>(state.currentBlog._id),
     });
     setShowEditor(false);
   };
 
   useEffect(() => {
-    console.log(state);
+    //console.log(state);
   });
 
   return (
     <section className="thread">
-      <Post
-        doc={doc.post}
-        showEditor={(flag: boolean) => setShowEditor(flag)}
-      />
+      <Post doc={doc.post} onClick={(flag: boolean) => setShowEditor(flag)} />
       {Object.values(doc.comments).map((comment) => {
         return <Comment key={comment._id} doc={comment} />;
       })}

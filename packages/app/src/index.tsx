@@ -6,8 +6,8 @@ import { render } from "react-dom";
 /**
  * Custom imports.
  */
+import { PouchDB } from "db";
 import { App } from "./components/App/App";
-import { PouchDB, GetDocument, AllDocuments } from "db";
 
 /**
  * App initialization.
@@ -18,7 +18,7 @@ const db = new PouchDB({
     /* example:
     {
       id: "find-upvotes",
-      map: (doc: GetDocument<AllDocuments>) => {
+      map: (doc: DesignDocument) => {
         if (doc.type === "blog")
           for (let thread of doc.threads)
             if (thread.stats.upvotes > 0) emit(thread);

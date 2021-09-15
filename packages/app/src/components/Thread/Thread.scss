@@ -4,10 +4,9 @@ $prefix: thread;
   display: flex;
   flex-flow: column;
   align-items: center;
-  min-width: 65vw;
 
   .#{$prefix}-divider {
-    min-width: 65vw;
+    min-width: 45vw;
     margin: {
       top: 2rem;
       bottom: 2rem;
