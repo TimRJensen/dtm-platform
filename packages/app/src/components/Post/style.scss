@@ -1,0 +1,45 @@
+@use "../../themes/base";
+$prefix: post;
+
+.#{$prefix} {
+  @include base.comment($prefix, 45vw);
+
+  .#{$prefix}-header {
+    border: {
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 1px  solid #7B93AB;
+    }; 
+
+    .#{$prefix}-header-divider {
+      margin: {
+        left: 0.33vw;
+        right: 0.33vw;
+      }
+    }
+  }
+
+  .#{$prefix}-body {
+    display: flex;
+    padding-right: 2vw;
+
+    .#{$prefix}-panel {
+      width: 2vw;
+      padding-left: 0.33vw;
+
+      .font-icon {
+        color: #7b93ab;
+
+        &:hover, &.active {
+          color: black;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .#{$prefix}-text-editor {
+      @include base.text-editor("#{$prefix}-text-editor", auto, auto);
+    }
+  }
+}

@@ -1,0 +1,25 @@
+@use "../../themes/base";
+$prefix: "thread";
+
+.#{$prefix} {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  margin-bottom: 4 * base.$default-spacing;
+
+  .#{$prefix}-body {
+    width: 45vw;
+    border: 1px solid #7b93ab;
+    border-radius: 00.33rem;
+
+    .#{$prefix}-text-editor {
+      @include base.text-editor("#{$prefix}-text-editor", auto, 15vh);
+      padding-left: 3vw;
+      padding-right: 2vw;
+
+      .#{$prefix}-text-editor-input {
+        border: 1px solid #7b93ab;
+      }
+    }
+  }
+}

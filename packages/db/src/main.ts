@@ -46,6 +46,17 @@ export interface PostDocument extends BaseDocument {
   type: "post";
   creator: UserDocument;
   content: string;
+  upvotes: Map<string, boolean>;
+  downvotes: Map<string, boolean>;
+  stats: {
+    infractions: number;
+  };
+}
+
+export interface CommentDocument extends BaseDocument {
+  type: "comment";
+  creator: UserDocument;
+  content: string;
   stats: {
     infractions: number;
   };
@@ -55,21 +66,15 @@ export interface ThreadDocument extends BaseDocument {
   type: "thread";
   creator: UserDocument;
   post: PostDocument;
-  comments: {
-    [key: string]: PostDocument;
-  };
+  comments: Map<string, CommentDocument>;
   stats: {
     comments: number;
-    upvotes: number;
-    downvotes: number;
   };
 }
 
 export interface BlogDocument extends BaseDocument {
   type: "blog";
-  threads: {
-    [key: string]: ThreadDocument;
-  };
+  threads: Map<string, ThreadDocument>;
   stats: {
     comments: number;
     threads: number;
@@ -82,10 +87,11 @@ export type AllDocuments =
   | PostDocument
   | ThreadDocument
   | BlogDocument
+  | CommentDocument
   | DesignDocument;
 
-type ExcludeKey<K> = K extends keyof BaseDocument ? never : K;
-type PutDocument<T, D = AllDocuments> = D extends {
+type ExcludeKey<K> = K extends keyof BaseDocument | "type" ? never : K;
+type PutDocument<T, D> = D extends {
   type: T;
 }
   ? { [K in ExcludeKey<keyof D>]: D[K] }
@@ -105,7 +111,7 @@ interface PouchDBWrapperOptions {
  * PouchDBWrapper - A simple class wrapper for PouchDB.
  */
 class PouchDBWrapper {
-  private db: PouchDB.Database<AllDocuments>;
+  private db: PouchDB.Database<AllDocuments & BaseDocument>;
   private defaults = {
     adapter: "idb",
     autoCompact: true,
@@ -124,36 +130,21 @@ class PouchDBWrapper {
     if (this.options.maps.length)
       for (let map of this.options.maps) this.addMap(map.id, map.map);
   }
-
-  private isEqual(a: any, b: any): boolean {
-    let result = true;
-
-    for (let key in a) {
-      if (typeof a[key] === "object" && typeof b[key] === "object")
-        if (a[key] === null) result = a[key] === b[key];
-        else if (Array.isArray(a[key])) {
-          let i = -1;
-
-          result = a[key].length === b[key].length;
-
-          while (++i < a[key].length && result)
-            result = this.isEqual(a[key][i], b[key][i]);
-        } else result = this.isEqual(a[key], b[key]);
-      else if (typeof a[key] === "function")
-        result = a[key].toString() === b[key].toString();
-      else result = a[key] === b[key];
-
-      if (!result) break;
-    }
-
-    return result;
-  }
-
   public createDoc<T extends AllDocuments["type"]>(
     type: T,
     _id: string,
-    doc: PutDocument<T>
+    doc: PutDocument<T, AllDocuments>
   ) {
+    if (type === "app-state" || type === "design")
+      return {
+        ...doc,
+        _id,
+        type,
+        timestamp: Date.now(),
+        lastModified: Date.now(),
+        key: "",
+      };
+
     return {
       ...doc,
       _id,
@@ -175,7 +166,7 @@ class PouchDBWrapper {
       });
     } catch (err: any) {
       if (err.status === 404)
-        return this.db.put(this.createDoc(doc.type, _id, doc));
+        return this.db.put(this.createDoc(doc.type, _id, doc) as any);
 
       if ((err as any).status === 409) {
       }

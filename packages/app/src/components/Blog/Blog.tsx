@@ -35,7 +35,7 @@ export const Blog = function Blog() {
 
   return (
     <div>
-      {Object.values(state.currentBlog.threads).map((thread, i) => {
+      {Array.from(state.currentBlog.threads.values()).map((thread, i) => {
         return <Thread key={thread._id} doc={thread} />;
       })}
     </div>

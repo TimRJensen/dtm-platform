@@ -1,0 +1,12 @@
+@use "../../themes/base";
+$prefix: comment;
+
+.#{$prefix} {
+  @include base.comment($prefix, 40vw);
+  padding-left: 3vw;
+  padding-right: 2vw;
+
+  .#{$prefix}-text-editor {
+    @include base.text-editor("#{$prefix}-text-editor", auto, auto);
+  }
+}

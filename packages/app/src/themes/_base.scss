@@ -1,76 +1,88 @@
+// https://paletton.com/#uid=13-0u0k2nTu00++0yZd5qKc9NxZ
 $default-spacing: 0.33rem;
 
-@mixin comment($width: 50vw) {
+@mixin comment($prefix, $width) {
   width: $width;
-  max-width: $width;
-  margin: {
-    top: $default-spacing * 3;
-    bottom: $default-spacing * 3;
-  }
 
-  .body {
-    .divider {
-      width: $width;
-      margin: $default-spacing;
-      border-top: #cccccc solid 1px;
+  .#{$prefix}-header {
+    display: flex;
+    padding: $default-spacing;
+    border-radius: 0.33rem 0.33rem 0 0;
+    background-color: #dae2ea;
+    border: 1px solid #7b93ab;
+    .#{$prefix}-header-link {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: default;
+        color: #7b93ab;
+      }
     }
 
-    .footer {
-      display: flex;
+    .#{$prefix}-header-info {
+      flex-grow: 2;
+    }
+  }
 
-      .link {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-      }
-
-      .info {
-        flex-grow: 10;
-        text-align: right;
-      }
+  .#{$prefix}-body {
+    margin-bottom: $default-spacing * 2.5;
+    
+    .#{$prefix}-content {
+      padding: $default-spacing;
+      border-bottom: 1px solid #7b93ab;
     }
   }
 }
 
 @mixin button(
-  $width: 6vw,
+  $width: 4vw,
   $height: 2.5vh,
-  $background-color: #cccccc,
-  $color: white
+  $background-color: #dae2ea,
+  $color: black
 ) {
   width: $width;
   height: $height;
   margin: $default-spacing/2;
-  border: none;
+  border: 1px solid #7b93ab;
   border-radius: 0.33rem;
   background-color: $background-color;
   color: $color;
   cursor: pointer;
+
+  &:hover {
+    background-color: #7b93ab;
+  }
 }
 
-@mixin text-editor {
-  .body {
-    .input {
-      height: 15vh;
-      max-height: 15vh;
-      border: 1px solid #cccccc;
-      border-radius: 0.33rem;
+@mixin text-editor($name, $width, $height) {
+  .#{$name}-body {
+    margin-bottom: $default-spacing * 2.5;
+
+    .#{$name}-input {
+      width: $width;
+      height: $height;
+      padding: $default-spacing;
+      border-bottom: 1px solid #7b93ab;
       overflow: auto;
     }
 
-    .footer {
-      justify-content: flex-end;
+    .#{$name}-footer {
+      display: flex;
+      justify-content: right;
       padding-top: 0.33rem;
 
-      .button {
+      .#{$name}-footer-button {
         @include button();
 
         &.submit {
           background-color: #4caf50;
-        }
+          border: 1px solid #15781b;
 
-        &.cancel {
-          color: black;
+          &:hover {
+            background-color: #15781b;
+          }
         }
       }
     }

@@ -9,6 +9,7 @@ import faker from "faker";
 import {
   BaseDocument,
   BlogDocument,
+  CommentDocument,
   PostDocument,
   PouchDB,
   ThreadDocument,
@@ -157,7 +158,7 @@ export const mockData = async function mockData(
       type: "blog",
       _id: `/blogs/blog-${i}`,
       key: `blog-${i}`,
-      threads: {},
+      threads: new Map<string, ThreadDocument>(),
       stats: {
         threads: randomNumber(1, 5),
         comments: 0,
@@ -190,36 +191,51 @@ export const mockData = async function mockData(
           key: "post",
           creator: user,
           content: faker.lorem.sentences(randomNumber(3, 15)),
+          upvotes: new Map(),
+          downvotes: new Map(),
           stats: {
             infractions: 0,
           },
           timestamp,
           lastModified,
         };
+
+        for (let i = 0; i < 25; i++) {
+          if (Math.random() < 0.1)
+            post.upvotes.set(
+              users[randomNumber(0, options.numberOfUsers)].email,
+              true
+            );
+        }
+
+        for (let i = 0; i < 25; i++) {
+          if (Math.random() < 0.05)
+            post.upvotes.set(
+              users[randomNumber(0, options.numberOfUsers)].email,
+              true
+            );
+        }
+
         const thread: ThreadDocument = {
           type: "thread",
           _id,
           key: `thread-${i}`,
           creator: user,
           post,
-          comments: {},
+          comments: new Map<string, CommentDocument>(),
           stats: {
             comments: randomNumber(1, 7),
-            upvotes: Math.random() < 0.15 ? randomNumber(0, 20) : 0,
-            downvotes: Math.random() < 0.07 ? randomNumber(0, 5) : 0,
           },
           timestamp: post.timestamp,
           lastModified: post.lastModified,
         };
 
-        if (thread.stats.comments)
+        if (thread.stats.comments) {
+          let lastTimestamp = thread.timestamp;
+
           for (let i = 0; i < thread.stats.comments; i++) {
             const timestamp = generateDate({
-              target: new Date(
-                thread.comments.length
-                  ? thread.comments[i - 1].timestamp
-                  : thread.timestamp
-              ),
+              target: new Date(lastTimestamp),
               past: false,
               year: { min: 0, max: 2 },
               month: { min: 0, max: 11 },
@@ -232,8 +248,8 @@ export const mockData = async function mockData(
               month: { min: 0, max: 11 },
               date: { min: 0, max: 31 },
             });
-            const comment = {
-              type: "post",
+            const comment: CommentDocument = {
+              type: "comment",
               _id: `${thread._id}/comment-${i}`,
               key: `comment-${i}`,
               timestamp,
@@ -244,10 +260,12 @@ export const mockData = async function mockData(
                 infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
               },
             };
-            // @ts-ignore
-            thread.comments[comment.key] = comment;
+
+            thread.comments.set(comment.key, comment);
+            lastTimestamp = comment.timestamp;
           }
-        blog.threads[thread.key] = thread;
+        }
+        blog.threads.set(thread._id, thread);
       }
     blogs.push(blog);
   }

@@ -22,7 +22,6 @@ interface Props {
 export const App = function ({ db }: Props) {
   const [state, dispatch] = useReducer<Reducer<AppState, Actions>>(reducer, {
     user: db.createDoc("user", "/users/john.doe@gmail.com", {
-      type: "user",
       name: "Arthur Fonzarelli",
       email: "the_fonz@gmail.com",
       stats: {

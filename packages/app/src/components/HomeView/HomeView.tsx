@@ -40,18 +40,19 @@ export const HomeView = function HomeView() {
       return o;
     });
     arr[1].b = 15;
-    console.log(obj, arr);
   };
 
   return (
     <div>
       <div>Home</div>
-      {blogs.map((blog, i) => (
-        <Fragment key={`blog-${i}`}>
-          <Link to={`/blogs/blog-${i}`}>{"Blog " + i}</Link>
-          <br></br>
-        </Fragment>
-      ))}
+      {blogs.map((blog, i) => {
+        return (
+          <Fragment key={`blog-${i}`}>
+            <Link to={`/blogs/blog-${i}`}>{"Blog " + i}</Link>
+            <br></br>
+          </Fragment>
+        );
+      })}
       <button onClick={handleClick}>Run Test</button>
     </div>
   );

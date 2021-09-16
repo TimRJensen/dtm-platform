@@ -1,16 +1,16 @@
 /**
  * Vendor imports.
  */
-import { useContext, useState, MouseEvent } from "react";
+import { useContext } from "react";
 
 /**
  * Custom imports.
  */
-import { BlogDocument, PostDocument, PouchDBContext } from "db";
+import { CommentDocument, PostDocument } from "db";
 import { AppStateContext } from "../App/app-state/context";
-import { useShowEditor } from "../App/hooks/main";
+import { useEditor } from "../App/hooks/main";
 import { CommentTexteditor } from "../CommentTexteditor/CommentTexteditor";
-import "./Comment.scss";
+import "./style.scss";
 
 /**
  * Helpers.
@@ -27,59 +27,42 @@ function formatDate(value: number) {
  * Comment functional component.
  */
 interface Props {
-  doc: PostDocument;
+  doc: CommentDocument;
 }
 
 export const Comment = function Comment({ doc }: Props) {
   if (!doc) return null;
 
-  const { state, dispatch } = useContext(AppStateContext);
-  const db = useContext(PouchDBContext);
-  const { showEditor, handleClick } = useShowEditor();
-
-  const handleSubmit = async (content?: string) => {
-    if (!content || !state.currentBlog) {
-      showEditor(false);
-      return;
-    }
-
-    // Update/mutate the model.
-    doc.content = content;
-
-    //Update the db.
-    await db.put(state.currentBlog._id, state.currentBlog);
-
-    // Update the view.
-    dispatch({
-      type: "setCurrentBlog",
-      value: await db.get<BlogDocument>(state.currentBlog._id),
-    });
-    showEditor(false);
-  };
+  const { state } = useContext(AppStateContext);
+  const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
 
   return (
-    <section className="comment container">
-      <div className="body">
-        {showEditor() ? (
-          <CommentTexteditor content={doc.content} onSubmit={handleSubmit} />
-        ) : (
-          <div className="content">{doc.content}</div>
-        )}
-        <div className="divider" />
-        <div className="footer">
-          {doc.creator.email === state.user?.email ? (
-            <a className="link" onClick={handleClick}>
-              edit
-            </a>
-          ) : (
-            <span>edit</span>
-          )}
-          <div className="info">
-            {`${formatDate(doc.timestamp)} by `}
-            <span className="user">{doc.creator.name}</span>
-          </div>
+    <section className="comment">
+      <div className="comment-header">
+        <div className="comment-header-info">
+          {`${formatDate(doc.timestamp)} by `}
+          <span className="comment-header-user">{doc.creator.name}</span>
         </div>
+        {doc.creator.email === state.user?.email ? (
+          <a className="comment-header-link" onClick={handleShowEditor}>
+            edit
+          </a>
+        ) : (
+          <a className="comment-header-link disabled">edit</a>
+        )}
       </div>
+      {showEditor() ? (
+        <CommentTexteditor
+          content={doc.content}
+          onSubmit={handleSubmit}
+          className="comment-text-editor"
+        />
+      ) : (
+        <div className="comment-body">
+          <div className="comment-content">{doc.content}</div>
+          <div className="comment-divider" />
+        </div>
+      )}
     </section>
   );
 };
