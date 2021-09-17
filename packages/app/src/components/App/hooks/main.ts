@@ -82,3 +82,33 @@ export const useEditor = function useSubmit(
     },
   };
 };
+
+export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
+  const db = useContext(PouchDBContext);
+  const { state, dispatch } = useContext(AppStateContext);
+  const [isUpvoted, setIsUpvoted] = useState(
+    state.user ? doc.upvotes.get(state.user?.email) : false
+  );
+
+  return {
+    isUpvoted,
+    handleUpvote: async () => {
+      if (!state.user || !state.currentBlog) return;
+
+      if (isUpvoted) {
+        doc.upvotes.delete(state.user?.email);
+        setIsUpvoted(false);
+      } else {
+        doc.upvotes.set(state.user?.email, true);
+        setIsUpvoted(true);
+      }
+
+      await db.put(state.currentBlog._id, state.currentBlog);
+
+      dispatch({
+        type: "setCurrentBlog",
+        value: await db.get<BlogDocument>(state.currentBlog._id),
+      });
+    },
+  };
+};

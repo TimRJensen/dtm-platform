@@ -1,0 +1,34 @@
+@use "../../themes/base";
+$prefix: "text-editor";
+
+.#{$prefix} {
+  margin-bottom: base.$default-spacing * 2.5;
+
+  &--body {
+    .input {
+      padding: base.$default-spacing;
+      border-bottom: 1px solid #7b93ab;
+      overflow: auto;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: right;
+      padding-top: base.$default-spacing;
+
+      .button {
+        @include base.button(60px, 20px);
+
+        &.submit {
+          background-color: #4caf50;
+          border: 1px solid #15781b;
+
+          &:hover {
+            background-color: #15781b;
+          }
+        }
+      }
+    }
+  }
+
+}

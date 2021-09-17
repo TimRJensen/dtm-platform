@@ -1,45 +1,10 @@
 // https://paletton.com/#uid=13-0u0k2nTu00++0yZd5qKc9NxZ
 $default-spacing: 0.33rem;
 
-@mixin comment($prefix, $width) {
-  width: $width;
-
-  .#{$prefix}-header {
-    display: flex;
-    padding: $default-spacing;
-    border-radius: 0.33rem 0.33rem 0 0;
-    background-color: #dae2ea;
-    border: 1px solid #7b93ab;
-    .#{$prefix}-header-link {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-
-      &.disabled {
-        cursor: default;
-        color: #7b93ab;
-      }
-    }
-
-    .#{$prefix}-header-info {
-      flex-grow: 2;
-    }
-  }
-
-  .#{$prefix}-body {
-    margin-bottom: $default-spacing * 2.5;
-    
-    .#{$prefix}-content {
-      padding: $default-spacing;
-      border-bottom: 1px solid #7b93ab;
-    }
-  }
-}
-
 @mixin button(
   $width: 4vw,
   $height: 2.5vh,
-  $background-color: #dae2ea,
+  $background-color: #DAE2EA,
   $color: black
 ) {
   width: $width;
@@ -56,35 +21,3 @@ $default-spacing: 0.33rem;
   }
 }
 
-@mixin text-editor($name, $width, $height) {
-  .#{$name}-body {
-    margin-bottom: $default-spacing * 2.5;
-
-    .#{$name}-input {
-      width: $width;
-      height: $height;
-      padding: $default-spacing;
-      border-bottom: 1px solid #7b93ab;
-      overflow: auto;
-    }
-
-    .#{$name}-footer {
-      display: flex;
-      justify-content: right;
-      padding-top: 0.33rem;
-
-      .#{$name}-footer-button {
-        @include button();
-
-        &.submit {
-          background-color: #4caf50;
-          border: 1px solid #15781b;
-
-          &:hover {
-            background-color: #15781b;
-          }
-        }
-      }
-    }
-  }
-}

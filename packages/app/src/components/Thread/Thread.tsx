@@ -1,17 +1,17 @@
 /**
  * Vendor imports.
  */
-import { useContext, useEffect, useState } from "react";
+import { useEffect } from "react";
+import { createUseStyles } from "react-jss";
 
 /**
  * Custom imports.
  */
-import { BlogDocument, PouchDBContext, ThreadDocument } from "db";
-import { AppStateContext } from "../App/app-state/context";
+import { ThreadDocument } from "db";
 import { useEditor } from "../App/hooks/main";
 import { Post } from "../Post/Post";
 import { Comment } from "../Comment/Comment";
-import { CommentTexteditor } from "../CommentTexteditor/CommentTexteditor";
+import { TextEditor } from "../TextEditor/TextEditor";
 import "./style.scss";
 
 /**
@@ -32,15 +32,15 @@ export const Thread = function Thread({ doc }: Props) {
 
   return (
     <section className="thread">
-      <div className="thread-body">
+      <div className="thread--body">
         <Post doc={doc.post} onComment={handleShowEditor} />
         {Array.from(doc.comments.values()).map((comment) => {
           return <Comment key={comment._id} doc={comment} />;
         })}
-        <CommentTexteditor
+        <TextEditor
           onSubmit={handleSubmit}
           show={showEditor()}
-          className="thread-text-editor"
+          //className="thread-editor"
         />
       </div>
     </section>

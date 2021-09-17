@@ -11,9 +11,9 @@ import { UserDocument, BlogDocument } from "db";
  * Types.
  */
 export interface AppState {
-  user?: UserDocument;
-  currentBlog?: BlogDocument;
-  showEditor?: (flag: boolean) => void;
+  user: UserDocument | undefined;
+  currentBlog: BlogDocument | undefined;
+  showEditor: ((flag: boolean) => void) | undefined;
 }
 
 export type Actions =

@@ -2,11 +2,37 @@
 $prefix: comment;
 
 .#{$prefix} {
-  @include base.comment($prefix, 40vw);
-  padding-left: 3vw;
-  padding-right: 2vw;
+  width: 540px;
+  margin-bottom: base.$default-spacing * 2.5;
+  padding-left: 40px;
 
-  .#{$prefix}-text-editor {
-    @include base.text-editor("#{$prefix}-text-editor", auto, auto);
+  &--header {
+    display: flex;
+    padding: base.$default-spacing;
+    background-color: #DAE2EA;
+    border: 1px solid #7b93ab;
+    border-radius: 5px 5px 0 0;
+
+    .link {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: default;
+        color: #7b93ab;
+      }
+    }
+
+    .info {
+      flex-grow: 2;
+    }
+  }
+
+  &--body {
+    .content {
+      padding: base.$default-spacing;
+      border-bottom: 1px solid #7b93ab;
+    }
   }
 }

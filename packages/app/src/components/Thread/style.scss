@@ -7,18 +7,19 @@ $prefix: "thread";
   align-items: center;
   margin-bottom: 4 * base.$default-spacing;
 
-  .#{$prefix}-body {
-    width: 45vw;
+  &--body {
+    width: 600px;
     border: 1px solid #7b93ab;
-    border-radius: 00.33rem;
+    border-radius: 5px 5px 0 0;
 
-    .#{$prefix}-text-editor {
-      @include base.text-editor("#{$prefix}-text-editor", auto, 15vh);
-      padding-left: 3vw;
-      padding-right: 2vw;
+    > .text-editor {
+      width: 540px;
+      padding-left: 40px;
 
-      .#{$prefix}-text-editor-input {
+      .input {
+        height: 100px;
         border: 1px solid #7b93ab;
+        border-radius: 5px;
       }
     }
   }

@@ -1,18 +1,33 @@
 @use "../../themes/base";
-$prefix: post;
+$prefix: "post";
 
 .#{$prefix} {
-  @include base.comment($prefix, 45vw);
+  //width: $width;
+  margin-bottom: base.$default-spacing * 2.5;
 
-  .#{$prefix}-header {
-    border: {
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 1px  solid #7B93AB;
-    }; 
+  &--header {
+    display: flex;
+    padding: base.$default-spacing;
+    background-color: #DAE2EA;
+    border-bottom: 1px  solid #7B93AB;
+    border-radius: 5px 5px 0 0;
 
-    .#{$prefix}-header-divider {
+    .link {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: default;
+        color: #7b93ab;
+      }
+    }
+
+    .info {
+      flex-grow: 2;
+    }
+
+    .divider {
       margin: {
         left: 0.33vw;
         right: 0.33vw;
@@ -20,26 +35,14 @@ $prefix: post;
     }
   }
 
-  .#{$prefix}-body {
+  &--body {
     display: flex;
-    padding-right: 2vw;
+    padding-right: 20px;
 
-    .#{$prefix}-panel {
-      width: 2vw;
-      padding-left: 0.33vw;
-
-      .font-icon {
-        color: #7b93ab;
-
-        &:hover, &.active {
-          color: black;
-          cursor: pointer;
-        }
-      }
-    }
-
-    .#{$prefix}-text-editor {
-      @include base.text-editor("#{$prefix}-text-editor", auto, auto);
+    .content {
+      width: 560px;
+      padding: base.$default-spacing;
+      border-bottom: 1px solid #7b93ab;
     }
   }
 }

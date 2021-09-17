@@ -9,7 +9,7 @@ import { useContext } from "react";
 import { CommentDocument, PostDocument } from "db";
 import { AppStateContext } from "../App/app-state/context";
 import { useEditor } from "../App/hooks/main";
-import { CommentTexteditor } from "../CommentTexteditor/CommentTexteditor";
+import { TextEditor } from "../TextEditor/TextEditor";
 import "./style.scss";
 
 /**
@@ -38,29 +38,29 @@ export const Comment = function Comment({ doc }: Props) {
 
   return (
     <section className="comment">
-      <div className="comment-header">
-        <div className="comment-header-info">
+      <div className="comment--header">
+        <div className="info">
           {`${formatDate(doc.timestamp)} by `}
-          <span className="comment-header-user">{doc.creator.name}</span>
+          <span className="user">{doc.creator.name}</span>
         </div>
         {doc.creator.email === state.user?.email ? (
-          <a className="comment-header-link" onClick={handleShowEditor}>
+          <a className="link" onClick={handleShowEditor}>
             edit
           </a>
         ) : (
-          <a className="comment-header-link disabled">edit</a>
+          <a className="link disabled">edit</a>
         )}
       </div>
       {showEditor() ? (
-        <CommentTexteditor
+        <TextEditor
           content={doc.content}
           onSubmit={handleSubmit}
-          className="comment-text-editor"
+          //className="editor"
         />
       ) : (
-        <div className="comment-body">
-          <div className="comment-content">{doc.content}</div>
-          <div className="comment-divider" />
+        <div className="comment--body">
+          <div className="content">{doc.content}</div>
+          <div className="divider" />
         </div>
       )}
     </section>
