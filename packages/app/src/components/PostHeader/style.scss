@@ -1,0 +1,31 @@
+@use "../../themes/theme" ;
+
+.post-header {
+  display: flex;
+  padding: theme.$spacing;
+  background-color: theme.colors("primary");
+  border-bottom: 1px solid theme.colors("secondary");
+  border-radius: 5px 5px 0 0;
+
+  .link {
+    color: theme.colors("text", "primary");
+    text-decoration: none;
+    cursor: pointer;
+
+    &.disabled {
+      cursor: default;
+      color: theme.colors("text", "secondary");
+    }
+  }
+
+  .info {
+    flex-grow: 2;
+  }
+
+  .divider {
+    margin: {
+      left: theme.$spacing;
+      right: theme.$spacing;
+    }
+  }
+}

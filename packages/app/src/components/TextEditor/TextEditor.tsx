@@ -43,7 +43,7 @@ export const TextEditor = function TextEditor({
 
   return (
     <section className={className}>
-      <div className={`${className}--body`}>
+      <div className={`${className}-body`}>
         <div className="input" onClick={() => editorRef.current?.focus()}>
           <Editor
             editorState={editorState}

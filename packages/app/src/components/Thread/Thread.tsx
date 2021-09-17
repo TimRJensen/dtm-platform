@@ -32,7 +32,7 @@ export const Thread = function Thread({ doc }: Props) {
 
   return (
     <section className="thread">
-      <div className="thread--body">
+      <div className="thread-body">
         <Post doc={doc.post} onComment={handleShowEditor} />
         {Array.from(doc.comments.values()).map((comment) => {
           return <Comment key={comment._id} doc={comment} />;

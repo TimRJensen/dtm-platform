@@ -1,16 +1,15 @@
-// https://paletton.com/#uid=13-0u0k2nTu00++0yZd5qKc9NxZ
-$default-spacing: 0.33rem;
+@use "./theme";
 
 @mixin button(
   $width: 4vw,
   $height: 2.5vh,
-  $background-color: #DAE2EA,
-  $color: black
+  $color: theme.colors("text", "primary"),
+  $background-color: theme.colors("button", "default"),
+  $border-color: theme.colors("button", "default-border")
 ) {
   width: $width;
   height: $height;
-  margin: $default-spacing/2;
-  border: 1px solid #7b93ab;
+  border: 1px solid $border-color;
   border-radius: 0.33rem;
   background-color: $background-color;
   color: $color;
@@ -20,4 +19,3 @@ $default-spacing: 0.33rem;
     background-color: #7b93ab;
   }
 }
-

@@ -1,0 +1,24 @@
+@use "../../themes/theme";
+
+.comment-header {
+  display: flex;
+  padding: theme.$spacing;
+  background-color: theme.colors("primary");
+  border: 1px solid theme.colors("secondary");
+  border-radius: 5px 5px 0 0;
+
+  .link {
+    color: theme.colors("text", "primary");
+    text-decoration: none;
+    cursor: pointer;
+
+    &.disabled {
+      cursor: default;
+      color: theme.colors("text", "secondary");
+    }
+  }
+
+  .info {
+    flex-grow: 2;
+  }
+}

@@ -5,28 +5,33 @@
 /**
  * Custom imports.
  */
-import { UserDocument, BlogDocument } from "db";
+import { UserDocument, BlogDocument, PostDocument, CommentDocument } from "db";
 
 /**
  * Types.
  */
 export interface AppState {
-  user: UserDocument | undefined;
+  currentUser: UserDocument | undefined;
   currentBlog: BlogDocument | undefined;
+  currentQuery: (PostDocument | CommentDocument)[] | undefined;
   showEditor: ((flag: boolean) => void) | undefined;
 }
 
 export type Actions =
   | {
-      type: "setUser";
+      type: "CURRENT_USER";
       value: UserDocument | undefined;
     }
   | {
-      type: "setCurrentBlog";
+      type: "CURRENT_BLOG";
       value: BlogDocument | undefined;
     }
   | {
-      type: "showEditor";
+      type: "CURRENT_QUERY";
+      value: (PostDocument | CommentDocument)[] | undefined;
+    }
+  | {
+      type: "SHOW_EDITOR";
       value: ((flag: boolean) => void) | undefined;
     };
 
@@ -35,9 +40,13 @@ export type Actions =
  */
 export const reducer = function reducer(state: AppState, action: Actions) {
   switch (action.type) {
-    case "setCurrentBlog":
+    case "CURRENT_BLOG":
       return { ...state, currentBlog: action.value };
-    case "showEditor":
+    case "CURRENT_USER":
+      return { ...state, currentUser: action.value };
+    case "CURRENT_QUERY":
+      return { ...state, currentQuery: action.value };
+    case "SHOW_EDITOR":
       return { ...state, showEditor: action.value };
     default:
       throw new Error();

@@ -22,13 +22,13 @@ export const Blog = function Blog() {
   const fetch = async () => {
     const response = await db.get<BlogDocument>(`/blogs/${blogId}`);
 
-    if (response) dispatch({ type: "setCurrentBlog", value: response });
+    if (response) dispatch({ type: "CURRENT_BLOG", value: response });
   };
 
   useEffect(() => {
     if (!state.currentBlog) fetch();
 
-    return () => dispatch({ type: "setCurrentBlog", value: undefined });
+    return () => dispatch({ type: "CURRENT_BLOG", value: undefined });
   }, []);
 
   if (!state.currentBlog) return null;

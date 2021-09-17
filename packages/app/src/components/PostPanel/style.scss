@@ -1,20 +1,20 @@
-@use "../../themes/base";
-$prefix: "panel";
+@use "../../themes/theme" ;
 
-.#{$prefix} {
+.post-panel {
   width: 20px;
-  padding-left: base.$default-spacing;
+  padding-left: theme.$spacing;
 
   .font-icon {
-    color: #7b93ab;
+    color: theme.colors("secondary");
 
     &:hover, &.active {
-      color: black;
+      color: theme.colors("text", "primary");
       cursor: pointer;
     }
-  }
 
-  .font-icon.disabled {
-    color: #7b93ab;
+    &-disabled {
+      color: theme.colors("secondary");
+      cursor: default;
+    }
   }
 }

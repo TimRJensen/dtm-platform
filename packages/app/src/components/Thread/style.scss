@@ -1,15 +1,14 @@
-@use "../../themes/base";
-$prefix: "thread";
+@use "../../themes/theme" ;
 
-.#{$prefix} {
+.thread {
   display: flex;
   flex-flow: column;
   align-items: center;
-  margin-bottom: 4 * base.$default-spacing;
+  margin-bottom: 4 * theme.$spacing;
 
-  &--body {
+  &-body {
     width: 600px;
-    border: 1px solid #7b93ab;
+    border: 1px solid theme.colors("secondary");
     border-radius: 5px 5px 0 0;
 
     > .text-editor {
@@ -18,7 +17,7 @@ $prefix: "thread";
 
       .input {
         height: 100px;
-        border: 1px solid #7b93ab;
+        border: 1px solid theme.colors("secondary");
         border-radius: 5px;
       }
     }

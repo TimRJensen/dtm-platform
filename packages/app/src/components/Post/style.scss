@@ -1,48 +1,16 @@
-@use "../../themes/base";
-$prefix: "post";
+@use "../../themes/theme" ;
 
-.#{$prefix} {
-  //width: $width;
-  margin-bottom: base.$default-spacing * 2.5;
+.post {
+  margin-bottom: theme.$spacing * 2.5;
 
-  &--header {
-    display: flex;
-    padding: base.$default-spacing;
-    background-color: #DAE2EA;
-    border-bottom: 1px  solid #7B93AB;
-    border-radius: 5px 5px 0 0;
-
-    .link {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-
-      &.disabled {
-        cursor: default;
-        color: #7b93ab;
-      }
-    }
-
-    .info {
-      flex-grow: 2;
-    }
-
-    .divider {
-      margin: {
-        left: 0.33vw;
-        right: 0.33vw;
-      }
-    }
-  }
-
-  &--body {
+  &-body {
     display: flex;
     padding-right: 20px;
 
     .content {
       width: 560px;
-      padding: base.$default-spacing;
-      border-bottom: 1px solid #7b93ab;
+      padding: theme.$spacing;
+      border-bottom: 1px solid theme.colors("secondary");
     }
   }
 }

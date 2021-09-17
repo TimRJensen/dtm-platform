@@ -18,26 +18,23 @@ import "./style.scss";
  */
 interface Props {
   doc: PostDocument;
-  className?: string;
 }
 
-export const PostPanel = function PostPanel({ doc, className }: Props) {
+export const PostPanel = function PostPanel({ doc }: Props) {
   const { state } = useContext(AppStateContext);
   const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
 
-  className = className || "panel";
-
   return (
-    <div className={className}>
-      <IfThen condition={!state.user}>
+    <div className="post-panel">
+      <IfThen condition={!state.currentUser}>
         <Fragment>
-          <FontIcon className="font-icon disabled">expand_less</FontIcon>
-          <FontIcon className="font-icon disabled">expand_more</FontIcon>
+          <FontIcon className="font-icon-disabled">expand_less</FontIcon>
+          <FontIcon className="font-icon-disabled">expand_more</FontIcon>
         </Fragment>
         <Fragment>
           <FontIcon
             className={`font-icon ${isUpvoted ? "active" : ""}`}
-            onClick={state.user ? handleUpvote : () => null}
+            onClick={state.currentUser ? handleUpvote : () => null}
           >
             expand_less
           </FontIcon>

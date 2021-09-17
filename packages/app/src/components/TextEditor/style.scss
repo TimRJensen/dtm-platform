@@ -1,30 +1,32 @@
-@use "../../themes/base";
-$prefix: "text-editor";
+@use "sass:math";
+@use "../../themes/theme" ;
+@use "../../themes/mix-ins";
 
-.#{$prefix} {
-  margin-bottom: base.$default-spacing * 2.5;
+.text-editor {
+  margin-bottom: theme.$spacing * 2.5;
 
-  &--body {
+  &-body {
     .input {
-      padding: base.$default-spacing;
-      border-bottom: 1px solid #7b93ab;
+      margin-bottom: theme.$spacing;
+      padding: theme.$spacing;
+      border-bottom: 1px solid theme.colors("secondary");
       overflow: auto;
     }
 
     .footer {
       display: flex;
       justify-content: right;
-      padding-top: base.$default-spacing;
 
       .button {
-        @include base.button(60px, 20px);
+        @include mix-ins.button(60px, 20px);
+        margin-left: math.div(theme.$spacing, 2);
 
         &.submit {
-          background-color: #4caf50;
-          border: 1px solid #15781b;
+          background-color: theme.colors("button", "accept");
+          border: 1px solid theme.colors("button", "accept-border");
 
           &:hover {
-            background-color: #15781b;
+            background-color: theme.colors("button", "accept-hover");
           }
         }
       }
