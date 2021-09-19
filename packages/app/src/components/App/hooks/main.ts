@@ -62,16 +62,19 @@ export const useEditor = function useSubmit(
 
       // Update/mutate the model.
       if (doc.type === "thread") {
-        const post = db.createDoc(
+        const comment = db.createDoc(
           "comment",
           `${doc._id}/comment-${doc.stats.comments}`,
           {
             content,
-            creator: state.currentUser,
+            user: {
+              name: state.currentUser.name,
+              email: state.currentUser.email,
+            },
             stats: { infractions: 0 },
           }
         );
-        doc.comments.set(post.key, post);
+        doc.comments.set(comment.key, comment);
         doc.stats.comments++;
       } else doc.content = content;
 
@@ -145,6 +148,7 @@ export const useQuery = function useQuery() {
         "content",
         "comments",
         "creator",
+        "user",
         "name",
         "timestamp",
       ];
@@ -168,10 +172,14 @@ export const useQuery = function useQuery() {
         []
       );
 
-      console.log(result);
-      history.push("/query/" + queries.join("&"));
+      document.querySelector<HTMLInputElement>(".search-bar .input")?.blur();
       setQuery("");
-      dispatch({ type: "CURRENT_QUERY", value: result });
+      dispatch({
+        type: "CURRENT_QUERY",
+        value: { queries: queries, result: result },
+      });
+
+      history.push("/search/" + queries.join("&"));
     },
   };
 };

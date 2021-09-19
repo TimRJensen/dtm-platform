@@ -116,7 +116,7 @@ export const mockData = async function mockData(
 
     users.push({
       type: "user",
-      _id: `/users/${email}`,
+      _id: `/users/user=${email}`,
       key: email,
       name: faker.name.findName(),
       email,
@@ -156,7 +156,7 @@ export const mockData = async function mockData(
     });
     const blog: BlogDocument = {
       type: "blog",
-      _id: `/blogs/blog-${i}`,
+      _id: `/blogs/blog=${i}`,
       key: `blog-${i}`,
       threads: new Map<string, ThreadDocument>(),
       stats: {
@@ -169,7 +169,7 @@ export const mockData = async function mockData(
 
     if (blog.stats.threads)
       for (let i = 0; i < blog.stats.threads; i++) {
-        const _id = `${blog._id}/thread-${i}`;
+        const _id = `${blog._id}/thread=${i}`;
         const user = users[randomNumber(0, options.numberOfUsers - 1)];
         const timestamp = generateDate({
           target: new Date(blog.timestamp),
@@ -189,7 +189,10 @@ export const mockData = async function mockData(
           type: "post",
           _id: `${_id}/post`,
           key: "post",
-          creator: user,
+          user: {
+            name: user.name,
+            email: user.email,
+          },
           content: faker.lorem.sentences(randomNumber(3, 15)),
           upvotes: new Map(),
           downvotes: new Map(),
@@ -219,8 +222,8 @@ export const mockData = async function mockData(
         const thread: ThreadDocument = {
           type: "thread",
           _id,
-          key: `thread-${i}`,
-          creator: user,
+          key: `thread=${i}`,
+          user: user.name,
           post,
           comments: new Map<string, CommentDocument>(),
           stats: {
@@ -234,6 +237,7 @@ export const mockData = async function mockData(
           let lastTimestamp = thread.timestamp;
 
           for (let i = 0; i < thread.stats.comments; i++) {
+            const user = users[randomNumber(0, options.numberOfUsers)];
             const timestamp = generateDate({
               target: new Date(lastTimestamp),
               past: false,
@@ -250,11 +254,14 @@ export const mockData = async function mockData(
             });
             const comment: CommentDocument = {
               type: "comment",
-              _id: `${thread._id}/comment-${i}`,
-              key: `comment-${i}`,
+              _id: `${post._id}/comment=${i}`,
+              key: `comment=${i}`,
               timestamp,
               lastModified,
-              creator: users[randomNumber(0, options.numberOfUsers)],
+              user: {
+                name: user.name,
+                email: user.email,
+              },
               content: faker.lorem.sentences(randomNumber(3, 15)),
               stats: {
                 infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,

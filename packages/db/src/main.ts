@@ -10,21 +10,13 @@ import { pathToRegexp } from "path-to-regexp";
  */
 export interface BaseDocument {
   _id: string;
+  type: string;
   key: string;
   timestamp: number;
   lastModified: number;
 }
 
-interface DesignDocument {
-  type: "design";
-  views: {
-    [key: string]: {
-      map: string;
-    };
-  };
-}
-
-interface AppStateDocument {
+interface AppStateDocument extends BaseDocument {
   type: "app-state";
   isPopulated: boolean;
 }
@@ -42,9 +34,24 @@ export interface UserDocument extends BaseDocument {
   };
 }
 
+export interface CommentDocument extends BaseDocument {
+  type: "comment";
+  user: {
+    name: string;
+    email: string;
+  };
+  content: string;
+  stats: {
+    infractions: number;
+  };
+}
+
 export interface PostDocument extends BaseDocument {
   type: "post";
-  creator: UserDocument;
+  user: {
+    name: string;
+    email: string;
+  };
   content: string;
   upvotes: Map<string, boolean>;
   downvotes: Map<string, boolean>;
@@ -53,18 +60,9 @@ export interface PostDocument extends BaseDocument {
   };
 }
 
-export interface CommentDocument extends BaseDocument {
-  type: "comment";
-  creator: UserDocument;
-  content: string;
-  stats: {
-    infractions: number;
-  };
-}
-
 export interface ThreadDocument extends BaseDocument {
   type: "thread";
-  creator: UserDocument;
+  user: string;
   post: PostDocument;
   comments: Map<string, CommentDocument>;
   stats: {
@@ -87,8 +85,7 @@ export type AllDocuments =
   | PostDocument
   | ThreadDocument
   | BlogDocument
-  | CommentDocument
-  | DesignDocument;
+  | CommentDocument;
 
 type ExcludeKey<K> = K extends keyof BaseDocument | "type" ? never : K;
 type PutDocument<T, D> = D extends {
@@ -100,11 +97,6 @@ type PutDocument<T, D> = D extends {
 interface PouchDBWrapperOptions {
   adapter?: "idb" | "leveldb" | "http";
   autoCompact?: boolean;
-  compareEqualityOnPut?: boolean;
-  maps?: {
-    id: string;
-    map: (doc: DesignDocument) => void;
-  }[];
 }
 
 /**
@@ -115,8 +107,6 @@ class PouchDBWrapper {
   private defaults = {
     adapter: "idb",
     autoCompact: true,
-    compareEqualityOnPut: true,
-    maps: [],
   };
   private options;
 
@@ -126,23 +116,21 @@ class PouchDBWrapper {
       adapter: this.options.adapter,
       auto_compaction: this.options.autoCompact,
     });
-
-    if (this.options.maps.length)
-      for (let map of this.options.maps) this.addMap(map.id, map.map);
   }
+
   public createDoc<T extends AllDocuments["type"]>(
     type: T,
     _id: string,
     doc: PutDocument<T, AllDocuments>
   ) {
-    if (type === "app-state" || type === "design")
+    if (type === "app-state")
       return {
         ...doc,
         _id,
+        key: "",
         type,
         timestamp: Date.now(),
         lastModified: Date.now(),
-        key: "",
       };
 
     return {
@@ -166,7 +154,7 @@ class PouchDBWrapper {
       });
     } catch (err: any) {
       if (err.status === 404)
-        return this.db.put(this.createDoc(doc.type, _id, doc) as any);
+        return this.db.put(this.createDoc(doc.type, _id, doc) as AllDocuments);
 
       if ((err as any).status === 409) {
       }
@@ -189,7 +177,6 @@ class PouchDBWrapper {
       return await this.db.get(_id);
     } catch (err) {
       console.log(err, this.get.name);
-      return undefined;
     }
   }
 
@@ -211,28 +198,6 @@ class PouchDBWrapper {
       return this.db.find(selector);
     } catch (err) {
       console.log(err, this.find.name);
-    }
-  }
-
-  public async addMap(_id: string, map: (doc: DesignDocument) => void) {
-    this.put(`_design/${_id}-index`, {
-      type: "design",
-      views: {
-        [_id]: {
-          map: map.toString(),
-        },
-      },
-    });
-  }
-
-  public async query(_id: string) {
-    try {
-      const result = await this.db.query(`${_id}-index/${_id}`);
-
-      return result.rows.map((row) => row.key);
-    } catch (err) {
-      console.log(err, this.query.name);
-      return [];
     }
   }
 

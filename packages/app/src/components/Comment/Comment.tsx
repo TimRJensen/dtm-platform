@@ -1,13 +1,13 @@
 /**
  * Vendor imports.
  */
-import { useContext } from "react";
+import { useRef, useEffect } from "react";
+import { useRouteMatch } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { CommentDocument } from "db";
-import { AppStateContext } from "../App/app-state/context";
 import { useEditor } from "../App/hooks/main";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { CommentHeader } from "../CommentHeader/CommentHeader";
@@ -24,11 +24,22 @@ interface Props {
 export const Comment = function Comment({ doc }: Props) {
   if (!doc) return null;
 
-  const { state } = useContext(AppStateContext);
+  const match = useRouteMatch();
+  const domElement = useRef<HTMLSelectElement>(null);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
 
+  useEffect(() => {
+    console.log(match.url, doc._id);
+    if (match.url === doc._id && domElement.current) {
+      const rect = domElement.current?.getBoundingClientRect();
+
+      if (rect.top > window.scrollY)
+        window.scrollTo(0, rect.bottom - window.innerHeight / 2);
+    }
+  }, []);
+
   return (
-    <section className="comment">
+    <section className="comment" ref={domElement}>
       <CommentHeader doc={doc} handleEdit={handleShowEditor} />
       <IfThen condition={showEditor() === true}>
         <TextEditor content={doc.content} onSubmit={handleSubmit} />

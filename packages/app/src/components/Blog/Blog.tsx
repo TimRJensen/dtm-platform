@@ -14,10 +14,15 @@ import { AppStateContext } from "../App/app-state/context";
 /**
  * Blog functonal component.
  */
-export const Blog = function Blog() {
+interface Props {
+  blog: BlogDocument | undefined;
+}
+
+export const Blog = function Blog({ blog }: Props) {
   const db = useContext(PouchDBContext);
-  const { state, dispatch } = useContext(AppStateContext);
+  const { dispatch } = useContext(AppStateContext);
   const { blogId } = useParams<{ blogId: string }>();
+  const test: any = useParams();
 
   const fetch = async () => {
     const response = await db.get<BlogDocument>(`/blogs/${blogId}`);
@@ -26,16 +31,16 @@ export const Blog = function Blog() {
   };
 
   useEffect(() => {
-    if (!state.currentBlog) fetch();
+    if (!blog) fetch();
 
     return () => dispatch({ type: "CURRENT_BLOG", value: undefined });
   }, []);
 
-  if (!state.currentBlog) return null;
+  if (!blog) return null;
 
   return (
     <div>
-      {Array.from(state.currentBlog.threads.values()).map((thread, i) => {
+      {Array.from(blog.threads.values()).map((thread, i) => {
         return <Thread key={thread._id} doc={thread} />;
       })}
     </div>

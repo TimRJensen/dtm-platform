@@ -30,9 +30,9 @@ export const CommentHeader = function CommentHeader({
     <div className="comment-header">
       <div className="info">
         {`${formatDate(doc.timestamp)} by `}
-        <span className="user">{doc.creator.name}</span>
+        <span className="user">{doc.user.name}</span>
       </div>
-      <IfThen condition={doc.creator.email === state.currentUser?.email}>
+      <IfThen condition={doc.user.email === state.currentUser?.email}>
         <a className="link" onClick={handleEdit}>
           edit
         </a>

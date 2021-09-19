@@ -2,7 +2,6 @@
  * Vendor imports.
  */
 import { useEffect } from "react";
-import { createUseStyles } from "react-jss";
 
 /**
  * Custom imports.
@@ -37,11 +36,7 @@ export const Thread = function Thread({ doc }: Props) {
         {Array.from(doc.comments.values()).map((comment) => {
           return <Comment key={comment._id} doc={comment} />;
         })}
-        <TextEditor
-          onSubmit={handleSubmit}
-          show={showEditor()}
-          //className="thread-editor"
-        />
+        <TextEditor onSubmit={handleSubmit} show={showEditor()} />
       </div>
     </section>
   );

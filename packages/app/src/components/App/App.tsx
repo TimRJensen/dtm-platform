@@ -13,6 +13,7 @@ import { Blog } from "../Blog/Blog";
 import { HomeView } from "../HomeView/HomeView";
 import { NavBar } from "../NavBar/NavBar";
 import "./style.scss";
+import { SearchView } from "../SearchView/SearchView";
 
 /**
  * App functional component.
@@ -47,7 +48,19 @@ export const App = function ({ db }: Props) {
           <div style={{ marginTop: "40px" }}>
             <Switch>
               <Route exact path="/" component={HomeView} />
-              <Route exact path="/blogs/:blogId" component={Blog} />
+              <Route
+                exact
+                path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
+                render={() => {
+                  return <Blog blog={state.currentBlog} />;
+                }}
+              />
+              <Route
+                path="/search/"
+                render={() => {
+                  return <SearchView query={state.currentQuery} />;
+                }}
+              />
             </Switch>
           </div>
         </Router>

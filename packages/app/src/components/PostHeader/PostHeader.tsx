@@ -32,7 +32,7 @@ export const PostHeader = function PostHeader({
     <div className="post-header">
       <div className="info">
         {`${formatDate(doc.timestamp)} by `}
-        <span className="user">{doc.creator.name}</span>
+        <span className="user">{doc.user.name}</span>
       </div>
       <IfThen condition={!state.currentUser}>
         <Fragment>
@@ -45,7 +45,7 @@ export const PostHeader = function PostHeader({
             comment
           </a>
           <span className="divider"> - </span>
-          <IfThen condition={state.currentUser?.email === doc.creator.email}>
+          <IfThen condition={state.currentUser?.email === doc.user.email}>
             <a className="link" onClick={handleEdit}>
               edit
             </a>
