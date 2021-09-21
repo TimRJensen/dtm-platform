@@ -9,8 +9,7 @@ import { useContext, Fragment } from "react";
 import { PostDocument } from "db";
 import { formatDate } from "../../util/main";
 import { AppStateContext } from "../App/app-state/context";
-import { IfThen } from "../IfThen/IfThen";
-import "./style.scss";
+import styles from "./styles.module.scss";
 
 /**
  * PostHeader functional component.
@@ -28,31 +27,36 @@ export const PostHeader = function PostHeader({
 }: Props) {
   const { state } = useContext(AppStateContext);
 
-  return (
-    <div className="post-header">
-      <div className="info">
-        {`${formatDate(doc.timestamp)} by `}
-        <span className="user">{doc.user.name}</span>
+  if (!state.currentUser)
+    return (
+      <div className={styles.postHeader}>
+        <div className={styles.info}>
+          {`${formatDate(doc.timestamp)} by `}
+          <span>{doc.user.name}</span>
+        </div>
+        <a className={`${styles.link} ${styles.disabled}`}>comment</a>
+        <span className={styles.divider}> - </span>
+        <a className={`${styles.link} ${styles.disabled}`}>edit</a>
       </div>
-      <IfThen condition={!state.currentUser}>
-        <Fragment>
-          <a className="link disabled">comment</a>
-          <span className="divider"> - </span>
-          <a className="link disabled">edit</a>
-        </Fragment>
-        <Fragment>
-          <a className="link" onClick={handleComment}>
-            comment
-          </a>
-          <span className="divider"> - </span>
-          <IfThen condition={state.currentUser?.email === doc.user.email}>
-            <a className="link" onClick={handleEdit}>
-              edit
-            </a>
-            <a className="link disabled">edit</a>
-          </IfThen>
-        </Fragment>
-      </IfThen>
+    );
+
+  return (
+    <div className={styles.postHeader}>
+      <div className={styles.info}>
+        {`${formatDate(doc.timestamp)} by `}
+        <span>{doc.user.name}</span>
+      </div>
+      <a className={styles.link} onClick={handleComment}>
+        comment
+      </a>
+      <span className={styles.divider}> - </span>
+      {state.currentUser?.email === doc.user.email ? (
+        <a className={styles.link} onClick={handleEdit}>
+          edit
+        </a>
+      ) : (
+        <a className={`${styles.link} ${styles.disabled}`}>edit</a>
+      )}
     </div>
   );
 };

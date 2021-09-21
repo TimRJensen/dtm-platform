@@ -9,11 +9,10 @@ import { useRouteMatch } from "react-router-dom";
  */
 import { PostDocument } from "db";
 import { useEditor } from "../App/hooks/main";
-import { IfThen } from "../IfThen/IfThen";
 import { PostPanel } from "../PostPanel/PostPanel";
 import { PostHeader } from "../PostHeader/PostHeader";
 import { TextEditor } from "../TextEditor/TextEditor";
-import "./style.scss";
+import styles from "./style.module.scss";
 
 /**
  * Post functional component.
@@ -40,18 +39,23 @@ export const Post = function Post({ doc, onComment }: Props) {
   }, []);
 
   return (
-    <section className="post" ref={domElement}>
+    <section className={styles.post} ref={domElement}>
       <PostHeader
         doc={doc}
         handleComment={onComment}
         handleEdit={handleShowEditor}
       />
-      <div className="post-body">
+      <div className={styles.body}>
         <PostPanel doc={doc} />
-        <IfThen condition={showEditor() === true}>
-          <TextEditor content={doc.content} onSubmit={handleSubmit} />
-          <div className="content">{doc.content}</div>
-        </IfThen>
+        {showEditor() ? (
+          <TextEditor
+            styles={styles}
+            content={doc.content}
+            onSubmit={handleSubmit}
+          />
+        ) : (
+          <div className={styles.content}>{doc.content}</div>
+        )}
       </div>
     </section>
   );

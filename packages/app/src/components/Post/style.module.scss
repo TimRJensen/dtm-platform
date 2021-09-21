@@ -1,9 +1,11 @@
 @use "../../themes/theme" ;
+@use "../../themes/mix-ins";
 
 .post {
+  width: inherit;
   margin-bottom: theme.$spacing * 2.5;
 
-  &-body {
+  .body {
     display: flex;
     padding-right: 20px;
 
@@ -11,6 +13,10 @@
       width: 560px;
       padding: theme.$spacing;
       border-bottom: 1px solid theme.colors("secondary");
+    }
+
+    .text-editor{
+      @include mix-ins.text-editor();
     }
   }
 }

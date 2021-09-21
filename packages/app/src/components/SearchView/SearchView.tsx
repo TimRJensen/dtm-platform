@@ -37,17 +37,16 @@ export const SearchView = function SearchView({ query }: Props) {
 
           if (typeof mappedContent === "string")
             return (
-              <div key={`search-result-${i}`}>{`${mappedContent}...`}</div>
+              <div key={`search-result-${i}`}>{`${mappedContent} ...`}</div>
             );
           else
             return (
               <div>
                 {mappedContent.map((content) => [
-                  "...",
                   content[0],
                   <b>{content[1]}</b>,
                   content.length === 3 ? content[2] : null,
-                  " ",
+                  " ... ",
                 ])}
               </div>
             );
@@ -64,7 +63,7 @@ function mapContent(regExp: RegExp, content: string) {
   for (const match of content.matchAll(/\.|$/g)) {
     if (match.index === undefined) continue;
 
-    const k = match.index;
+    const k = match.index + 1;
     let a = 0;
     let rest = undefined;
 
@@ -78,7 +77,7 @@ function mapContent(regExp: RegExp, content: string) {
 
     if (rest) result[result.length - 1].push(rest);
 
-    i = k + 1;
+    i = k;
   }
 
   // result might be empty if the query matched user or date. In that case return a fixed array.

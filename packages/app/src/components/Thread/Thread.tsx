@@ -11,7 +11,7 @@ import { useEditor } from "../App/hooks/main";
 import { Post } from "../Post/Post";
 import { Comment } from "../Comment/Comment";
 import { TextEditor } from "../TextEditor/TextEditor";
-import "./style.scss";
+import styles from "./styles.module.scss";
 
 /**
  * Thread functional component.
@@ -25,19 +25,15 @@ export const Thread = function Thread({ doc }: Props) {
 
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
 
-  useEffect(() => {
-    //console.log(state);
-  });
+  useEffect(() => {});
 
   return (
-    <section className="thread">
-      <div className="thread-body">
-        <Post doc={doc.post} onComment={handleShowEditor} />
-        {Array.from(doc.comments.values()).map((comment) => {
-          return <Comment key={comment._id} doc={comment} />;
-        })}
-        <TextEditor onSubmit={handleSubmit} show={showEditor()} />
-      </div>
+    <section className={styles.thread}>
+      <Post doc={doc.post} onComment={handleShowEditor} />
+      {Array.from(doc.comments.values()).map((comment) => {
+        return <Comment key={comment._id} doc={comment} />;
+      })}
+      <TextEditor styles={styles} onSubmit={handleSubmit} show={showEditor()} />
     </section>
   );
 };

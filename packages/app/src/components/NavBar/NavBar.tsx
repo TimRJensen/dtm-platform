@@ -6,9 +6,9 @@ import { ChangeEvent, useState } from "react";
 /**
  * Custom imports.
  */
-import { FontIcon } from "../FontIcon/FontIcon";
-import "./style.scss";
 import { useQuery } from "../App/hooks/main";
+import { FontIcon } from "../FontIcon/FontIcon";
+import styles from "./styles.module.scss";
 
 /**
  * NavBar functional component.
@@ -18,26 +18,27 @@ export const NavBar = function NavBar() {
   const [hasFocus, setHasFocus] = useState(false);
 
   return (
-    <section className="nav-bar">
-      <div className="controls">
+    <section className={styles.navBar}>
+      <div className={styles.controls}>
         <div
-          className={hasFocus ? "search-bar focus" : "search-bar"}
+          className={
+            hasFocus ? `${styles.searchBar} ${styles.focus}` : styles.searchBar
+          }
           onFocus={() => setHasFocus(true)}
           onBlur={() => setHasFocus(false)}
         >
-          <form className="form" onSubmit={handleQuery}>
+          <form onSubmit={handleQuery}>
             <input
-              className="input"
               type="text"
               value={query}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setQuery(e.target.value)
               }
             />
-            <FontIcon className="font-icon">search</FontIcon>
+            <FontIcon className={styles.fontIcon}>search</FontIcon>
           </form>
         </div>
-        <FontIcon className="font-icon">account_circle</FontIcon>
+        <FontIcon className={styles.fontIcon}>account_circle</FontIcon>
       </div>
     </section>
   );

@@ -3,8 +3,6 @@
  */
 import { useState, useEffect, useRef, useContext } from "react";
 import { ContentState, Editor, EditorState } from "draft-js";
-import { AppStateContext } from "../App/app-state/context";
-import "./style.scss";
 
 /**
  * Custom imports.
@@ -17,14 +15,14 @@ interface Props {
   show?: boolean;
   content?: string;
   onSubmit?: (content?: string) => void;
-  className?: string;
+  styles?: { [key: string]: string };
 }
 
 export const TextEditor = function TextEditor({
+  styles = {},
   show = true,
   content,
   onSubmit,
-  className,
 }: Props) {
   if (!show) return null;
 
@@ -39,37 +37,32 @@ export const TextEditor = function TextEditor({
     editorRef.current?.focus();
   }, []);
 
-  className = className || "text-editor";
-
   return (
-    <section className={className}>
-      <div className={`${className}-body`}>
-        <div className="input" onClick={() => editorRef.current?.focus()}>
-          <Editor
-            editorState={editorState}
-            onChange={setEditorState}
-            ref={editorRef}
-          />
-        </div>
-        <div className="footer">
-          <button
-            className={"button submit"}
-            onClick={() => {
-              if (onSubmit)
-                onSubmit(editorState.getCurrentContent().getPlainText());
-            }}
-          >
-            submit
-          </button>
-          <button
-            className={"button cancel"}
-            onClick={() => {
-              if (onSubmit) onSubmit(undefined);
-            }}
-          >
-            cancel
-          </button>
-        </div>
+    <section className={styles.textEditor}>
+      <div className={styles.input} onClick={() => editorRef.current?.focus()}>
+        <Editor
+          editorState={editorState}
+          onChange={setEditorState}
+          ref={editorRef}
+        />
+      </div>
+      <div className={styles.footer}>
+        <button
+          className={styles.submit}
+          onClick={() => {
+            if (onSubmit)
+              onSubmit(editorState.getCurrentContent().getPlainText());
+          }}
+        >
+          submit
+        </button>
+        <button
+          onClick={() => {
+            if (onSubmit) onSubmit(undefined);
+          }}
+        >
+          cancel
+        </button>
       </div>
     </section>
   );
