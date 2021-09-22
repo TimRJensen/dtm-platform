@@ -1,8 +1,8 @@
 /**
  * Vendor imports.
  */
-import { useContext, useState, FormEvent } from "react";
-import { useHistory } from "react-router-dom";
+import { useContext, useState, FormEvent, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -14,7 +14,7 @@ import {
   ThreadDocument,
   CommentDocument,
 } from "db";
-import { formatString, docIncludes } from "../../../util/main";
+import { docIncludes } from "../../../util/main";
 import { AppStateContext } from "../app-state/context";
 
 /**
@@ -121,65 +121,83 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
 };
 
 /**
+ * useSearch hook.
+ */
+export const useSearch = function useSearch() {
+  const history = useHistory();
+  const [input, setInput] = useState("");
+
+  return {
+    input: (value?: string) => {
+      if (!value) return input;
+
+      setInput(value);
+    },
+    handleSubmit: (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      setInput("");
+      history.push("/search/" + input.split(" ").join("+"));
+    },
+  };
+};
+
+/**
  * useQuery hook.
  */
 export const useQuery = function useQuery() {
   const db = useContext(PouchDBContext);
-  const { dispatch } = useContext(AppStateContext);
-  const history = useHistory();
-  const [query, setQuery] = useState("");
+  const { query } = useParams<{ query: string }>();
+  const [results, setResults] = useState(
+    undefined as (PostDocument | CommentDocument)[] | undefined
+  );
+
+  const fetch = async () => {
+    const response = await db.find(["type"], {
+      selector: {
+        type: "blog",
+      },
+    });
+
+    if (!response) return;
+
+    const queries = query.split("+");
+    const includeKeys = [
+      "content",
+      "comments",
+      "creator",
+      "user",
+      "name",
+      "timestamp",
+    ];
+
+    setResults(
+      response.docs.reduce((result, doc) => {
+        if (doc.type === "blog") {
+          doc.threads.forEach((thread) => {
+            if (docIncludes(thread.post, includeKeys, queries))
+              result.push(thread.post);
+
+            thread.comments.forEach((comment) => {
+              if (docIncludes(comment, includeKeys, queries))
+                result.push(comment);
+            });
+          });
+        }
+
+        return result;
+      }, [] as (CommentDocument | PostDocument)[])
+    );
+  };
+
+  useEffect(() => {
+    fetch();
+
+    return () => setResults(undefined);
+  }, [query]);
 
   return {
-    query,
-    setQuery,
-    handleQuery: async (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-
-      const response = await db.find(["type"], {
-        selector: {
-          type: "blog",
-        },
-      });
-
-      if (!response) return;
-
-      const queries = formatString(query).split(" ");
-      const includeKeys = [
-        "content",
-        "comments",
-        "creator",
-        "user",
-        "name",
-        "timestamp",
-      ];
-
-      const result = response.docs.reduce(
-        (result: (CommentDocument | PostDocument)[], doc) => {
-          if (doc.type === "blog") {
-            doc.threads.forEach((thread, key) => {
-              if (docIncludes(thread.post, includeKeys, queries))
-                result.push(thread.post);
-
-              thread.comments.forEach((comment) => {
-                if (docIncludes(comment, includeKeys, queries))
-                  result.push(comment);
-              });
-            });
-          }
-
-          return result;
-        },
-        []
-      );
-
-      document.querySelector<HTMLInputElement>(".search-bar .input")?.blur();
-      setQuery("");
-      dispatch({
-        type: "CURRENT_QUERY",
-        value: { queries: queries, result: result },
-      });
-
-      history.push("/search/" + queries.join("&"));
-    },
+    results,
+    test: new RegExp(query.split("&").join("|"), "gi"),
   };
 };

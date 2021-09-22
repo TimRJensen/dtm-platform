@@ -14,7 +14,7 @@
 
     &.disabled {
       cursor: default;
-      color: theme.colors("text", "secondary");
+      color: theme.colors("text", "disabled");
     }
   }
 

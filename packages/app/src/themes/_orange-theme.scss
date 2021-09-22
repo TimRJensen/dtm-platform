@@ -1,25 +1,25 @@
 // https://paletton.com/#uid=13-0u0k2nTu00++0yZd5qKc9NxZ
 
 $colors: (
-  primary: #AF550B,
-  secondary: #6B3100,
-  primary-faded: #E38E48,
+  primary: #dae2ea,
+  secondary: #7b93ab,
+  primary-faded: #f6f8fa,
   text: (
     primary: #000,
-    secondary: #6B3100,
+    secondary: #7b93ab,
     link: #0645ad,
-    disabled: #6B3100,
+    disabled: #7b93ab,
   ),
   button: (
-    default: #AF550B,
-    default-hover: #6B3100,
-    default-border: #6B3100,
+    default: #dae2ea,
+    default-hover: #7b93ab,
+    default-border: #7b93ab,
     accept: #4caf50,
     accept-hover: #15781b,
     accept-border: #15781b,
   ),
   font-icon: (
     default: #000,
-    disabled: #6B3100,
+    disabled: #7b93ab,
   )
 );

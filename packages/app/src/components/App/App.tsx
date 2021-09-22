@@ -9,11 +9,11 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
  */
 import { PouchDB, PouchDBProvider } from "db";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
+import { AppHeader } from "../AppHeader/AppHeader";
 import { Blog } from "../Blog/Blog";
 import { HomeView } from "../HomeView/HomeView";
-import { NavBar } from "../NavBar/NavBar";
-import "./style.scss";
 import { SearchView } from "../SearchView/SearchView";
+import "./style.scss";
 
 /**
  * App functional component.
@@ -44,25 +44,22 @@ export const App = function ({ db }: Props) {
     <PouchDBProvider value={db}>
       <AppStateProvider value={{ state, dispatch }}>
         <Router>
-          <NavBar />
-          <div style={{ marginTop: "40px" }}>
-            <Switch>
-              <Route exact path="/" component={HomeView} />
-              <Route
-                exact
-                path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
-                render={() => {
-                  return <Blog blog={state.currentBlog} />;
-                }}
-              />
-              <Route
-                path="/search/"
-                render={() => {
-                  return <SearchView query={state.currentQuery} />;
-                }}
-              />
-            </Switch>
-          </div>
+          <AppHeader />
+          <Switch>
+            <Route exact path="/" component={HomeView} />
+            <Route
+              path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
+              render={() => {
+                return <Blog blog={state.currentBlog} />;
+              }}
+            />
+            <Route
+              path="/search/:query/"
+              render={() => {
+                return <SearchView />;
+              }}
+            />
+          </Switch>
         </Router>
       </AppStateProvider>
     </PouchDBProvider>

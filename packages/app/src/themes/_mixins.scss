@@ -11,7 +11,7 @@
   width: $width;
   height: $height;
   border: 1px solid $border-color;
-  border-radius: 0.33rem;
+  border-radius: theme.$spacing;
   background-color: $background-color;
   color: $color;
   cursor: pointer;

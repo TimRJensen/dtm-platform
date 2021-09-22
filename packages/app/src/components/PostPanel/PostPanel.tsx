@@ -38,7 +38,9 @@ export const PostPanel = function PostPanel({ doc }: Props) {
   return (
     <div className={styles.postPanel}>
       <FontIcon
-        className={`${styles.fontIcon} ${isUpvoted ? styles.active : ""}`}
+        className={`${styles.fontIcon} ${
+          isUpvoted ? `${styles.fontIcon} ${styles.active}` : styles.fontIcon
+        }`}
         onClick={handleUpvote}
       >
         expand_less

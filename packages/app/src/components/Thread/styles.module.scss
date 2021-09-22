@@ -1,5 +1,5 @@
-@use "../../themes/theme" ;
-@use "../../themes/mix-ins";
+@use "../../themes/theme";
+@use "../../themes/mixins";
 
 .thread {
   display: flex;
@@ -8,22 +8,20 @@
   margin: auto;
   margin-bottom: 4 * theme.$spacing;
 
-  //.body {
-    width: 600px;
-    border: 1px solid theme.colors("secondary");
-    border-radius: 5px 5px 0 0;
+  width: 600px;
+  border: 1px solid theme.colors("secondary");
+  border-radius: 5px 5px 0 0;
 
-    .text-editor {
-      @include mix-ins.text-editor(540px, auto);
-      width: 540px;
-      padding-left: 40px;
-      padding-right: 20px;
+  .text-editor {
+    @include mixins.text-editor(540px, auto);
+    width: 540px;
+    padding-left: 40px;
+    padding-right: 20px;
 
-      .input {
-        height: 100px;
-        border: 1px solid theme.colors("secondary");
-        border-radius: 5px;
-      }
+    .input {
+      height: 100px;
+      border: 1px solid theme.colors("secondary");
+      border-radius: 5px;
     }
- // }
+  }
 }

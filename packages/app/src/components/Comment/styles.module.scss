@@ -1,5 +1,5 @@
 @use "../../themes/theme";
-@use "../../themes/mix-ins";
+@use "../../themes/mixins";
 
 .comment {
   width: 540px;
@@ -13,6 +13,6 @@
   }
 
   .text-editor{
-    @include mix-ins.text-editor();
+    @include mixins.text-editor();
   }
 }

@@ -22,7 +22,6 @@ export const Blog = function Blog({ blog }: Props) {
   const db = useContext(PouchDBContext);
   const { dispatch } = useContext(AppStateContext);
   const { blogId } = useParams<{ blogId: string }>();
-  const test: any = useParams();
 
   const fetch = async () => {
     const response = await db.get<BlogDocument>(`/blogs/${blogId}`);

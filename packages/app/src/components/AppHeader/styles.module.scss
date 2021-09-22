@@ -1,6 +1,6 @@
 @use "../../themes/theme";
 
-.nav-bar {
+.app-header {
   position: fixed;
   display: flex;
   align-items: center;
@@ -17,23 +17,20 @@
     width: 95vw;
 
     .font-icon {
-      display: inline;
       font-size: 34px;
+      color: theme.colors("font-icon", "default");
+      cursor: pointer;
 
-      &:hover {
-        cursor: pointer;
+      &.disabled {
+        color: theme.colors("font-icon", "disabled");
       }
-    }
-
-    .font-icon-disabled {
-      background-color: theme.colors("secondary");
     }
 
     .search-bar {
       border: 1px solid theme.colors("secondary");
       margin-right: theme.$spacing;
       border-radius: 5px;
-      background-color: #f6f8fa;
+      background-color: theme.colors("primary-faded");
 
       form {
         height: 38px;
@@ -43,6 +40,7 @@
         align-items: center;
         input {
           width: 264px;
+          height: inherit;
           border: 0;
           background-color: transparent;
           outline: none;
@@ -50,7 +48,7 @@
       }
 
       &.focus {
-        box-shadow: 0 0 0 1px black;
+        box-shadow: 0 0 3px 0.8px theme.colors("secondary");
       }
     }
   }

@@ -1,5 +1,5 @@
 @use "../../themes/theme" ;
-@use "../../themes/mix-ins";
+@use "../../themes/mixins";
 
 .post {
   width: inherit;
@@ -16,7 +16,7 @@
     }
 
     .text-editor{
-      @include mix-ins.text-editor();
+      @include mixins.text-editor();
     }
   }
 }

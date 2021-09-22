@@ -1,20 +1,25 @@
-@use "./default";
+@use "sass:map";
+@use "./default.scss";
+@use "./orange-theme.scss";
 
 $themes: (
-  default: true,
+  default: false,
+  orange-theme: true,
 );
 
 $spacing: 0.33rem ;
 
 @function colors($keys...) {
-  $map: 0;
+  $map: ();
 
-  @if map-get($themes, "default") {
+  @if map.get($themes, "default") {
     $map: default.$colors;
+  } @else if map.get($themes, "orange-theme") {
+    $map: orange-theme.$colors;
   }
 
   @each $key in $keys {
-    $map: map-get($map, $key);
+    $map: map.get($map, $key);
   }
 
   @return $map;

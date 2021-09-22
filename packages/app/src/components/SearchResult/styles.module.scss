@@ -1,0 +1,6 @@
+@use "../../themes/theme";
+
+.search-result {
+  width: inherit;
+  margin-bottom: 3*theme.$spacing;
+}

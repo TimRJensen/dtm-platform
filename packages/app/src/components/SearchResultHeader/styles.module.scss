@@ -1,0 +1,17 @@
+@use "../../themes/theme";
+
+.search-result-header {
+  display: flex;
+  padding: theme.$spacing;
+  border-bottom: 1px solid theme.colors("secondary");
+
+  .link {
+    color:theme.colors("text", "link");;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .info {
+    flex-grow: 2;
+  }
+}
