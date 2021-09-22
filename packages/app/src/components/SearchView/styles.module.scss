@@ -1,24 +1,6 @@
-@use "sass:math";
 @use "../../themes/theme";
-@use "../../themes/mixins";
 
 .search-view {
   width: 600px;
   margin: auto;
-
-  .button {
-    @include mixins.button(20px,20px);
-    margin-right: math.div(theme.$spacing, 1.5);
-    border-radius:math.div(theme.$spacing, 2);
-    background-color: theme.colors("primary-faded");
-
-    &.active, &:hover {
-      background-color: theme.colors("primary");
-    }
-  }
-
-  .divider {
-    margin-left: theme.$spacing -  math.div(theme.$spacing, 1.5);
-    margin-right: theme.$spacing;
-  }
 }

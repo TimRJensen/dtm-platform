@@ -1,14 +1,13 @@
 /**
  * Vendor imports.
  */
-import { FormEvent, useContext, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useContext } from "react";
 
 /**
  * Custom imports.
  */
 import { AppStateContext } from "../App/app-state/context";
-import { useSearch } from "../App/hooks/main";
+import { SearchBar } from "../SearchBar/SearchBar";
 import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 
@@ -17,13 +16,12 @@ import styles from "./styles.module.scss";
  */
 export const AppHeader = function AppHeader() {
   const { state } = useContext(AppStateContext);
-  const { input, handleSubmit } = useSearch();
-  const [hasFocus, setHasFocus] = useState(false);
 
   return (
     <section className={styles.appHeader}>
       <div className={styles.controls}>
-        <div
+        <SearchBar />
+        {/*         <div
           className={
             hasFocus ? `${styles.searchBar} ${styles.focus}` : styles.searchBar
           }
@@ -38,7 +36,7 @@ export const AppHeader = function AppHeader() {
             />
             <FontIcon className={styles.fontIcon}>search</FontIcon>
           </form>
-        </div>
+        </div> */}
         {state.currentUser ? (
           <FontIcon className={styles.fontIcon}>account_circle</FontIcon>
         ) : (

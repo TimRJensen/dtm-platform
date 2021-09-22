@@ -6,7 +6,6 @@
  * Custom imports.
  */
 import { CommentDocument, PostDocument } from "db";
-import { Fragment } from "react";
 import { SearchResultHeader } from "../SearchResultHeader/SearchResultHeader";
 import styles from "./styles.module.scss";
 

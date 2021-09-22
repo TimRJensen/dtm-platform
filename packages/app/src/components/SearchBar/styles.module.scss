@@ -1,0 +1,38 @@
+@use "../../themes/theme";
+
+.search-bar {
+  border: 1px solid theme.colors("secondary");
+  margin-right: theme.$spacing;
+  border-radius: 5px;
+  background-color: theme.colors("primary-faded");
+
+  form {
+    height: 38px;
+    width: 300px;
+    display: inline-flex;
+    justify-content: end;
+    align-items: center;
+
+    input {
+      width: 264px;
+      height: inherit;
+      border: 0;
+      background-color: transparent;
+      outline: none;
+    }
+
+    .font-icon {
+      font-size: 34px;
+      color: theme.colors("font-icon", "default");
+      cursor: pointer;
+
+      &.disabled {
+        color: theme.colors("font-icon", "disabled");
+      }
+    }
+  }
+
+  &.focus {
+    box-shadow: 0 0 3px 0.8px theme.colors("secondary");
+  }
+}

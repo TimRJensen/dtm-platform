@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useContext, useState, FormEvent, useEffect } from "react";
+import { useContext, useState, FormEvent, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
 /**
@@ -126,8 +126,10 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
 export const useSearch = function useSearch() {
   const history = useHistory();
   const [input, setInput] = useState("");
+  const domElement = useRef<HTMLInputElement>(null);
 
   return {
+    domElement,
     input: (value?: string) => {
       if (!value) return input;
 
@@ -137,7 +139,8 @@ export const useSearch = function useSearch() {
       event.preventDefault();
 
       setInput("");
-      history.push("/search/" + input.split(" ").join("+"));
+      domElement.current?.blur();
+      history.push("/search/" + input.split(" ").join("+") + "/page=0");
     },
   };
 };

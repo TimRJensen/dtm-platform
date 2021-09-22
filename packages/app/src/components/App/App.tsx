@@ -54,7 +54,7 @@ export const App = function ({ db }: Props) {
               }}
             />
             <Route
-              path="/search/:query/"
+              path="/search/:query/:pageId?"
               render={() => {
                 return <SearchView />;
               }}
