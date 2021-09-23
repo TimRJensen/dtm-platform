@@ -24,12 +24,11 @@ async function createMockData() {
   const { mockData } = await import("mock-data");
 
   mockData(db);
-  db.put(
-    "app-state",
-    db.createDoc("app-state", "app-state", {
-      isPopulated: true,
-    })
-  );
+  db.put({
+    type: "app-state",
+    _id: "app-state",
+    isPopulated: true,
+  });
 }
 createMockData();
 

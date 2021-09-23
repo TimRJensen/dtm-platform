@@ -62,24 +62,23 @@ export const useEditor = function useSubmit(
 
       // Update/mutate the model.
       if (doc.type === "thread") {
-        const comment = db.createDoc(
-          "comment",
-          `${doc._id}/comment-${doc.stats.comments}`,
-          {
-            content,
-            user: {
-              name: state.currentUser.name,
-              email: state.currentUser.email,
-            },
-            stats: { infractions: 0 },
-          }
-        );
-        doc.comments.set(comment.key, comment);
+        doc.comments.set(`comment-${doc.stats.comments}`, {
+          type: "comment",
+          _id: `${doc._id}/comment-${doc.stats.comments}`,
+          content,
+          user: {
+            name: state.currentUser.name,
+            email: state.currentUser.email,
+          },
+          stats: { infractions: 0 },
+          timestamp: Date.now(),
+          lastModified: Date.now(),
+        });
         doc.stats.comments++;
       } else doc.content = content;
 
       //Update the db.
-      await db.put(state.currentBlog._id, state.currentBlog);
+      await db.put(state.currentBlog);
 
       // Update the view.
       dispatch({
@@ -109,7 +108,7 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
       if (isUpvoted) doc.upvotes.delete(state.currentUser?.email);
       else doc.upvotes.set(state.currentUser?.email, true);
 
-      await db.put(state.currentBlog._id, state.currentBlog);
+      await db.put(state.currentBlog);
 
       setIsUpvoted(!isUpvoted);
       dispatch({

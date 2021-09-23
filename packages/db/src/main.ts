@@ -11,7 +11,6 @@ import { pathToRegexp } from "path-to-regexp";
 export interface BaseDocument {
   _id: string;
   type: string;
-  key: string;
   timestamp: number;
   lastModified: number;
 }
@@ -87,10 +86,8 @@ export type AllDocuments =
   | BlogDocument
   | CommentDocument;
 
-type ExcludeKey<K> = K extends keyof BaseDocument | "type" ? never : K;
-type PutDocument<T, D> = D extends {
-  type: T;
-}
+type ExcludeKey<K> = K extends "timestamp" | "lastModified" | "key" ? never : K;
+type PutDocument<D extends AllDocuments> = D extends { type: D["type"] }
   ? { [K in ExcludeKey<keyof D>]: D[K] }
   : never;
 
@@ -103,7 +100,7 @@ interface PouchDBWrapperOptions {
  * PouchDBWrapper - A simple class wrapper for PouchDB.
  */
 class PouchDBWrapper {
-  private db: PouchDB.Database<AllDocuments & BaseDocument>;
+  private db: PouchDB.Database<AllDocuments>;
   private defaults = {
     adapter: "idb",
     autoCompact: true,
@@ -118,44 +115,22 @@ class PouchDBWrapper {
     });
   }
 
-  public createDoc<T extends AllDocuments["type"]>(
-    type: T,
-    _id: string,
-    doc: PutDocument<T, AllDocuments>
-  ) {
-    if (type === "app-state")
-      return {
-        ...doc,
-        _id,
-        key: "",
-        type,
-        timestamp: Date.now(),
-        lastModified: Date.now(),
-      };
-
-    return {
-      ...doc,
-      _id,
-      type,
-      key: pathToRegexp("/:typeid/:name/:thread?/:post?")
-        .exec(_id)!
-        .slice(-1)[0],
-      timestamp: Date.now(),
-      lastModified: Date.now(),
-    };
-  }
-
-  public async put(_id: string, doc: AllDocuments) {
+  public async put(doc: PutDocument<AllDocuments>) {
     try {
-      await this.db.put({
-        ...(await this.db.get(_id)),
-        ...doc,
-        lastModified: Date.now(),
-      });
+      await this.db.put(
+        Object.create({
+          ...(await this.db.get(doc._id)),
+          ...doc,
+          lastModified: Date.now(),
+        })
+      );
     } catch (err: any) {
       if (err.status === 404)
-        return this.db.put(this.createDoc(doc.type, _id, doc) as AllDocuments);
-
+        this.db.put({
+          ...doc,
+          timestamp: Date.now(),
+          lastModified: Date.now(),
+        });
       if ((err as any).status === 409) {
       }
       console.log(err, this.get.name);
