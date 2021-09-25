@@ -1,0 +1,17 @@
+@use "../../themes/theme";
+@use "../../themes/mixins";
+
+.blog {
+  margin-top: 4 * theme.$spacing;
+
+  .text-editor {
+    @include mixins.text-editor(600px, auto);
+    margin: auto;
+
+    .input {
+      height: 100px;
+      border: 1px solid theme.colors("secondary");
+      border-radius: 5px;
+    }
+  }
+}

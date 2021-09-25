@@ -1,15 +1,21 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useRef, useContext } from "react";
-import { ContentState, Editor, EditorState } from "draft-js";
+import { useState, useEffect, useRef } from "react";
+import {
+  ContentState,
+  Editor,
+  EditorState,
+  RichUtils,
+  convertToRaw,
+} from "draft-js";
 
 /**
  * Custom imports.
  */
 
 /**
- * CommentTextbox functional component - wrapper for https://draftjs.org/
+ * CommentTextbox functional component - https://draftjs.org/
  */
 interface Props {
   show?: boolean;
@@ -33,6 +39,17 @@ export const TextEditor = function TextEditor({
     return EditorState.createWithContent(ContentState.createFromText(content));
   });
 
+  const handleKeyCommand = (command: string, editorState: EditorState) => {
+    const newState = RichUtils.handleKeyCommand(editorState, command);
+
+    if (newState) {
+      setEditorState(newState);
+      return "handled";
+    }
+
+    return "not-handled";
+  };
+
   useEffect(() => {
     editorRef.current?.focus();
   }, []);
@@ -42,6 +59,7 @@ export const TextEditor = function TextEditor({
       <div className={styles.input} onClick={() => editorRef.current?.focus()}>
         <Editor
           editorState={editorState}
+          handleKeyCommand={handleKeyCommand}
           onChange={setEditorState}
           ref={editorRef}
         />
@@ -50,6 +68,7 @@ export const TextEditor = function TextEditor({
         <button
           className={styles.submit}
           onClick={() => {
+            console.log(convertToRaw(editorState.getCurrentContent()));
             if (onSubmit)
               onSubmit(editorState.getCurrentContent().getPlainText());
           }}

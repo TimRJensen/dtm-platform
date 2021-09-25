@@ -61,7 +61,10 @@ export interface PostDocument extends BaseDocument {
 
 export interface ThreadDocument extends BaseDocument {
   type: "thread";
-  user: string;
+  user: {
+    name: string;
+    email: string;
+  };
   post: PostDocument;
   comments: Map<string, CommentDocument>;
   stats: {
@@ -69,8 +72,18 @@ export interface ThreadDocument extends BaseDocument {
   };
 }
 
+export interface ArtifactDocument extends BaseDocument {
+  type: "artifact";
+  title: string;
+  image: string;
+  content: string;
+  period: string;
+  tags: string[];
+}
+
 export interface BlogDocument extends BaseDocument {
   type: "blog";
+  artifact: ArtifactDocument;
   threads: Map<string, ThreadDocument>;
   stats: {
     comments: number;
@@ -83,6 +96,7 @@ export type AllDocuments =
   | UserDocument
   | PostDocument
   | ThreadDocument
+  | ArtifactDocument
   | BlogDocument
   | CommentDocument;
 
@@ -117,13 +131,11 @@ class PouchDBWrapper {
 
   public async put(doc: PutDocument<AllDocuments>) {
     try {
-      await this.db.put(
-        Object.create({
-          ...(await this.db.get(doc._id)),
-          ...doc,
-          lastModified: Date.now(),
-        })
-      );
+      await this.db.put({
+        ...(await this.db.get(doc._id)),
+        ...doc,
+        lastModified: Date.now(),
+      });
     } catch (err: any) {
       if (err.status === 404)
         this.db.put({

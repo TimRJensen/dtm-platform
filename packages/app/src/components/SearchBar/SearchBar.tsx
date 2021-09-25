@@ -29,8 +29,8 @@ export const SearchBar = function SearchBar() {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          value={input()}
           onChange={(event) => input(event.target.value)}
+          value={input()}
           ref={domElement}
         />
         <FontIcon className={styles.fontIcon}>search</FontIcon>

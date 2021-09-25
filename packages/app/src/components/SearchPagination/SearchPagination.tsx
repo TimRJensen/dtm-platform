@@ -66,7 +66,10 @@ export const SearchPagination = function SearchPagination({
             }
             onClick={() =>
               history.push(
-                history.location.pathname.replace(/=\d*/, `=${value - 1}`)
+                history.location.pathname.replace(
+                  /(\/page=\d*)|$/,
+                  `/page=${value - 1}`
+                )
               )
             }
           >

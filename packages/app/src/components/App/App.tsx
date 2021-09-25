@@ -24,7 +24,21 @@ interface Props {
 
 export const App = function ({ db }: Props) {
   const [state, dispatch] = useReducer<Reducer<AppState, Actions>>(reducer, {
-    currentUser: undefined,
+    currentUser: {
+      type: "user",
+      _id: "users/test-user",
+      name: "Arthur Fonzarelli",
+      email: "arthur.fonzarelli@gmail.com",
+      stats: {
+        upvotes: 0,
+        downvotes: 0,
+        infractions: 0,
+        comments: 0,
+        threads: 0,
+      },
+      timestamp: Date.now(),
+      lastModified: Date.now(),
+    },
     currentBlog: undefined,
     currentQuery: undefined,
     showEditor: undefined,

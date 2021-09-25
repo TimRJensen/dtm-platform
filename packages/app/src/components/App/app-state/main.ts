@@ -13,9 +13,7 @@ import { UserDocument, BlogDocument, PostDocument, CommentDocument } from "db";
 export interface AppState {
   currentUser: UserDocument | undefined;
   currentBlog: BlogDocument | undefined;
-  currentQuery:
-    | { queries: string[]; result: (PostDocument | CommentDocument)[] }
-    | undefined;
+  currentQuery: string[] | undefined;
   showEditor: ((flag: boolean) => void) | undefined;
 }
 
@@ -30,9 +28,7 @@ export type Actions =
     }
   | {
       type: "CURRENT_QUERY";
-      value:
-        | { queries: string[]; result: (PostDocument | CommentDocument)[] }
-        | undefined;
+      value: string[] | undefined;
     }
   | {
       type: "SHOW_EDITOR";

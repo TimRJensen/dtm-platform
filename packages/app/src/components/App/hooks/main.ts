@@ -44,8 +44,13 @@ export const useShowEditor = function useShowEditor() {
 /**
  * useEditor hook.
  */
-export const useEditor = function useSubmit(
-  doc: CommentDocument | PostDocument | ThreadDocument
+export const useEditor = function useEditor(
+  doc:
+    | CommentDocument
+    | PostDocument
+    | ThreadDocument
+    | BlogDocument
+    | undefined
 ) {
   const db = useContext(PouchDBContext);
   const { state, dispatch } = useContext(AppStateContext);
@@ -55,13 +60,43 @@ export const useEditor = function useSubmit(
     showEditor,
     handleShowEditor,
     handleSubmit: async (content?: string) => {
-      if (!content || !state.currentBlog || !state.currentUser) {
+      if (!doc || !content || !state.currentBlog || !state.currentUser) {
         showEditor(false);
         return;
       }
 
       // Update/mutate the model.
-      if (doc.type === "thread") {
+      if (doc.type === "blog") {
+        doc.threads.set(`thread-${doc.stats.threads}`, {
+          type: "thread",
+          _id: `${doc._id}/thread-${doc.stats.threads}`,
+          user: {
+            name: state.currentUser.name,
+            email: state.currentUser.email,
+          },
+          post: {
+            type: "post",
+            _id: `${doc._id}/thread-${doc.stats.threads}/post`,
+            user: {
+              name: state.currentUser.name,
+              email: state.currentUser.email,
+            },
+            content,
+            upvotes: new Map(),
+            downvotes: new Map(),
+            stats: { infractions: 0 },
+            timestamp: Date.now(),
+            lastModified: Date.now(),
+          },
+          comments: new Map(),
+          stats: {
+            comments: 0,
+          },
+          timestamp: Date.now(),
+          lastModified: Date.now(),
+        });
+        doc.stats.threads++;
+      } else if (doc.type === "thread") {
         doc.comments.set(`comment-${doc.stats.comments}`, {
           type: "comment",
           _id: `${doc._id}/comment-${doc.stats.comments}`,
@@ -130,7 +165,7 @@ export const useSearch = function useSearch() {
   return {
     domElement,
     input: (value?: string) => {
-      if (!value) return input;
+      if (value === undefined) return input;
 
       setInput(value);
     },
@@ -139,7 +174,7 @@ export const useSearch = function useSearch() {
 
       setInput("");
       domElement.current?.blur();
-      history.push("/search/" + input.split(" ").join("+") + "/page=0");
+      history.push("/search/" + input.trim().split(" ").join("+") + "/page=0");
     },
   };
 };
@@ -163,7 +198,7 @@ export const useQuery = function useQuery() {
 
     if (!response) return;
 
-    const queries = query.split("+");
+    const queries = query.toLowerCase().split("+");
     const includeKeys = [
       "content",
       "comments",

@@ -18,15 +18,17 @@ import styles from "./styles.module.scss";
  */
 
 export const SearchView = function SearchView() {
-  const { pageId } = useParams<{ pageId: string }>();
+  const { pageId } = useParams<{ pageId?: string }>();
   const { results, test } = useQuery();
   const [currentPage, setCurrentPage] = useState(
     pageId ? Number.parseInt(pageId.replace("page=", "")) : 0
   );
 
   useEffect(() => {
-    setCurrentPage(Number.parseInt(pageId.replace("page=", "")));
-    window.scrollTo(0, 0);
+    if (pageId) {
+      setCurrentPage(Number.parseInt(pageId.replace("page=", "")));
+      window.scrollTo(0, 0);
+    }
   }, [pageId]);
 
   if (!results) return null;

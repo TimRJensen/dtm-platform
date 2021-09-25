@@ -1,92 +1,20 @@
 /**
  * Vendor imports.
  */
-import faker from "faker";
+import { date, datatype, internet, lorem, name, image } from "faker";
 
 /**
  * Custom imports.
  */
 import {
-  BaseDocument,
   BlogDocument,
+  ArtifactDocument,
   CommentDocument,
   PostDocument,
   PouchDB,
   ThreadDocument,
   UserDocument,
 } from "db";
-
-/**
- * randomNumber - Generates a random (int) number within user specified confines.
- */
-function randomNumber(min = 0, max = 10) {
-  return min + Math.floor(Math.random() * max);
-}
-
-/**
- * generateDate - Generates a random (past) date within user specified confines.
- */
-interface GenerateDateOptions {
-  target?: Date;
-  past?: boolean;
-  year?: {
-    min: number;
-    max: number;
-  };
-  month?: {
-    min: number;
-    max: number;
-  };
-  date?: {
-    min: number;
-    max: number;
-  };
-}
-
-function generateDate(userOptions?: GenerateDateOptions) {
-  const defaults = {
-    target: new Date(),
-    past: true,
-    year: { min: 0, max: 4 },
-    month: { min: 0, max: 5 },
-    date: { min: 0, max: 14 },
-  };
-  const options = {
-    ...defaults,
-    ...userOptions,
-  };
-
-  if (options.past)
-    return new Date(
-      options.target.getFullYear() -
-        randomNumber(options.year.min, options.year.max),
-      options.target.getMonth() -
-        randomNumber(options.month.min, options.month.max),
-      options.target.getDate() -
-        randomNumber(options.date.min, options.date.max)
-    ).getTime();
-  else {
-    const result = new Date(
-      options.target.getFullYear() +
-        randomNumber(options.year.min, options.year.max),
-      options.target.getMonth() +
-        Math.abs(
-          options.target.getMonth() -
-            randomNumber(options.month.min, options.month.max)
-        ),
-      options.target.getDate() +
-        Math.abs(
-          options.target.getDate() -
-            randomNumber(options.date.min, options.date.max)
-        )
-    );
-    const thisYear = defaults.target.getFullYear();
-
-    if (result.getFullYear() > thisYear) result.setFullYear(thisYear);
-
-    return result.getTime();
-  }
-}
 
 /**
  * mockData - Just a single function that populates a PouchDB with mockdata.
@@ -101,66 +29,67 @@ export const mockData = async function mockData(
   userOptions?: MockDataOptions
 ) {
   const defaults = {
-    numberOfBlogs: randomNumber(10, 12),
-    numberOfUsers: randomNumber(90, 120),
+    numberOfBlogs: datatype.number({ min: 10, max: 15 }),
+    numberOfUsers: datatype.number({ min: 90, max: 200 }),
   };
   const options = {
     ...defaults,
     ...userOptions,
   };
+  const now = new Date();
   const blogs = [];
   const users: UserDocument[] = [];
 
+  const response = await fetch("https://picsum.photos/v2/list?limit=100");
+  const images = await response.json();
+
   for (let i = 0; i < options.numberOfUsers; i++) {
-    const email = faker.internet.email();
+    const email = internet.email();
+    const timestamp = date.past(datatype.number({ min: 0, max: 8 })).getTime();
 
     users.push({
       type: "user",
       _id: `/users/user=${email}`,
-      key: email,
-      name: faker.name.findName(),
+      name: name.findName(),
       email,
       stats: {
-        threads: randomNumber(1, 20),
-        comments: randomNumber(1, 80),
-        upvotes: Math.random() < 0.15 ? randomNumber(0, 75) : 0,
-        downvotes: Math.random() < 0.07 ? randomNumber(0, 30) : 0,
-        infractions: Math.random() < 0.05 ? randomNumber(0, 10) : 0,
+        threads: datatype.number({ min: 1, max: 20 }),
+        comments: datatype.number({ min: 1, max: 80 }),
+        upvotes:
+          Math.random() < 0.15 ? datatype.number({ min: 0, max: 50 }) : 0,
+        downvotes:
+          Math.random() < 0.07 ? datatype.number({ min: 0, max: 20 }) : 0,
+        infractions:
+          Math.random() < 0.05 ? datatype.number({ min: 0, max: 10 }) : 0,
       },
-      timestamp: generateDate({
-        year: { min: 0, max: 2 },
-        month: { min: 0, max: 11 },
-        date: { min: 0, max: 31 },
-      }),
-      lastModified: generateDate({
-        past: false,
-        year: { min: 0, max: 0 },
-        month: { min: 0, max: 11 },
-        date: { min: 0, max: 31 },
-      }),
+      timestamp,
+      lastModified: date.between(new Date(timestamp), now).getTime(),
     });
   }
 
   for (let i = 0; i < options.numberOfBlogs; i++) {
-    const timestamp = generateDate({
-      year: { min: 0, max: 10 },
-      month: { min: 0, max: 11 },
-      date: { min: 0, max: 31 },
-    });
-    const lastModified = generateDate({
-      target: new Date(timestamp),
-      past: false,
-      year: { min: 0, max: 0 },
-      month: { min: 0, max: 11 },
-      date: { min: 0, max: 31 },
-    });
+    const timestamp = date.past(datatype.number({ min: 5, max: 8 })).getTime();
+    const lastModified = date.between(new Date(timestamp), now).getTime();
+
+    const artifact: ArtifactDocument = {
+      type: "artifact",
+      _id: `/blogs/blog=${i}/artifact`,
+      title: lorem.words(datatype.number({ min: 1, max: 4 })),
+      // @ts-ignore
+      image: images[datatype.number({ min: 0, max: 99 })]["download_url"],
+      content: lorem.sentences(datatype.number({ min: 10, max: 15 })),
+      period: "",
+      tags: lorem.words(datatype.number({ min: 2, max: 5 })).split(" "),
+      timestamp,
+      lastModified,
+    };
     const blog: BlogDocument = {
       type: "blog",
       _id: `/blogs/blog=${i}`,
-      key: `blog-${i}`,
+      artifact,
       threads: new Map<string, ThreadDocument>(),
       stats: {
-        threads: randomNumber(1, 5),
+        threads: datatype.number({ min: 3, max: 10 }),
         comments: 0,
       },
       timestamp,
@@ -170,30 +99,18 @@ export const mockData = async function mockData(
     if (blog.stats.threads)
       for (let i = 0; i < blog.stats.threads; i++) {
         const _id = `${blog._id}/thread=${i}`;
-        const user = users[randomNumber(0, options.numberOfUsers - 1)];
-        const timestamp = generateDate({
-          target: new Date(blog.timestamp),
-          past: false,
-          year: { min: 0, max: 2 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        });
-        const lastModified = generateDate({
-          target: new Date(timestamp),
-          past: false,
-          year: { min: 0, max: 2 },
-          month: { min: 0, max: 11 },
-          date: { min: 0, max: 31 },
-        });
+        const user =
+          users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })];
+        const timestamp = date.between(new Date(blog.timestamp), now).getTime();
+        const lastModified = date.between(new Date(timestamp), now).getTime();
         const post: PostDocument = {
           type: "post",
           _id: `${_id}/post`,
-          key: "post",
           user: {
             name: user.name,
             email: user.email,
           },
-          content: faker.lorem.sentences(randomNumber(3, 15)),
+          content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
           upvotes: new Map(),
           downvotes: new Map(),
           stats: {
@@ -206,15 +123,17 @@ export const mockData = async function mockData(
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.1)
             post.upvotes.set(
-              users[randomNumber(0, options.numberOfUsers)].email,
+              users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
+                .email,
               true
             );
         }
 
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.05)
-            post.upvotes.set(
-              users[randomNumber(0, options.numberOfUsers)].email,
+            post.downvotes.set(
+              users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
+                .email,
               true
             );
         }
@@ -222,12 +141,14 @@ export const mockData = async function mockData(
         const thread: ThreadDocument = {
           type: "thread",
           _id,
-          key: `thread=${i}`,
-          user: user.name,
+          user: {
+            name: user.name,
+            email: user.email,
+          },
           post,
           comments: new Map<string, CommentDocument>(),
           stats: {
-            comments: randomNumber(1, 7),
+            comments: datatype.number({ min: 5, max: 15 }),
           },
           timestamp: post.timestamp,
           lastModified: post.lastModified,
@@ -237,38 +158,35 @@ export const mockData = async function mockData(
           let lastTimestamp = thread.timestamp;
 
           for (let i = 0; i < thread.stats.comments; i++) {
-            const user = users[randomNumber(0, options.numberOfUsers)];
-            const timestamp = generateDate({
-              target: new Date(lastTimestamp),
-              past: false,
-              year: { min: 0, max: 2 },
-              month: { min: 0, max: 11 },
-              date: { min: 0, max: 31 },
-            });
-            const lastModified = generateDate({
-              target: new Date(timestamp),
-              past: false,
-              year: { min: 0, max: 0 },
-              month: { min: 0, max: 11 },
-              date: { min: 0, max: 31 },
-            });
+            const user =
+              users[
+                datatype.number({ min: 0, max: options.numberOfUsers - 1 })
+              ];
+            const timestamp = date
+              .between(new Date(lastTimestamp), now)
+              .getTime();
+            const lastModified = date
+              .between(new Date(timestamp), now)
+              .getTime();
             const comment: CommentDocument = {
               type: "comment",
               _id: `${post._id}/comment=${i}`,
-              key: `comment=${i}`,
               timestamp,
               lastModified,
               user: {
                 name: user.name,
                 email: user.email,
               },
-              content: faker.lorem.sentences(randomNumber(3, 15)),
+              content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
               stats: {
-                infractions: Math.random() < 0.05 ? randomNumber(0, 5) : 0,
+                infractions:
+                  Math.random() < 0.05
+                    ? datatype.number({ min: 0, max: 5 })
+                    : 0,
               },
             };
 
-            thread.comments.set(comment.key, comment);
+            thread.comments.set(`comment=${i}`, comment);
             lastTimestamp = comment.timestamp;
           }
         }

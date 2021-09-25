@@ -1,0 +1,11 @@
+@use "../../themes/theme";
+
+.artifact-info {
+  margin-bottom: theme.$spacing;
+
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: theme.$spacing;
+  }
+}
