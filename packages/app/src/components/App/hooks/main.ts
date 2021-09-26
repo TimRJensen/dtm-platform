@@ -3,6 +3,7 @@
  */
 import { useContext, useState, FormEvent, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import draftToHtml from "draftjs-to-html";
 
 /**
  * Custom imports.
@@ -16,6 +17,7 @@ import {
 } from "db";
 import { docIncludes } from "../../../util/main";
 import { AppStateContext } from "../app-state/context";
+import { RawDraftContentState } from "draft-js";
 
 /**
  * useShowEditor hook.
@@ -59,7 +61,7 @@ export const useEditor = function useEditor(
   return {
     showEditor,
     handleShowEditor,
-    handleSubmit: async (content?: string) => {
+    handleSubmit: async (content?: RawDraftContentState) => {
       if (!doc || !content || !state.currentBlog || !state.currentUser) {
         showEditor(false);
         return;
@@ -81,7 +83,7 @@ export const useEditor = function useEditor(
               name: state.currentUser.name,
               email: state.currentUser.email,
             },
-            content,
+            content: draftToHtml(content),
             upvotes: new Map(),
             downvotes: new Map(),
             stats: { infractions: 0 },
@@ -100,7 +102,7 @@ export const useEditor = function useEditor(
         doc.comments.set(`comment-${doc.stats.comments}`, {
           type: "comment",
           _id: `${doc._id}/comment-${doc.stats.comments}`,
-          content,
+          content: draftToHtml(content),
           user: {
             name: state.currentUser.name,
             email: state.currentUser.email,
@@ -110,7 +112,7 @@ export const useEditor = function useEditor(
           lastModified: Date.now(),
         });
         doc.stats.comments++;
-      } else doc.content = content;
+      } else doc.content = draftToHtml(content);
 
       //Update the db.
       await db.put(state.currentBlog);

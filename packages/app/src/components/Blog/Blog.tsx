@@ -37,8 +37,6 @@ export const Blog = function Blog({ blog }: Props) {
   useEffect(() => {
     if (!blog) fetch();
 
-    console.log("A");
-
     return () => dispatch({ type: "CURRENT_BLOG", value: undefined });
   }, []);
 
@@ -51,6 +49,7 @@ export const Blog = function Blog({ blog }: Props) {
         styles={styles}
         onSubmit={handleSubmit}
         show={showEditor()}
+        advanced
       ></TextEditor>
       {Array.from(blog.threads.values()).map((thread, i) => {
         return <Thread key={thread._id} doc={thread} />;

@@ -12,6 +12,7 @@ import { useEditor } from "../App/hooks/main";
 import { PostPanel } from "../PostPanel/PostPanel";
 import { PostHeader } from "../PostHeader/PostHeader";
 import { TextEditor } from "../TextEditor/TextEditor";
+import { TextBox } from "../TextBox/TextBox";
 import styles from "./style.module.scss";
 
 /**
@@ -26,7 +27,7 @@ export const Post = function Post({ doc, onComment }: Props) {
   if (!doc) return null;
 
   const match = useRouteMatch();
-  const domElement = useRef<HTMLSelectElement>(null);
+  const domElement = useRef<HTMLDivElement>(null);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
 
   useEffect(() => {
@@ -52,9 +53,10 @@ export const Post = function Post({ doc, onComment }: Props) {
             styles={styles}
             content={doc.content}
             onSubmit={handleSubmit}
+            advanced
           />
         ) : (
-          <div className={styles.content}>{doc.content}</div>
+          <TextBox className={styles.content} htmlString={doc.content} />
         )}
       </div>
     </section>

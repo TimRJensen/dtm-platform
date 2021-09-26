@@ -10,6 +10,7 @@ import { useRouteMatch } from "react-router-dom";
 import { CommentDocument } from "db";
 import { useEditor } from "../App/hooks/main";
 import { TextEditor } from "../TextEditor/TextEditor";
+import { TextBox } from "../TextBox/TextBox";
 import { CommentHeader } from "../CommentHeader/CommentHeader";
 import styles from "./styles.module.scss";
 
@@ -46,7 +47,7 @@ export const Comment = function Comment({ doc }: Props) {
           onSubmit={handleSubmit}
         />
       ) : (
-        <div className={styles.content}>{doc.content}</div>
+        <TextBox className={styles.content} htmlString={doc.content} />
       )}
     </section>
   );

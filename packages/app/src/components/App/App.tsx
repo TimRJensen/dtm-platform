@@ -13,6 +13,7 @@ import { AppHeader } from "../AppHeader/AppHeader";
 import { Blog } from "../Blog/Blog";
 import { HomeView } from "../HomeView/HomeView";
 import { SearchView } from "../SearchView/SearchView";
+import { Test } from "../Test/Test";
 import "./style.scss";
 
 /**
@@ -63,6 +64,7 @@ export const App = function ({ db }: Props) {
                 return <SearchView />;
               }}
             />
+            <Route path="/test" component={Test} />
           </Switch>
         </Router>
       </AppStateProvider>

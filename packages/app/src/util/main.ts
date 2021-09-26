@@ -22,6 +22,33 @@ export function formatString(value: string) {
   return value.toLowerCase().replace(/[^\sa-zA-Z0-9_]+/g, "");
 }
 
+export function formatStyleKey(key: string) {
+  if (!key.includes("-")) return key;
+
+  const result = key.split("-");
+  let i = 0;
+
+  while (++i < result.length)
+    result[i] = result[i].slice(0, 1).toUpperCase() + result[i].slice(1);
+
+  return result.join("");
+}
+
+const matchColon = /:|,/;
+
+export function objectFromString(value: string) {
+  const fields = value.split(matchColon);
+  const result = {} as { [key: string]: any };
+  let i = 0;
+
+  while (i < fields.length) {
+    result[formatStyleKey(fields[i])] = fields[i + 1];
+    i += 2;
+  }
+
+  return result;
+}
+
 export function stringIncludes(value: string, queries: string[]) {
   let i = -1;
 

@@ -2,16 +2,21 @@
 @use "../../themes/mixins";
 
 .blog {
-  margin-top: 4 * theme.$spacing;
+  //margin-top: 4 * theme.$spacing;
 
   .text-editor {
     @include mixins.text-editor(600px, auto);
     margin: auto;
 
     .input {
-      height: 100px;
+      min-height: 300px;
       border: 1px solid theme.colors("secondary");
+      border-radius: 0 0 theme.$spacing theme.$spacing;
       border-radius: 5px;
     }
+  }
+
+  p {
+    margin: 0;
   }
 }
