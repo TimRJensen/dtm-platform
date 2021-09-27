@@ -19,7 +19,7 @@ import styles from "./styles.module.scss";
 
 export const SearchView = function SearchView() {
   const { pageId } = useParams<{ pageId?: string }>();
-  const { results, test } = useQuery();
+  const { results, query } = useQuery();
   const [currentPage, setCurrentPage] = useState(
     pageId ? Number.parseInt(pageId.replace("page=", "")) : 0
   );
@@ -49,7 +49,7 @@ export const SearchView = function SearchView() {
         .map((doc: PostDocument | CommentDocument) => (
           <SearchResult
             key={`search-result-${doc._id}`}
-            test={test}
+            query={query}
             result={doc}
           />
         ))}

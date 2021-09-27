@@ -6,68 +6,36 @@ import { ReactHTML } from "react";
 /**
  * Custom imports.
  */
-import { objectFromString } from "../../util/main";
+import { mapHtml } from "../../util/main";
+import styles from "./styles.module.scss";
 
 /**
  * TextBox functional component.
  */
 interface Props {
-  htmlString: string;
-  className?: string;
+  children?: string;
 }
 
-const matchHtmlTag = /<(\w+)([^>]+)?>(.+)(<\/\1?>)+/g;
-const matchWhitespaceQuotes = /\s|"|'|`/g;
-const matchColon = /:(?![//])/;
+export const TextBox = function TextBox({ children }: Props) {
+  if (!children) return null;
 
-export const TextBox = function TextBox({ htmlString, className = "" }: Props) {
-  if (!htmlString) return null;
+  return (
+    <div className={styles.htmlTextBox}>
+      {mapHtml(children).map(function _map(component, i) {
+        if (typeof component === "string") return component;
 
-  const transformHtml = (htmlString: string) => {
-    const test = htmlString.replace(/\n/g, "").matchAll(matchHtmlTag);
-    const result = [];
-    let i = 0;
-    console.log("htmlString", htmlString.replace(/\n/g, ""));
+        const Component = component.type as keyof ReactHTML;
 
-    for (const match of test) {
-      console.log(match);
-      if (match.index === undefined) continue;
-
-      const Component = match[1] as keyof ReactHTML;
-      const children = transformHtml(match[3]);
-      let props: { [k: string]: any } | undefined;
-
-      if (match[2]) {
-        props = {};
-
-        const attributes = match[2]
-          .replace(matchWhitespaceQuotes, "")
-          .split("=");
-        let i = 0;
-
-        while (i < attributes.length) {
-          const [key, value] = attributes.slice(i, i + 2);
-
-          if (value.search(matchColon) !== -1) {
-            props[key] = objectFromString(value);
-          } else props[key] = value;
-          i += 2;
-        }
-      }
-
-      result.push(
-        htmlString.slice(i, match.index),
-        <Component key={match[3]} {...(props ? props : null)}>
-          {children}
-        </Component>
-      );
-      i = match.index + match[0].length;
-    }
-    result.push(htmlString.slice(i));
-
-    //console.log(result);
-    return result;
-  };
-
-  return <div className={className}>{transformHtml(htmlString)}</div>;
+        return (
+          <Component
+            key={`text-box-${Component}-${i}`}
+            className={styles.content}
+            {...(component.props ? component.props : null)}
+          >
+            {component.children.map(_map)}
+          </Component>
+        );
+      })}
+    </div>
+  );
 };

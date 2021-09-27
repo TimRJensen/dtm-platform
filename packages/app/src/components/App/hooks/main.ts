@@ -237,6 +237,6 @@ export const useQuery = function useQuery() {
 
   return {
     results,
-    test: new RegExp(query.split("&").join("|"), "gi"),
+    query,
   };
 };

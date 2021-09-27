@@ -22,18 +22,23 @@ import { TextBox } from "../TextBox/TextBox";
  */
 
 export const Test = function Test() {
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createWithContent(
-      ContentState.createFromBlockArray(convertFromHTML(html).contentBlocks)
-    )
+  const [editorState, setEditorState] = useState(
+    () =>
+      // @ts-ignore
+      console.log(convertFromHTML(html).entityMap) ||
+      EditorState.createWithContent(
+        ContentState.createFromBlockArray(
+          convertFromHTML(html).contentBlocks,
+          convertFromHTML(html).entityMap
+        )
+      )
   );
-  const [text, setText] = useState(undefined as string | undefined);
+  const [text, setText] = useState(html);
 
   return (
     <div style={{ width: 400, marginLeft: 50 }}>
       <TextEditorControls editorState={editorState} onToggle={setEditorState} />
       <Editor editorState={editorState} onChange={setEditorState} />
-      <TextBox htmlString={text as string} />
       <button
         onClick={() =>
           setText(draftToHtml(convertToRaw(editorState.getCurrentContent())))
@@ -45,6 +50,5 @@ export const Test = function Test() {
   );
 };
 
-const lorem =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-const html = "<ol><li>A</li><li>B</li><li>C</li>\n" + lorem;
+const html =
+  "<ol><li>A</li><li>B</li><li>C</li></ol><p>Lorem ipsum dolor sit amet,</p><p>consectetur adipiscing elit, sed do eiusmod tempor <span style='color: red; font-size: 1.5rem'>incididunt</span> ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";

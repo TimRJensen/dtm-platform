@@ -56,7 +56,7 @@ export const Post = function Post({ doc, onComment }: Props) {
             advanced
           />
         ) : (
-          <TextBox className={styles.content} htmlString={doc.content} />
+          <TextBox>{doc.content}</TextBox>
         )}
       </div>
     </section>

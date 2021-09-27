@@ -47,7 +47,7 @@ export const Comment = function Comment({ doc }: Props) {
           onSubmit={handleSubmit}
         />
       ) : (
-        <TextBox className={styles.content} htmlString={doc.content} />
+        <TextBox>{doc.content}</TextBox>
       )}
     </section>
   );
