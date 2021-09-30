@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
  * Custom imports.
  */
 import { CommentDocument, PostDocument } from "db";
-import { useQuery } from "../App/hooks/main";
+import { useQuery } from "../../hooks/";
 import { SearchPagination } from "../SearchPagination/SearchPagination";
 import { SearchResult } from "../SearchResult/SearchResult";
 import styles from "./styles.module.scss";

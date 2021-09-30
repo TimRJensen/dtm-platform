@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { PouchDB, PouchDBProvider } from "db";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 import { AppHeader } from "../AppHeader/AppHeader";
-import { Blog } from "../Blog/Blog";
+import { BlogView } from "../BlogView/BlogView";
 import { HomeView } from "../HomeView/HomeView";
 import { SearchView } from "../SearchView/SearchView";
 import { Test } from "../Test/Test";
@@ -55,7 +55,7 @@ export const App = function ({ db }: Props) {
             <Route
               path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
               render={() => {
-                return <Blog blog={state.currentBlog} />;
+                return <BlogView blog={state.currentBlog} />;
               }}
             />
             <Route

@@ -8,7 +8,7 @@ import { useRouteMatch } from "react-router-dom";
  * Custom imports.
  */
 import { PostDocument } from "db";
-import { useEditor } from "../App/hooks/main";
+import { useEditor } from "../../hooks/";
 import { PostPanel } from "../PostPanel/PostPanel";
 import { PostHeader } from "../PostHeader/PostHeader";
 import { TextEditor } from "../TextEditor/TextEditor";

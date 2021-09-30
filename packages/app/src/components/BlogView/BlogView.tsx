@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
  * Custom import.
  */
 import { BlogDocument, PouchDBContext } from "db";
-import { useEditor } from "../App/hooks/main";
+import { useEditor } from "../../hooks";
 import { AppStateContext } from "../App/app-state/context";
 import { Artifact } from "../Artifact/Artifact";
 import { Thread } from "../Thread/Thread";
@@ -22,7 +22,7 @@ interface Props {
   blog: BlogDocument | undefined;
 }
 
-export const Blog = function Blog({ blog }: Props) {
+export const BlogView = function BlogView({ blog }: Props) {
   const db = useContext(PouchDBContext);
   const { dispatch } = useContext(AppStateContext);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(blog);
@@ -43,7 +43,7 @@ export const Blog = function Blog({ blog }: Props) {
   if (!blog) return null;
 
   return (
-    <section className={styles.blog}>
+    <section className={styles.blogView}>
       <Artifact doc={blog.artifact} onComment={handleShowEditor} />
       <TextEditor
         styles={styles}

@@ -8,7 +8,7 @@ import { useRouteMatch } from "react-router-dom";
  * Custom imports.
  */
 import { CommentDocument } from "db";
-import { useEditor } from "../App/hooks/main";
+import { useEditor } from "../../hooks/";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { TextBox } from "../TextBox/TextBox";
 import { CommentHeader } from "../CommentHeader/CommentHeader";

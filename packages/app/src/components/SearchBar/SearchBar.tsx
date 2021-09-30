@@ -6,7 +6,7 @@ import { useState } from "react";
 /**
  * Custom imports.
  */
-import { useSearch } from "../App/hooks/main";
+import { useSearch } from "../../hooks/";
 import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 

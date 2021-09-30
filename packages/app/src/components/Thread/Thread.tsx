@@ -7,7 +7,7 @@ import { useEffect } from "react";
  * Custom imports.
  */
 import { ThreadDocument } from "db";
-import { useEditor } from "../App/hooks/main";
+import { useEditor } from "../../hooks/";
 import { Post } from "../Post/Post";
 import { Comment } from "../Comment/Comment";
 import { TextEditor } from "../TextEditor/TextEditor";

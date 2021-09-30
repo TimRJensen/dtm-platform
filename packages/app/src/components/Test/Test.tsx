@@ -10,45 +10,51 @@ import {
   convertFromHTML,
 } from "draft-js";
 import draftToHtml from "draftjs-to-html";
+import * as htmlParser2 from "htmlparser2";
 
 /**
  * Custom imports.
  */
 import { TextEditorControls } from "../TextEditorControls/TextEditorControls";
+import { SearchResult } from "../SearchResult/SearchResult";
 import { TextBox } from "../TextBox/TextBox";
+import { CommentDocument } from "db";
 
 /**
  * Test functional component.
  */
 
 export const Test = function Test() {
-  const [editorState, setEditorState] = useState(
-    () =>
-      // @ts-ignore
-      console.log(convertFromHTML(html).entityMap) ||
-      EditorState.createWithContent(
-        ContentState.createFromBlockArray(
-          convertFromHTML(html).contentBlocks,
-          convertFromHTML(html).entityMap
-        )
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createWithContent(
+      ContentState.createFromBlockArray(
+        convertFromHTML(html).contentBlocks,
+        convertFromHTML(html).entityMap
       )
+    )
   );
   const [text, setText] = useState(html);
 
   return (
     <div style={{ width: 400, marginLeft: 50 }}>
-      <TextEditorControls editorState={editorState} onToggle={setEditorState} />
-      <Editor editorState={editorState} onChange={setEditorState} />
-      <button
-        onClick={() =>
-          setText(draftToHtml(convertToRaw(editorState.getCurrentContent())))
-        }
-      >
-        Test
-      </button>
+      <SearchResult query="volup" result={comment}></SearchResult>
     </div>
   );
 };
 
 const html =
-  "<ol><li>A</li><li>B</li><li>C</li></ol><p>Lorem ipsum dolor sit amet,</p><p>consectetur adipiscing elit, sed do eiusmod tempor <span style='color: red; font-size: 1.5rem'>incididunt</span> ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
+  "<p>Similique molestias quisquam blanditiis dignissimos incidunt. Maiores similique mollitia autem. Voluptatem hic repudiandae laudantium quam nulla enim minima neque repudiandae. Modi aut voluptatem cumque magnam nisi aperiam. Perspiciatis sit eligendi accusamus debitis voluptas blanditiis. Aut eum enim non quaerat. Cupiditate quaerat eum. Expedita aliquid voluptatum quo deserunt delectus atque vel sit. Possimus optio dolor in eius maxime dolor.</p>";
+const comment: CommentDocument = {
+  type: "comment",
+  _id: "test-comment",
+  content: html,
+  user: {
+    name: "abc",
+    email: "test",
+  },
+  stats: {
+    infractions: 0,
+  },
+  timestamp: Date.now(),
+  lastModified: Date.now(),
+};

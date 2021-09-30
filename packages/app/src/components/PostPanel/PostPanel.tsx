@@ -8,7 +8,7 @@ import { useContext } from "react";
  */
 import { PostDocument } from "db";
 import { AppStateContext } from "../App/app-state/context";
-import { useIsUpvoted } from "../App/hooks/main";
+import { useIsUpvoted } from "../../hooks/";
 import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 

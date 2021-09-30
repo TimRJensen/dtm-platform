@@ -1,12 +1,13 @@
 @use "../../themes/theme";
 @use "../../themes/mixins";
 
-.blog {
+.blog-view {
   //margin-top: 4 * theme.$spacing;
 
   .text-editor {
     @include mixins.text-editor(600px, auto);
     margin: auto;
+    margin-bottom: theme.$spacing * 2.5;
 
     .input {
       min-height: 300px;

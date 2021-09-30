@@ -1,6 +1,12 @@
+@use "../../themes/theme";
+
 .html-text-box{
-  .content {
-    //display: block;
+  width: inherit;
+  padding: theme.$spacing;
+  border-bottom: 1px solid theme.colors("secondary");
+
+  p {
+    display: inline;
     margin: 0;
   }
 }
