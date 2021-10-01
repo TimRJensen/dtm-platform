@@ -80,24 +80,25 @@ export function docIncludes(
 
     if (!fields.includes(key)) continue;
 
-    if (typeof value === "object") {
-      if (value instanceof Map) {
-        for (const doc of value.values()) {
-          return docIncludes(doc, fields, queries);
-        }
-      } else {
-        return docIncludes(value, fields, queries);
+    if (value instanceof Map) {
+      for (const doc of value.values()) {
+        if (docIncludes(doc, fields, queries)) return true;
       }
+    } else if (typeof value === "object") {
+      if (docIncludes(value, queries, fields)) return true;
     } else if (typeof value === "number") {
-      return stringIncludes(
-        new Date(value).toLocaleDateString("da-DK", {
-          month: "long",
-          year: "numeric",
-        }),
-        queries
-      );
-    } else {
-      return stringIncludes(value, queries);
+      if (
+        stringIncludes(
+          new Date(value).toLocaleDateString("da-DK", {
+            month: "long",
+            year: "numeric",
+          }),
+          queries
+        )
+      )
+        return true;
+    } else if (typeof value === "string") {
+      if (stringIncludes(value, queries)) return true;
     }
   }
 

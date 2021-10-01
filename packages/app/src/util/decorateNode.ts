@@ -2,7 +2,14 @@
  * Vendor imports.
  */
 import { DomUtils } from "htmlparser2";
-import { Node, Text, Element } from "domhandler";
+import {
+  Node,
+  Text,
+  Element,
+  NodeWithChildren,
+  hasChildren,
+  isText,
+} from "domhandler";
 
 const { textContent } = DomUtils;
 
@@ -13,68 +20,70 @@ const { textContent } = DomUtils;
 /**
  * formatNode
  */
-export function decorateNode(node: Node, regExp: RegExp, tag: string) {
-  const text = textContent(node);
-  const matches = text.matchAll(regExp);
+
+function linkNodes(nodes: Node[], parent?: NodeWithChildren) {
+  let i = -1;
+
+  while (++i < nodes.length) {
+    const node = nodes[i];
+
+    node.prev = node.previousSibling = nodes[i - 1] ?? null;
+    node.next = node.nextSibling = nodes[i + 1] ?? null;
+    if (parent) node.parent = parent;
+  }
+
+  return nodes;
+}
+
+function splitNode(node: Node, regExp: RegExp) {
   const result = [];
 
-  let i = 0;
+  for (const text of textContent(node).split(regExp)) {
+    result.push(new Text(text));
+  }
 
-  for (const match of matches) {
-    if (match.input === undefined || match.index === undefined) continue;
+  return linkNodes(result, hasChildren(node) ? node : undefined);
+}
 
-    // Create the new element.
-    const element = new Element(tag, {}, [new Text(match[0])]);
+function mapNodes(nodes: Node[], mapper: (node: Node) => Node) {
+  const result = [];
 
-    element.parent = node.parent;
+  for (const node of nodes) {
+    result.push(mapper(node));
+  }
 
-    // Perform a look-behind for the new element.
-    const start = text.lastIndexOf(".", match.index);
-    const prev = new Text(text.slice(start > -1 ? start + 1 : i, match.index));
+  return result;
+}
 
-    prev.parent = node.parent;
-    prev.next = prev.nextSibling = element;
-    element.prev = element.previousSibling = prev;
+function replaceNode(node: Node, replacement: Node) {
+  replacement.next = replacement.nextSibling = node.next;
+  replacement.prev = replacement.previousSibling = node.prev;
 
-    // The look-ahead for the new element is performed in the next iteration (see below(a)). This is done to avoid
-    // skipping a possible matches, matching the same match twice or instanciating a new element for each match.
-    // This does leave an issue: The final match won't have look-ahead. This final look-ahead is however implemented
-    // outside the loop (see below (b)).
+  return replacement;
+}
 
-    // Perform a look-ahead for the last element. (a)
-    const last = result[result.length - 1];
-    let lastNext;
+export function decorateNode(node: Node, regExp: RegExp, tag: string) {
+  const result = mapNodes(splitNode(node, regExp), (node) => {
+    if (textContent(node).search(regExp) > -1) {
+      if (node.prev && isText(node.prev)) {
+        const text = node.prev.data;
+        const start = text.search("\\.\\s\\w") + 1;
 
-    if (last) {
-      const end = text.indexOf(".", i);
-      lastNext = new Text(text.slice(i, end > -1 ? end + 1 : match.index));
+        node.prev.data = text.slice(start > 0 ? start : 0, text.length);
+      }
 
-      lastNext.parent = node.parent;
-      lastNext.next = lastNext.nextSibling = prev;
-      lastNext.prev = lastNext.previousSibling = last;
-      prev.prev = prev.previousSibling = lastNext;
-      last.next = last.nextSibling = lastNext;
+      if (node.next && !node.next.next && isText(node.next)) {
+        const text = node.next.data;
+        const end = text.indexOf(".") + 1;
+
+        node.next.data = text.slice(0, end > 0 ? end : text.length);
+      }
+
+      node = replaceNode(node, new Element(tag, {}, [node.cloneNode()]));
     }
 
-    result.push(...(lastNext ? [lastNext, prev, element] : [prev, element]));
-
-    i = match.index + match[0].length;
-  }
-
-  // Perform a look-ahead for the final match. (b)
-  if (i < text.length && result.length > 0) {
-    const end = text.indexOf(".", i);
-    const next = new Text(text.slice(i, end > -1 ? end + 1 : text.length));
-    const prev = result[result.length - 1];
-
-    next.parent = node.parent;
-    next.prev = next.previousSibling = prev;
-    prev.next = prev.nextSibling = next;
-
-    result.push(next);
-
-    if (end === -1) console.log("a");
-  }
+    return node;
+  });
 
   return result;
 }

@@ -16,6 +16,7 @@ import * as htmlParser2 from "htmlparser2";
  * Custom imports.
  */
 import { Post } from "../Post/Post";
+import { SearchResult } from "../SearchResult/SearchResult";
 import { CommentDocument, PostDocument } from "db";
 
 /**
@@ -35,7 +36,7 @@ export const Test = function Test() {
 
   return (
     <div style={{ width: 400, marginLeft: 50 }}>
-      <Post doc={comment} onComment={() => false}></Post>
+      <SearchResult result={comment} query="volup"></SearchResult>
     </div>
   );
 };

@@ -33,6 +33,7 @@ export const Post = function Post({ doc, onComment }: Props) {
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
   const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
 
+  // extract.
   useEffect(() => {
     if (match.url === doc._id && domElement.current) {
       const rect = domElement.current?.getBoundingClientRect();
@@ -52,12 +53,12 @@ export const Post = function Post({ doc, onComment }: Props) {
       ) : (
         <div className={styles.body}>
           <TextBox>{doc.content}</TextBox>
+          {/** extract */}
           <div className={styles.footer}>
             <FontIcon
               key="footer-comment-button"
               type="question_answer"
-              active={state.currentUser !== undefined}
-              //styles={styles}
+              disabled={!state.currentUser}
               onClick={onComment}
             >
               comment
@@ -65,8 +66,8 @@ export const Post = function Post({ doc, onComment }: Props) {
             <FontIcon
               key="footer-vote-button"
               type="thumb_up"
-              active={state.currentUser !== undefined && isUpvoted}
-              //styles={styles}
+              active={isUpvoted}
+              disabled={!state.currentUser}
               onClick={handleUpvote}
             >
               upvote

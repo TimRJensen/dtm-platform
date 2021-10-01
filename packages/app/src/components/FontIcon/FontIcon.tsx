@@ -33,7 +33,7 @@ export const FontIcon = function FontIcon({
   return (
     <span
       className={`${_styles.fontIcon} ${
-        disabled ? _styles.disabled : active ? styles.active : ""
+        disabled ? _styles.disabled : active ? _styles.active : ""
       }`}
       onClick={(event: MouseEvent) => {
         event.preventDefault();

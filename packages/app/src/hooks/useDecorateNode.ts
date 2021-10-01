@@ -19,9 +19,10 @@ export function useDecorateNode(
   tag: string
 ): { nodes: Node[] } {
   const { nodes, isTag } = useHtmlParser(htmlString);
+
   const regExp =
     typeof queryOrRegExp === "string"
-      ? new RegExp(queryOrRegExp.trim().split("+").join("|"), "gi")
+      ? new RegExp(`(${queryOrRegExp.trim().split("+").join("|")})`, "gi")
       : queryOrRegExp;
   const result = [];
 

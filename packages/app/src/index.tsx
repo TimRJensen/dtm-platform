@@ -32,4 +32,16 @@ async function createMockData() {
 }
 createMockData();
 
-render(<App db={db} />, document.getElementById("app"));
+// @ts-ignore
+if (module.hot)
+  // @ts-ignore
+  module.hot.accept("./components/App/App.tsx", () => {
+    hotRender();
+  });
+
+function hotRender() {
+  const { App } = require("./components/App/App");
+
+  render(<App db={db} />, document.getElementById("app"));
+}
+hotRender();

@@ -16,7 +16,9 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
   const db = useContext(PouchDBContext);
   const { state, dispatch } = useContext(AppStateContext);
   const [isUpvoted, setIsUpvoted] = useState(
-    state.currentUser ? doc.upvotes.get(state.currentUser?.email) : false
+    state.currentUser
+      ? doc.upvotes.get(state.currentUser?.email) ?? false
+      : false
   );
 
   return {

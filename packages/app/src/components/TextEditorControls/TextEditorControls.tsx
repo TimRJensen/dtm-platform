@@ -36,7 +36,7 @@ export const TextEditorControls = function TextEditorControls({
         {inlineControls.map((control) => (
           <FontIcon
             key={`text-control-button-${control.type}`}
-            //styles={styles}
+            styles={styles}
             type={control.fontIcon}
             active={editorState.getCurrentInlineStyle().has(control.type)}
             onToggle={() =>

@@ -42,15 +42,14 @@ export const useQuery = function useQuery() {
     setResults(
       response.docs.reduce((result, doc) => {
         if (doc.type === "blog") {
-          doc.threads.forEach((thread) => {
+          for (const thread of doc.threads.values()) {
             if (docIncludes(thread.post, includeKeys, queries))
               result.push(thread.post);
 
-            thread.comments.forEach((comment) => {
+            for (const comment of thread.comments.values())
               if (docIncludes(comment, includeKeys, queries))
                 result.push(comment);
-            });
-          });
+          }
         }
 
         return result;
