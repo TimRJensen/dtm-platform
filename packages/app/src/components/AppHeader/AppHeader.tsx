@@ -37,13 +37,8 @@ export const AppHeader = function AppHeader() {
             <FontIcon className={styles.fontIcon}>search</FontIcon>
           </form>
         </div> */}
-        {state.currentUser ? (
-          <FontIcon className={styles.fontIcon}>account_circle</FontIcon>
-        ) : (
-          <FontIcon className={`${styles.fontIcon} ${styles.disabled}`}>
-            account_circle
-          </FontIcon>
-        )}
+
+        <FontIcon type="account_circle" /*className={styles.fontIcon}*/ />
       </div>
     </section>
   );

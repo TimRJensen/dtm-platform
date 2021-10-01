@@ -15,10 +15,8 @@ import * as htmlParser2 from "htmlparser2";
 /**
  * Custom imports.
  */
-import { TextEditorControls } from "../TextEditorControls/TextEditorControls";
-import { SearchResult } from "../SearchResult/SearchResult";
-import { TextBox } from "../TextBox/TextBox";
-import { CommentDocument } from "db";
+import { Post } from "../Post/Post";
+import { CommentDocument, PostDocument } from "db";
 
 /**
  * Test functional component.
@@ -37,15 +35,15 @@ export const Test = function Test() {
 
   return (
     <div style={{ width: 400, marginLeft: 50 }}>
-      <SearchResult query="volup" result={comment}></SearchResult>
+      <Post doc={comment} onComment={() => false}></Post>
     </div>
   );
 };
 
 const html =
   "<p>Similique molestias quisquam blanditiis dignissimos incidunt. Maiores similique mollitia autem. Voluptatem hic repudiandae laudantium quam nulla enim minima neque repudiandae. Modi aut voluptatem cumque magnam nisi aperiam. Perspiciatis sit eligendi accusamus debitis voluptas blanditiis. Aut eum enim non quaerat. Cupiditate quaerat eum. Expedita aliquid voluptatum quo deserunt delectus atque vel sit. Possimus optio dolor in eius maxime dolor.</p>";
-const comment: CommentDocument = {
-  type: "comment",
+const comment: PostDocument = {
+  type: "post",
   _id: "test-comment",
   content: html,
   user: {
@@ -55,6 +53,8 @@ const comment: CommentDocument = {
   stats: {
     infractions: 0,
   },
+  upvotes: new Map(),
+  downvotes: new Map(),
   timestamp: Date.now(),
   lastModified: Date.now(),
 };

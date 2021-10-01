@@ -1,0 +1,35 @@
+@use "sass:math";
+@use "../../themes/theme";
+@use "../../themes/mixins";
+
+.text-editor {
+  margin-bottom: theme.$spacing * 2.5;
+
+  .input {
+    height: inherit;
+    margin-bottom: theme.$spacing;
+    padding: theme.$spacing;
+    border-bottom: 1px solid theme.colors("secondary");
+    overflow: auto;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: right;
+
+    button {
+      @include mixins.button(60px, 20px);
+      margin-left: math.div(theme.$spacing, 2);
+
+      &.submit {
+        color: #fff;
+        background-color: theme.colors("button", "accept");
+        border: 1px solid theme.colors("button", "accept-border");
+
+        &:hover {
+          background-color: theme.colors("button", "accept-hover");
+        }
+      }
+    }
+  }
+}

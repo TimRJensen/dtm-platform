@@ -41,11 +41,7 @@ export const Comment = function Comment({ doc }: Props) {
     <section className={styles.comment} ref={domElement}>
       <CommentHeader doc={doc} handleEdit={handleShowEditor} />
       {showEditor() ? (
-        <TextEditor
-          styles={styles}
-          content={doc.content}
-          onSubmit={handleSubmit}
-        />
+        <TextEditor content={doc.content} onSubmit={handleSubmit} />
       ) : (
         <TextBox>{doc.content}</TextBox>
       )}

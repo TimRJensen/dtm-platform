@@ -6,8 +6,4 @@
   margin-bottom: theme.$spacing * 2.5;
   padding-left: 40px;
   padding-right: 20px;
-
-  .text-editor{
-    @include mixins.text-editor();
-  }
 }

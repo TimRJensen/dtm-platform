@@ -26,9 +26,9 @@ export const PostPanel = function PostPanel({ doc }: Props) {
   if (!state.currentUser)
     return (
       <div className={styles.postPanel}>
-        <FontIcon className={`${styles.fontIcon} ${styles.disabled}`}>
-          expand_less
-        </FontIcon>
+        {/* <FontIcon className={`${styles.fontIcon} ${styles.disabled}`}>
+          thumb_up
+        </FontIcon> */}
         {/* <FontIcon className={`${styles.fontIcon} ${styles.disabled}`}>
           expand_more
         </FontIcon> */}
@@ -37,14 +37,14 @@ export const PostPanel = function PostPanel({ doc }: Props) {
 
   return (
     <div className={styles.postPanel}>
-      <FontIcon
+      {/* <FontIcon
         className={`${styles.fontIcon} ${
           isUpvoted ? `${styles.fontIcon} ${styles.active}` : styles.fontIcon
         }`}
         onClick={handleUpvote}
       >
-        expand_less
-      </FontIcon>
+        thumb_up
+      </FontIcon> */}
       {/*<FontIcon className="font-icon" onClick={handleDownvote}>
         expand_more
       </FontIcon>*/}

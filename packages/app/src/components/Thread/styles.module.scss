@@ -1,5 +1,5 @@
 @use "../../themes/theme";
-@use "../../themes/mixins";
+@use "../TextEditor/styles.module.scss";
 
 .thread {
   display: flex;
@@ -13,7 +13,8 @@
   border-radius: 5px 5px 0 0;
 
   .text-editor {
-    @include mixins.text-editor(540px, auto);
+    @extend .text-editor;
+    width: 540px;
     padding-left: 40px;
     padding-right: 20px;
 

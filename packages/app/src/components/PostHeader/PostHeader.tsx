@@ -16,29 +16,11 @@ import styles from "./styles.module.scss";
  */
 interface Props {
   doc: PostDocument;
-  handleComment: () => void;
   handleEdit: () => void;
 }
 
-export const PostHeader = function PostHeader({
-  doc,
-  handleComment,
-  handleEdit,
-}: Props) {
+export const PostHeader = function PostHeader({ doc, handleEdit }: Props) {
   const { state } = useContext(AppStateContext);
-
-  if (!state.currentUser)
-    return (
-      <div className={styles.postHeader}>
-        <div className={styles.info}>
-          {`${formatDate(doc.timestamp)} by `}
-          <span>{doc.user.name}</span>
-        </div>
-        <a className={`${styles.link} ${styles.disabled}`}>comment</a>
-        <span className={styles.divider}> - </span>
-        <a className={`${styles.link} ${styles.disabled}`}>edit</a>
-      </div>
-    );
 
   return (
     <div className={styles.postHeader}>
@@ -46,11 +28,7 @@ export const PostHeader = function PostHeader({
         {`${formatDate(doc.timestamp)} by `}
         <span>{doc.user.name}</span>
       </div>
-      <a className={styles.link} onClick={handleComment}>
-        comment
-      </a>
-      <span className={styles.divider}> - </span>
-      {state.currentUser?.email === doc.user.email ? (
+      {state.currentUser && state.currentUser.email === doc.user.email ? (
         <a className={styles.link} onClick={handleEdit}>
           edit
         </a>

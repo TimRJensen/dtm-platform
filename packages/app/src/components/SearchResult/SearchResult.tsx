@@ -22,7 +22,6 @@ interface Props {
 export const SearchResult = function SearchResult({ query, result }: Props) {
   const { nodes } = useDecorateNode(result.content, query, "strong");
 
-  console.log(nodes);
   return (
     <div className={styles.searchResult}>
       <SearchResultHeader doc={result} />

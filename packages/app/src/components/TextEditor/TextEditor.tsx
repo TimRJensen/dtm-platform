@@ -16,6 +16,7 @@ import {
  * Custom imports.
  */
 import { TextEditorControls } from "../TextEditorControls/TextEditorControls";
+import styles from "./styles.module.scss";
 
 /**
  * CommentTextbox functional component - https://draftjs.org/
@@ -29,7 +30,7 @@ interface Props {
 }
 
 export const TextEditor = function TextEditor({
-  styles = {},
+  styles: _styles = styles,
   show = true,
   advanced = false,
   content,
@@ -38,13 +39,15 @@ export const TextEditor = function TextEditor({
   if (!show) return null;
 
   const editorRef = useRef<Editor>(null);
-  const [editorState, setEditorState] = useState(() => {
-    if (!content) return EditorState.createEmpty();
-
-    return EditorState.createWithContent(
-      ContentState.createFromBlockArray(convertFromHTML(content).contentBlocks)
-    );
-  });
+  const [editorState, setEditorState] = useState(() =>
+    !content
+      ? EditorState.createEmpty()
+      : EditorState.createWithContent(
+          ContentState.createFromBlockArray(
+            convertFromHTML(content).contentBlocks
+          )
+        )
+  );
 
   const handleKeyCommand = (command: string, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -62,8 +65,8 @@ export const TextEditor = function TextEditor({
   }, []);
 
   return (
-    <section className={styles.textEditor}>
-      <div className={styles.input} onClick={() => editorRef.current?.focus()}>
+    <section className={_styles.textEditor}>
+      <div className={_styles.input} onClick={() => editorRef.current?.focus()}>
         {advanced ? (
           <TextEditorControls
             editorState={editorState}
@@ -77,9 +80,9 @@ export const TextEditor = function TextEditor({
           ref={editorRef}
         />
       </div>
-      <div className={styles.footer}>
+      <div className={_styles.footer}>
         <button
-          className={styles.submit}
+          className={_styles.submit}
           onClick={() => {
             if (onSubmit)
               onSubmit(convertToRaw(editorState.getCurrentContent()));

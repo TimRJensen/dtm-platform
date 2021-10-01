@@ -1,0 +1,48 @@
+@use "../../themes/theme";
+@use "../CommentHeader/styles.module.scss";
+
+.post {
+  width: inherit;
+  margin-bottom: theme.$spacing * 2.5;
+
+  .comment-header {
+    @extend .comment-header;
+    border: 0;
+    border-bottom: 1px solid theme.colors("secondary");
+  }
+
+  .body {
+    width: 540px;
+    margin-left: 30px;
+    margin-right: 30px;
+
+    .footer {
+      display: flex;
+      padding: theme.$spacing;
+      justify-content: end;
+
+      .comment-button {
+        display: flex;
+        align-items: center;
+        margin-right: 2*theme.$spacing;
+        color: theme.colors("text", "primary");
+        text-decoration: none;
+        cursor: pointer;
+    
+        &.disabled {
+          cursor: default;
+          color: theme.colors("text", "disabled");
+        }
+      }
+
+      .vote-button {
+        @extend .comment-button;
+        color: theme.colors("text", "secondary");
+
+        &:hover, &.active {
+          color: theme.colors("text", "primary");
+        }
+      }
+    }
+  }
+}

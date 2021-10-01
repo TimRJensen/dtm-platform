@@ -2,7 +2,7 @@
 
 .post-panel {
   width: 20px;
-  padding-left: theme.$spacing;
+  padding: theme.$spacing;
 
   .font-icon {
     color: theme.colors("font-icon", "disabled");

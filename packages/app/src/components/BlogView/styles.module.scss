@@ -1,11 +1,10 @@
 @use "../../themes/theme";
-@use "../../themes/mixins";
+@use "../TextEditor/styles.module.scss";
 
 .blog-view {
-  //margin-top: 4 * theme.$spacing;
-
   .text-editor {
-    @include mixins.text-editor(600px, auto);
+    @extend .text-editor;
+    width: 600px;
     margin: auto;
     margin-bottom: theme.$spacing * 2.5;
 

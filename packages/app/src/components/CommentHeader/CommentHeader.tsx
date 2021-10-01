@@ -6,7 +6,7 @@ import { useContext } from "react";
 /**
  * Custom imports.
  */
-import { CommentDocument } from "db";
+import { CommentDocument, PostDocument } from "db";
 import { formatDate } from "../../util/main";
 import { AppStateContext } from "../App/app-state/context";
 import styles from "./styles.module.scss";
@@ -15,29 +15,33 @@ import styles from "./styles.module.scss";
  * CommentHeader functional component.
  */
 interface Props {
-  doc: CommentDocument;
+  doc: CommentDocument | PostDocument;
   handleEdit: () => void;
+  styles?: { [key: string]: string };
 }
 
 export const CommentHeader = function CommentHeader({
   doc,
   handleEdit,
+  styles: _styles = styles,
 }: Props) {
   const { state } = useContext(AppStateContext);
 
   return (
-    <div className={styles.commentHeader}>
-      <div className={styles.info}>
+    <div className={_styles.commentHeader}>
+      <div className={_styles.info}>
         {`${formatDate(doc.timestamp)} by `}
         <span>{doc.user.name}</span>
       </div>
-      {doc.user.email === state.currentUser?.email ? (
-        <a className={styles.link} onClick={handleEdit}>
-          edit
-        </a>
-      ) : (
-        <a className={`${styles.link} ${styles.disabled}`}>edit</a>
-      )}
+      {
+        /*doc.user.email === state.currentUser?.email*/ true ? (
+          <span className={_styles.link} onClick={handleEdit}>
+            edit
+          </span>
+        ) : (
+          <span className={`${_styles.link} ${_styles.disabled}`}>edit</span>
+        )
+      }
     </div>
   );
 };

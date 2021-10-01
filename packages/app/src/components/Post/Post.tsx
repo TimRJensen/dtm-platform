@@ -1,19 +1,20 @@
 /**
  * Vendor imports.
  */
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useRouteMatch } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { PostDocument } from "db";
-import { useEditor } from "../../hooks/";
-import { PostPanel } from "../PostPanel/PostPanel";
-import { PostHeader } from "../PostHeader/PostHeader";
+import { AppStateContext } from "../App/app-state/context";
+import { useEditor, useIsUpvoted } from "../../hooks/";
+import { CommentHeader } from "../CommentHeader/CommentHeader";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { TextBox } from "../TextBox/TextBox";
-import styles from "./style.module.scss";
+import { FontIcon } from "../FontIcon/FontIcon";
+import styles from "./styles.module.scss";
 
 /**
  * Post functional component.
@@ -28,7 +29,9 @@ export const Post = function Post({ doc, onComment }: Props) {
 
   const match = useRouteMatch();
   const domElement = useRef<HTMLDivElement>(null);
+  const { state } = useContext(AppStateContext);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
+  const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
 
   useEffect(() => {
     if (match.url === doc._id && domElement.current) {
@@ -41,24 +44,36 @@ export const Post = function Post({ doc, onComment }: Props) {
 
   return (
     <section className={styles.post} ref={domElement}>
-      <PostHeader
-        doc={doc}
-        handleComment={onComment}
-        handleEdit={handleShowEditor}
-      />
-      <div className={styles.body}>
-        <PostPanel doc={doc} />
-        {showEditor() ? (
-          <TextEditor
-            styles={styles}
-            content={doc.content}
-            onSubmit={handleSubmit}
-            advanced
-          />
-        ) : (
+      <CommentHeader styles={styles} doc={doc} handleEdit={handleShowEditor} />
+      {showEditor() ? (
+        <div className={styles.body}>
+          <TextEditor content={doc.content} onSubmit={handleSubmit} advanced />
+        </div>
+      ) : (
+        <div className={styles.body}>
           <TextBox>{doc.content}</TextBox>
-        )}
-      </div>
+          <div className={styles.footer}>
+            <FontIcon
+              key="footer-comment-button"
+              type="question_answer"
+              active={state.currentUser !== undefined}
+              //styles={styles}
+              onClick={onComment}
+            >
+              comment
+            </FontIcon>
+            <FontIcon
+              key="footer-vote-button"
+              type="thumb_up"
+              active={state.currentUser !== undefined && isUpvoted}
+              //styles={styles}
+              onClick={handleUpvote}
+            >
+              upvote
+            </FontIcon>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

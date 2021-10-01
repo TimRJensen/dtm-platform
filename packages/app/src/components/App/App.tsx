@@ -14,7 +14,7 @@ import { BlogView } from "../BlogView/BlogView";
 import { HomeView } from "../HomeView/HomeView";
 import { SearchView } from "../SearchView/SearchView";
 import { Test } from "../Test/Test";
-import "./style.scss";
+import "./styles.scss";
 
 /**
  * App functional component.

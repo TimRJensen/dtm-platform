@@ -1,10 +1,9 @@
 @use "../../themes/theme";
 
 .html-text-box{
-  width: inherit;
-  padding: theme.$spacing;
   border-bottom: 1px solid theme.colors("secondary");
-
+  
+  padding: theme.$spacing;
   p {
     display: inline;
     margin: 0;

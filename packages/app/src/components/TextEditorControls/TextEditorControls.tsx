@@ -6,7 +6,7 @@ import { EditorState, RichUtils } from "draft-js";
 /**
  * Custom imports.
  */
-import { TextEditorControlButton } from "../TextEditorControlButton/TextEditorControlButton";
+import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 
 /**
@@ -25,7 +25,7 @@ export const TextEditorControls = function TextEditorControls({
     { type: "BOLD", fontIcon: "format_bold" },
     { type: "ITALIC", fontIcon: "format_italic" },
   ];
-  const blockControl = [
+  const blockControls = [
     { type: "unordered-list-item", fontIcon: "format_list_bulleted" },
     { type: "ordered-list-item", fontIcon: "format_list_numbered" },
   ];
@@ -34,21 +34,23 @@ export const TextEditorControls = function TextEditorControls({
     <div className={styles.textEditorControls}>
       <span className={styles.inlineControls}>
         {inlineControls.map((control) => (
-          <TextEditorControlButton
+          <FontIcon
             key={`text-control-button-${control.type}`}
+            //styles={styles}
+            type={control.fontIcon}
             active={editorState.getCurrentInlineStyle().has(control.type)}
             onToggle={() =>
               onToggle(RichUtils.toggleInlineStyle(editorState, control.type))
             }
-          >
-            {control.fontIcon}
-          </TextEditorControlButton>
+          />
         ))}
       </span>
       <span className={styles.blockControls}>
-        {blockControl.map((control) => (
-          <TextEditorControlButton
+        {blockControls.map((control) => (
+          <FontIcon
             key={`text-control-button-${control.type}`}
+            styles={styles}
+            type={control.fontIcon}
             active={
               editorState
                 .getCurrentContent()
@@ -58,9 +60,7 @@ export const TextEditorControls = function TextEditorControls({
             onToggle={() =>
               onToggle(RichUtils.toggleBlockType(editorState, control.type))
             }
-          >
-            {control.fontIcon}
-          </TextEditorControlButton>
+          />
         ))}
       </span>
     </div>
