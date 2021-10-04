@@ -14,34 +14,22 @@ import { App } from "./components/App/App";
  */
 const db = new PouchDB();
 
-db.clearView();
-
 async function createMockData() {
   const doc = await db.get("app-state");
 
-  if (doc && doc.type === "app-state" && doc.isPopulated) return;
+  if (doc && doc.type === "app-state" && doc.isPopulated) {
+    render(<App db={db} />, document.getElementById("app"));
+    return;
+  }
 
   const { mockData } = await import("mock-data");
 
-  mockData(db);
-  db.put({
+  await mockData(db);
+  await db.put({
     type: "app-state",
     _id: "app-state",
     isPopulated: true,
   });
-}
-createMockData();
-
-// @ts-ignore
-if (module.hot)
-  // @ts-ignore
-  module.hot.accept("./components/App/App.tsx", () => {
-    hotRender();
-  });
-
-function hotRender() {
-  const { App } = require("./components/App/App");
-
   render(<App db={db} />, document.getElementById("app"));
 }
-hotRender();
+createMockData();

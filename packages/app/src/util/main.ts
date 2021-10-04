@@ -80,25 +80,31 @@ export function docIncludes(
 
     if (!fields.includes(key)) continue;
 
-    if (value instanceof Map) {
-      for (const doc of value.values()) {
-        if (docIncludes(doc, fields, queries)) return true;
+    switch (typeof value) {
+      case "string": {
+        if (stringIncludes(value, queries)) return true;
       }
-    } else if (typeof value === "object") {
-      if (docIncludes(value, queries, fields)) return true;
-    } else if (typeof value === "number") {
-      if (
-        stringIncludes(
-          new Date(value).toLocaleDateString("da-DK", {
-            month: "long",
-            year: "numeric",
-          }),
-          queries
+      case "number": {
+        if (
+          stringIncludes(
+            new Date(value).toLocaleDateString("da-DK", {
+              month: "long",
+              year: "numeric",
+            }),
+            queries
+          )
         )
-      )
-        return true;
-    } else if (typeof value === "string") {
-      if (stringIncludes(value, queries)) return true;
+          return true;
+      }
+      case "object": {
+        if (value instanceof Map) {
+          for (const doc of value.values()) {
+            if (docIncludes(doc, fields, queries)) return true;
+          }
+        } else {
+          if (docIncludes(value, queries, fields)) return true;
+        }
+      }
     }
   }
 

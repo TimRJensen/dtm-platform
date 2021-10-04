@@ -1,13 +1,16 @@
 /**
  * Vendor imports.
  */
-import { Node, Element } from "domhandler";
+import { DomUtils } from "htmlparser2";
+import { Node, Text, Element, isText } from "domhandler";
 import htmlRender from "dom-serializer";
+
+const { textContent } = DomUtils;
 
 /**
  * Custom imports.
  */
-import { decorateNode } from "../util/decorateNode";
+import { mapNodes, splitNode, replaceNode } from "../util/decorateNode";
 import { useHtmlParser } from "./useHtmlParser";
 
 /**
@@ -39,18 +42,30 @@ export function useDecorateNode(
         result.push(new Element(node.name, node.attribs, children));
       }
     } else {
-      const children = decorateNode(node, regExp, tag);
+      const children = mapNodes(splitNode(node, regExp), (node) => {
+        if (textContent(node).search(regExp) > -1) {
+          if (node.prev && isText(node.prev)) {
+            const text = node.prev.data;
+            const start = text.search("\\.\\s\\w") + 1;
 
-      if (children.length > 0) {
-        const prev = result[result.length - 1];
-        const next = children[0];
+            node.prev.data = text.slice(start > 0 ? start : 0, text.length);
+          }
 
-        if (prev) {
-          prev.next = prev.nextSibling = next;
-          next.prev = next.previousSibling = prev;
+          if (node.next && isText(node.next)) {
+            const text = node.next.data;
+            const end = text.indexOf(".") + 1;
+
+            node.next.data =
+              text.slice(0, end > 0 ? end : text.length) + " ... ";
+          }
+
+          node = replaceNode(node, new Element(tag, {}, [node.cloneNode()]));
         }
-        result.push(...children);
-      }
+
+        return node;
+      });
+
+      if (children.length > 0) result.push(...children);
     }
   }
 

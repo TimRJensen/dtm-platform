@@ -33,15 +33,13 @@ export const CommentHeader = function CommentHeader({
         {`${formatDate(doc.timestamp)} by `}
         <span>{doc.user.name}</span>
       </div>
-      {
-        /*doc.user.email === state.currentUser?.email*/ true ? (
-          <span className={_styles.link} onClick={handleEdit}>
-            edit
-          </span>
-        ) : (
-          <span className={`${_styles.link} ${_styles.disabled}`}>edit</span>
-        )
-      }
+      {doc.user.email === state.currentUser?.email ? (
+        <span className={_styles.link} onClick={handleEdit}>
+          edit
+        </span>
+      ) : (
+        <span className={`${_styles.link} ${_styles.disabled}`}>edit</span>
+      )}
     </div>
   );
 };

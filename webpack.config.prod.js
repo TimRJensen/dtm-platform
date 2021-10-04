@@ -6,11 +6,9 @@ module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
   output: {
     path: resolve(__dirname, "./dist"),
-    publicPath: "/",
     filename: "bundle.js",
   },
-  mode: "development",
-
+  mode: "production",
   target: "web",
   module: {
     rules: [
@@ -38,16 +36,6 @@ module.exports = {
     },
   },
   devtool: "source-map",
-  devServer: {
-    host: "localhost",
-    port: "1234",
-    historyApiFallback: true,
-    hot: true,
-    client: {
-      overlay: true,
-    },
-  },
-  stats: "minimal",
   plugins: [
     new CleanWebpackPlugin(),
     new htmlWebpackPlugin({
