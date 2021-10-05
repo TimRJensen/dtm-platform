@@ -1,6 +1,8 @@
 const resolve = require("path").resolve;
-const htmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ReactRefreshTypeScript = require("react-refresh-typescript");
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
@@ -16,7 +18,17 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "ts-loader",
+        use: [
+          {
+            loader: require.resolve("ts-loader"),
+            options: {
+              getCustomTransformers: () => ({
+                before: [ReactRefreshTypeScript()],
+              }),
+              transpileOnly: true,
+            },
+          },
+        ],
       },
       {
         test: /\.scss$/,
@@ -42,6 +54,7 @@ module.exports = {
     host: "localhost",
     port: "1234",
     historyApiFallback: true,
+    allowedHosts: [".netlify.live"],
     hot: true,
     client: {
       overlay: true,
@@ -50,9 +63,10 @@ module.exports = {
   stats: "minimal",
   plugins: [
     new CleanWebpackPlugin(),
-    new htmlWebpackPlugin({
+    new HtmlWebpackPlugin({
       title: "DNT Platform",
       template: resolve(__dirname, "./packages/app/src/index.html"),
     }),
+    new ReactRefreshWebpackPlugin(),
   ],
 };

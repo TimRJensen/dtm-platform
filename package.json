@@ -3,13 +3,15 @@
   "packageManager": "yarn@3.0.2",
   "private": true,
   "scripts": {
-    "start": "webpack serve --config webpack.config.dev.js",
+    "start:webpack": "webpack serve --config webpack.config.dev.js",
+    "start": "netlify dev",
     "build": "webpack --config webpack.config.prod.js"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@types/events": "^3",
     "@types/sass": "^1",
     "@types/webpack-dev-server": "^4",
@@ -17,6 +19,9 @@
     "css-loader": "^6.2.0",
     "events": "^3.3.0",
     "html-webpack-plugin": "^5.3.2",
+    "netlify-cli": "^6.9.30",
+    "react-refresh": "^0.10.0",
+    "react-refresh-typescript": "^2.0.2",
     "sass": "^1.39.2",
     "sass-loader": "^12.1.0",
     "style-loader": "^3.2.1",

@@ -45,7 +45,7 @@ export const FontIcon = function FontIcon({
       }}
     >
       <span className="material-icons">{type}</span>
-      {children ? <span>{children}</span> : null}
+      {children ? <span className={_styles.label}>{children}</span> : null}
     </span>
   );
 };

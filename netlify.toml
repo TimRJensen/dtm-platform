@@ -1,0 +1,19 @@
+[build]
+  command = "yarn build"
+
+[[redirects]]
+  from = "/blogs/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/search/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  command = "yarn start:webpack"
+  port = 8888
+  targetPort = 1234
+  publish = "dist" 
+  framework = "#custom"

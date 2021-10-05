@@ -16,3 +16,6 @@
 # Parcel specific
 /.parcel-cache
 /dist
+
+# Local Netlify folder
+.netlify

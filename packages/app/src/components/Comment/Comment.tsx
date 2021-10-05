@@ -1,14 +1,12 @@
 /**
  * Vendor imports.
  */
-import { useRef, useEffect } from "react";
-import { useRouteMatch } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { CommentDocument } from "db";
-import { useEditor } from "../../hooks/";
+import { useEditor, useScrollElement } from "../../hooks/";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { TextBox } from "../TextBox/TextBox";
 import { CommentHeader } from "../CommentHeader/CommentHeader";
@@ -24,18 +22,8 @@ interface Props {
 export const Comment = function Comment({ doc }: Props) {
   if (!doc) return null;
 
-  const match = useRouteMatch();
-  const domElement = useRef<HTMLSelectElement>(null);
+  const { domElement } = useScrollElement(doc);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
-
-  useEffect(() => {
-    if (match.url === doc._id && domElement.current) {
-      const rect = domElement.current?.getBoundingClientRect();
-
-      if (rect.top > window.scrollY)
-        window.scrollTo(0, rect.bottom - window.innerHeight / 2);
-    }
-  }, []);
 
   return (
     <section className={styles.comment} ref={domElement}>

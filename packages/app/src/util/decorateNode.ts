@@ -11,9 +11,8 @@ const { textContent } = DomUtils;
  */
 
 /**
- * formatNode
+ * linkNodes
  */
-
 function linkNodes(nodes: Node[], parent?: NodeWithChildren) {
   let i = -1;
 
@@ -28,7 +27,13 @@ function linkNodes(nodes: Node[], parent?: NodeWithChildren) {
   return nodes;
 }
 
-export function splitNode(node: Node, regExp: RegExp) {
+/**
+ * Splits a node into Text nodes according to the given regExp.
+ * @param {Node} node
+ * @param {RegExp} regExp
+ * @returns {Node[]}
+ */
+export function splitNode(node: Node, regExp: RegExp): Node[] {
   const result = [];
 
   for (const text of textContent(node).split(regExp)) {
@@ -38,7 +43,19 @@ export function splitNode(node: Node, regExp: RegExp) {
   return linkNodes(result, hasChildren(node) ? node : undefined);
 }
 
-export function mapNodes(nodes: Node[], mapper: (node: Node) => Node) {
+/**
+ * @callback mapper
+ * @param {Node} node
+ * @returns {Node}
+ */
+
+/**
+ * Maps an array of nodes.
+ * @param {Node[]} nodes
+ * @param {mapper} mapper
+ * @returns {Node[]}
+ */
+export function mapNodes(nodes: Node[], mapper: (node: Node) => Node): Node[] {
   const result = [];
 
   for (const node of nodes) {

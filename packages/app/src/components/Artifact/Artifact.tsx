@@ -8,6 +8,7 @@
 import { ArtifactDocument } from "db";
 import { ArtifactInfo } from "../ArtifactInfo/ArtifactInfo";
 import { ArtifactTag } from "../ArtifactTag/ArtifactTag";
+import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 
 /**
@@ -32,9 +33,9 @@ export const Artifact = function Artifact({ doc, onComment }: Props) {
               <ArtifactTag key={`artifact-tag-${tag}`}>{tag}</ArtifactTag>
             ))}
           </ArtifactInfo>
-          <div className={styles.link} onClick={onComment}>
-            Comment
-          </div>
+          <FontIcon styles={styles} type="add_comment" onClick={onComment}>
+            comment
+          </FontIcon>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@
  * Vendor imports.
  */
 import { useContext } from "react";
+import { useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -15,30 +16,14 @@ import styles from "./styles.module.scss";
  * NavBar functional component.
  */
 export const AppHeader = function AppHeader() {
-  const { state } = useContext(AppStateContext);
+  const history = useHistory();
 
   return (
     <section className={styles.appHeader}>
       <div className={styles.controls}>
         <SearchBar />
-        {/*         <div
-          className={
-            hasFocus ? `${styles.searchBar} ${styles.focus}` : styles.searchBar
-          }
-          onFocus={() => setHasFocus(true)}
-          onBlur={() => setHasFocus(false)}
-        >
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={input()}
-              onChange={(event) => input(event.target.value)}
-            />
-            <FontIcon className={styles.fontIcon}>search</FontIcon>
-          </form>
-        </div> */}
-
-        <FontIcon type="account_circle" /*className={styles.fontIcon}*/ />
+        <FontIcon type="account_circle" />
+        <FontIcon type="home" onClick={() => history.push("/")} />
       </div>
     </section>
   );

@@ -1,19 +1,16 @@
 /**
  * Vendor imports.
  */
-import { useContext, useEffect, useRef } from "react";
-import { useRouteMatch } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { PostDocument } from "db";
-import { AppStateContext } from "../App/app-state/context";
-import { useEditor, useIsUpvoted } from "../../hooks/";
+import { useEditor, useScrollElement } from "../../hooks/";
 import { CommentHeader } from "../CommentHeader/CommentHeader";
 import { TextEditor } from "../TextEditor/TextEditor";
+import { PostFooter } from "../PostFooter/PostFooter";
 import { TextBox } from "../TextBox/TextBox";
-import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
 
 /**
@@ -27,21 +24,8 @@ interface Props {
 export const Post = function Post({ doc, onComment }: Props) {
   if (!doc) return null;
 
-  const match = useRouteMatch();
-  const domElement = useRef<HTMLDivElement>(null);
-  const { state } = useContext(AppStateContext);
+  const { domElement } = useScrollElement(doc);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
-  const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
-
-  // extract.
-  useEffect(() => {
-    if (match.url === doc._id && domElement.current) {
-      const rect = domElement.current?.getBoundingClientRect();
-
-      if (rect.top > window.scrollY)
-        window.scrollTo(0, rect.bottom - window.innerHeight / 2);
-    }
-  }, []);
 
   return (
     <section className={styles.post} ref={domElement}>
@@ -53,26 +37,7 @@ export const Post = function Post({ doc, onComment }: Props) {
       ) : (
         <div className={styles.body}>
           <TextBox>{doc.content}</TextBox>
-          {/** extract */}
-          <div className={styles.footer}>
-            <FontIcon
-              key="footer-comment-button"
-              type="question_answer"
-              disabled={!state.currentUser}
-              onClick={onComment}
-            >
-              comment
-            </FontIcon>
-            <FontIcon
-              key="footer-vote-button"
-              type="thumb_up"
-              active={isUpvoted}
-              disabled={!state.currentUser}
-              onClick={handleUpvote}
-            >
-              upvote
-            </FontIcon>
-          </div>
+          <PostFooter doc={doc} onComment={onComment} />
         </div>
       )}
     </section>
