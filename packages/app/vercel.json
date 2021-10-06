@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/search/*",
+      "destination": "/"
+    },
+    {
+      "source": "/blogs/*",
+      "destination": "/"
+    }
+  ]
+}
