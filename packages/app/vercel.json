@@ -1,11 +1,11 @@
 {
   "redirects": [
     {
-      "source": "/search/*",
+      "source": "/search/:query/:pageId?",
       "destination": "/"
     },
     {
-      "source": "/blogs/*",
+      "source": "/blogs/:blogId/:threadId?/:postId?/:commentId?",
       "destination": "/"
     }
   ]
