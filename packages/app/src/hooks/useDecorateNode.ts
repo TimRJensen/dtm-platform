@@ -1,73 +1,98 @@
 /**
  * Vendor imports.
  */
-import { DomUtils } from "htmlparser2";
 import { Node, Text, Element, isText } from "domhandler";
 import htmlRender from "dom-serializer";
-
-const { textContent } = DomUtils;
+import Fuse from "fuse.js";
 
 /**
  * Custom imports.
  */
-import { mapNodes, splitNode, replaceNode } from "../util/decorateNode";
+import { splitNode } from "../util/main";
 import { useHtmlParser } from "./useHtmlParser";
 
 /**
  * useDecorate hook.
  */
-export function useDecorateNode(
-  htmlString: string,
-  queryOrRegExp: string | RegExp,
-  tag: string
-): { nodes: Node[] } {
-  const { nodes, isTag } = useHtmlParser(htmlString);
+interface Params {
+  htmlString: string;
+  tests: string[];
+  decorator: {
+    tag: string;
+    className?: string;
+    styles?: string;
+  };
+}
 
-  const regExp =
-    typeof queryOrRegExp === "string"
-      ? new RegExp(`(${queryOrRegExp.trim().split("+").join("|")})`, "gi")
-      : queryOrRegExp;
-  const result = [];
+export function useDecorateNode({ htmlString, tests, decorator }: Params) {
+  const test = tests.join("|");
+  const regExp = new RegExp(`(${test})`, "gi");
 
-  for (const node of nodes ? nodes : []) {
-    if (isTag(node)) {
-      const children = useDecorateNode(
-        htmlRender(node.children),
-        regExp,
-        tag
-      ).nodes;
+  const decorateNode = (htmlString: string) => {
+    const { nodes, isTag } = useHtmlParser(htmlString);
+    const result = [] as Node[];
 
-      if (children.length > 0) {
-        node.children = node.childNodes = children;
-        result.push(new Element(node.name, node.attribs, children));
+    for (const node of nodes ? nodes : []) {
+      if (isTag(node)) {
+        const children = decorateNode(htmlRender(node.children));
+
+        if (children.length > 0)
+          result.push(new Element(node.name, node.attribs, children));
+      } else {
+        const fuse = new Fuse(splitNode(node, regExp), {
+          threshold: 0.2,
+          isCaseSensitive: false,
+          useExtendedSearch: true,
+          keys: ["data"],
+        });
+
+        result.push(
+          ...fuse.search(test).reduce((result, fuseResult) => {
+            const node = fuseResult.item;
+
+            if (node.prev && isText(node.prev)) {
+              const text = node.prev.data;
+              const start = text.lastIndexOf(".") + 1;
+
+              result.push(
+                new Text(
+                  text.slice(start > 0 ? start : 0, text.length).trimLeft()
+                )
+              );
+            }
+
+            result.push(
+              new Element(
+                decorator.tag,
+                {
+                  className: decorator.className ?? "",
+                  style: decorator.styles ?? "",
+                },
+                [node.cloneNode()]
+              )
+            );
+
+            if (node.next && isText(node.next)) {
+              const text = node.next.data;
+              const end = text.indexOf(".") + 1;
+
+              if (end > 0)
+                result.push(
+                  new Text(
+                    text.slice(0, end > 0 ? end : text.length).trimRight() +
+                      " ... "
+                  )
+                );
+            }
+
+            return result;
+          }, [] as Node[])
+        );
       }
-    } else {
-      const children = mapNodes(splitNode(node, regExp), (node) => {
-        if (textContent(node).search(regExp) > -1) {
-          if (node.prev && isText(node.prev)) {
-            const text = node.prev.data;
-            const start = text.search("\\.\\s\\w") + 1;
-
-            node.prev.data = text.slice(start > 0 ? start : 0, text.length);
-          }
-
-          if (node.next && isText(node.next)) {
-            const text = node.next.data;
-            const end = text.indexOf(".") + 1;
-
-            node.next.data =
-              text.slice(0, end > 0 ? end : text.length) + " ... ";
-          }
-
-          node = replaceNode(node, new Element(tag, {}, [node.cloneNode()]));
-        }
-
-        return node;
-      });
-
-      if (children.length > 0) result.push(...children);
     }
-  }
 
-  return { nodes: result };
+    return result;
+  };
+
+  return { nodes: decorateNode(htmlString) };
 }

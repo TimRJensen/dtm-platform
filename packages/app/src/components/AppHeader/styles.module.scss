@@ -1,55 +1,24 @@
 @use "../../themes/theme";
+@use "../../themes/mixins";
 
 .app-header {
   position: fixed;
   display: flex;
   align-items: center;
   top: 0;
-  width: 100%;
+  width: 100vw;
   height: 50px;
   background-color: theme.colors("primary");
-  box-shadow: 0 0 2px 1px theme.colors("secondary");
 
   .controls {
     display: flex;
-    align-items: center;
-    justify-content: end;
-    width: 95vw;
+    justify-content: center;
+    width: 100px;
+    height: inherit;
+    background-color: theme.colors("secondary");
 
     .font-icon {
-      font-size: 34px;
-      color: theme.colors("font-icon", "default");
-      cursor: pointer;
-
-      &.disabled {
-        color: theme.colors("font-icon", "disabled");
-      }
-    }
-
-    .search-bar {
-      border: 1px solid theme.colors("secondary");
-      margin-right: theme.$spacing;
-      border-radius: 5px;
-      background-color: theme.colors("primary-faded");
-
-      form {
-        height: 38px;
-        width: 300px;
-        display: inline-flex;
-        justify-content: end;
-        align-items: center;
-        input {
-          width: 264px;
-          height: inherit;
-          border: 0;
-          background-color: transparent;
-          outline: none;
-        }
-      }
-
-      &.focus {
-        box-shadow: 0 0 3px 0.8px theme.colors("secondary");
-      }
+      @include mixins.font-icon(36px, theme.colors("primary-lightest"), theme.colors("primary"), theme.colors("primary"));
     }
   }
 }

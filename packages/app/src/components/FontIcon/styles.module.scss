@@ -1,23 +1,5 @@
-@use "../../themes/theme";
+@use "../../themes/mixins";
 
 .font-icon {
-  display: flex;
-  align-items: center;
-  margin-right: 2*theme.$spacing;
-  color: theme.colors("text", "secondary");
-  text-decoration: none;
-  cursor: pointer;
-
-  /*&:hover,*/ &.active {
-    color: theme.colors("text", "primary");
-  }
-
-  &.disabled {
-    cursor: default;
-    color: theme.colors("text", "disabled");
-  }
-
-  .label {
-    margin-left: 0.5*theme.$spacing;
-  }
+  @include mixins.font-icon();
 }

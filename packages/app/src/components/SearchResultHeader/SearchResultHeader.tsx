@@ -22,7 +22,7 @@ export const SearchResultHeader = function SearchResultHeader({ doc }: Props) {
     <div className={styles.searchResultHeader}>
       <div className={styles.info}>
         {`${formatDate(doc.timestamp)} by `}
-        <span>{doc.user.name}</span>
+        <span>{doc.user.displayName}</span>
       </div>
       <Link className={styles.link} to={doc._id}>
         {doc._id}

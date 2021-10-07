@@ -4,7 +4,6 @@
   "main": "src/main.ts",
   "private": true,
   "dependencies": {
-    "path-to-regexp": "^6.2.0",
     "pouchdb-browser": "^7.2.2",
     "pouchdb-find": "^7.2.2",
     "react": "^17.0.2"

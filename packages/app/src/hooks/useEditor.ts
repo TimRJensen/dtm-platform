@@ -44,28 +44,22 @@ export const useEditor = function useEditor(
 
       // Update/mutate the model.
       if (doc.type === "blog") {
-        doc.threads.set(`thread-${doc.stats.threads}`, {
+        doc.threads.push({
           type: "thread",
           _id: `${doc._id}/thread-${doc.stats.threads}`,
-          user: {
-            name: state.currentUser.name,
-            email: state.currentUser.email,
-          },
+          user: state.currentUser,
           post: {
             type: "post",
             _id: `${doc._id}/thread-${doc.stats.threads}/post`,
-            user: {
-              name: state.currentUser.name,
-              email: state.currentUser.email,
-            },
+            user: state.currentUser,
             content: draftParser(content),
-            upvotes: new Map(),
-            downvotes: new Map(),
+            upvotes: [],
+            downvotes: [],
             stats: { infractions: 0 },
             timestamp: Date.now(),
             lastModified: Date.now(),
           },
-          comments: new Map(),
+          comments: [],
           stats: {
             comments: 0,
           },
@@ -74,14 +68,11 @@ export const useEditor = function useEditor(
         });
         doc.stats.threads++;
       } else if (doc.type === "thread") {
-        doc.comments.set(`comment-${doc.stats.comments}`, {
+        doc.comments.push({
           type: "comment",
           _id: `${doc._id}/comment-${doc.stats.comments}`,
           content: draftParser(content),
-          user: {
-            name: state.currentUser.name,
-            email: state.currentUser.email,
-          },
+          user: state.currentUser,
           stats: { infractions: 0 },
           timestamp: Date.now(),
           lastModified: Date.now(),

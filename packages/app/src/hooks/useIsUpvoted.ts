@@ -17,7 +17,9 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
   const { state, dispatch } = useContext(AppStateContext);
   const [isUpvoted, setIsUpvoted] = useState(
     state.currentUser
-      ? doc.upvotes.get(state.currentUser?.email) ?? false
+      ? doc.upvotes.find((user) => user._id === state.currentUser?._id)
+        ? true
+        : false
       : false
   );
 
@@ -26,8 +28,13 @@ export const useIsUpvoted = function useUpvotes(doc: PostDocument) {
     handleUpvote: async () => {
       if (!state.currentUser || !state.currentBlog) return;
 
-      if (isUpvoted) doc.upvotes.delete(state.currentUser?.email);
-      else doc.upvotes.set(state.currentUser?.email, true);
+      if (isUpvoted) {
+        const i = doc.upvotes.findIndex(
+          (user) => user._id === state.currentUser?._id
+        );
+
+        doc.upvotes = [...doc.upvotes.slice(0, i), ...doc.upvotes.slice(i + 1)];
+      } else doc.upvotes.push(state.currentUser);
 
       await db.put(state.currentBlog);
 

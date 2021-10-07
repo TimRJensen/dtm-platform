@@ -3,7 +3,6 @@
  */
 import PouchDB from "pouchdb-browser";
 import PouchDbFind from "pouchdb-find";
-import { pathToRegexp } from "path-to-regexp";
 
 /**
  * Types.
@@ -22,8 +21,9 @@ interface AppStateDocument extends BaseDocument {
 
 export interface UserDocument extends BaseDocument {
   type: "user";
-  name: string;
+  displayName: string;
   email: string;
+  role: "moderator" | "admin" | "user";
   stats: {
     infractions: number;
     upvotes: number;
@@ -35,10 +35,7 @@ export interface UserDocument extends BaseDocument {
 
 export interface CommentDocument extends BaseDocument {
   type: "comment";
-  user: {
-    name: string;
-    email: string;
-  };
+  user: UserDocument;
   content: string;
   stats: {
     infractions: number;
@@ -47,13 +44,10 @@ export interface CommentDocument extends BaseDocument {
 
 export interface PostDocument extends BaseDocument {
   type: "post";
-  user: {
-    name: string;
-    email: string;
-  };
+  user: UserDocument;
   content: string;
-  upvotes: Map<string, boolean>;
-  downvotes: Map<string, boolean>;
+  upvotes: UserDocument[];
+  downvotes: UserDocument[];
   stats: {
     infractions: number;
   };
@@ -61,12 +55,9 @@ export interface PostDocument extends BaseDocument {
 
 export interface ThreadDocument extends BaseDocument {
   type: "thread";
-  user: {
-    name: string;
-    email: string;
-  };
+  user: UserDocument;
   post: PostDocument;
-  comments: Map<string, CommentDocument>;
+  comments: CommentDocument[];
   stats: {
     comments: number;
   };
@@ -84,7 +75,7 @@ export interface ArtifactDocument extends BaseDocument {
 export interface BlogDocument extends BaseDocument {
   type: "blog";
   artifact: ArtifactDocument;
-  threads: Map<string, ThreadDocument>;
+  threads: ThreadDocument[];
   stats: {
     comments: number;
     threads: number;

@@ -1,7 +1,7 @@
 @use "../../themes/theme";
 
 .html-text-box{
-  border-bottom: 1px solid theme.colors("secondary");
+  border-bottom: 1px solid theme.colors("primary-darker");
   
   padding: theme.$spacing;
   p {

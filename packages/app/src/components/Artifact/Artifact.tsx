@@ -33,7 +33,7 @@ export const Artifact = function Artifact({ doc, onComment }: Props) {
               <ArtifactTag key={`artifact-tag-${tag}`}>{tag}</ArtifactTag>
             ))}
           </ArtifactInfo>
-          <FontIcon styles={styles} type="add_comment" onClick={onComment}>
+          <FontIcon styles={styles} type="chat_bubble" onClick={onComment}>
             comment
           </FontIcon>
         </div>

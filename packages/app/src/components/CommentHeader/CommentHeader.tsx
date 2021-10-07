@@ -31,9 +31,9 @@ export const CommentHeader = function CommentHeader({
     <div className={_styles.commentHeader}>
       <div className={_styles.info}>
         {`${formatDate(doc.timestamp)} by `}
-        <span>{doc.user.name}</span>
+        <span>{doc.user.displayName}</span>
       </div>
-      {doc.user.email === state.currentUser?.email ? (
+      {doc.user._id === state.currentUser?._id ? (
         <span className={_styles.link} onClick={handleEdit}>
           edit
         </span>

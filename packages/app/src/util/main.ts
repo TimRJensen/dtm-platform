@@ -1,11 +1,14 @@
 /**
  * Vendor imports.
  */
+import { DomUtils } from "htmlparser2";
+import { Node, Text, NodeWithChildren, hasChildren } from "domhandler";
+
+const { textContent } = DomUtils;
 
 /**
  * Custom imports.
  */
-import { AllDocuments } from "db";
 
 /**
  * Utility functions.
@@ -53,60 +56,46 @@ export function formatAttributesObject(attributeObject: {
   for (const style of styles) {
     const [key, value] = style.replace(matchWhitespace, "").split(":");
 
+    if (!key) continue;
+
     result[formatAttributeKey(key)] = formatAttributeKey(value);
   }
 
   return { ...attributeObject, style: result };
 }
 
-// stringIncludes
-export function stringIncludes(value: string, queries: string[]) {
-  for (const query of queries)
-    if (formatString(value).includes(query)) return true;
+/**
+ * Links an array of nodes.
+ * @param {Node[]} nodes
+ * @param {Node} [parent]
+ * @returns {Node[]} The linked nodes array.
+ */
+function linkNodes(nodes: Node[], parent?: NodeWithChildren) {
+  let i = -1;
 
-  return false;
-}
+  while (++i < nodes.length) {
+    const node = nodes[i];
 
-// docIncludes
-export function docIncludes(
-  doc: AllDocuments,
-  fields: string[],
-  queries: string[]
-): boolean {
-  const entries = Object.entries(doc);
-
-  for (const entry of entries) {
-    const [key, value] = entry;
-
-    if (!fields.includes(key)) continue;
-
-    switch (typeof value) {
-      case "string": {
-        if (stringIncludes(value, queries)) return true;
-      }
-      case "number": {
-        if (
-          stringIncludes(
-            new Date(value).toLocaleDateString("da-DK", {
-              month: "long",
-              year: "numeric",
-            }),
-            queries
-          )
-        )
-          return true;
-      }
-      case "object": {
-        if (value instanceof Map) {
-          for (const doc of value.values()) {
-            if (docIncludes(doc, fields, queries)) return true;
-          }
-        } else {
-          if (docIncludes(value, queries, fields)) return true;
-        }
-      }
-    }
+    node.prev = node.previousSibling = nodes[i - 1] ?? null;
+    node.next = node.nextSibling = nodes[i + 1] ?? null;
+    if (parent) node.parent = parent;
   }
 
-  return false;
+  return nodes;
+}
+
+/**
+ * Splits a node into Text nodes according to the given regExp.
+ * @param {Node} node
+ * @param {RegExp} regExp
+ * @returns {Text[]} An array of Text nodes.
+ */
+export function splitNode(node: Node, regExp: RegExp): Node[] {
+  const result = [];
+
+  for (const text of textContent(node).split(regExp)) {
+    result.push(new Text(text));
+  }
+
+  return linkNodes(result, hasChildren(node) ? node : undefined);
 }

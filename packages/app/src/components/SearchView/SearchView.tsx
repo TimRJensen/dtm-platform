@@ -19,7 +19,7 @@ import styles from "./styles.module.scss";
 
 export const SearchView = function SearchView() {
   const { pageId } = useParams<{ pageId?: string }>();
-  const { results, query } = useQuery();
+  const { results, queries } = useQuery(["content", "user.displayName"]);
   const [currentPage, setCurrentPage] = useState(
     pageId ? Number.parseInt(pageId.replace("page=", "")) : 0
   );
@@ -29,18 +29,14 @@ export const SearchView = function SearchView() {
       setCurrentPage(Number.parseInt(pageId.replace("page=", "")));
       window.scrollTo(0, 0);
     }
-  }, [pageId]);
+  });
 
-  if (!results) return null;
+  if (results.length === 0) return null;
 
-  const resultsPerPage = 25;
+  const resultsPerPage = 10;
 
   return (
     <section className={styles.searchView}>
-      {/* <div className="header">
-        <h2 className="title">Results:</h2>
-        <span className="controls"></span>
-      </div> */}
       {results
         .slice(
           currentPage * resultsPerPage,
@@ -49,11 +45,15 @@ export const SearchView = function SearchView() {
         .map((doc: PostDocument | CommentDocument) => (
           <SearchResult
             key={`search-result-${doc._id}`}
-            query={query}
+            queries={queries}
             result={doc}
           />
         ))}
-      <SearchPagination currentPage={currentPage} maxResults={results.length} />
+      <SearchPagination
+        currentPage={currentPage}
+        maxResults={results.length}
+        resultsPerPage={resultsPerPage}
+      />
     </section>
   );
 };

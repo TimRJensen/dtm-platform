@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/search/:query/:pageId?",
+      "destination": "/"
+    },
+    {
+      "source": "/blogs/:blogId/:threadId?/:postId?/:commentId?",
+      "destination": "/"
+    }
+  ]
+}

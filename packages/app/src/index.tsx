@@ -15,7 +15,7 @@ import { App } from "./components/App/App";
 const db = new PouchDB();
 
 async function createMockData() {
-  const doc = await db.get("app-state");
+  const doc = await db.get("app-state/db-populated");
 
   if (doc && doc.type === "app-state" && doc.isPopulated) {
     render(<App db={db} />, document.getElementById("app"));
@@ -27,7 +27,7 @@ async function createMockData() {
   await mockData(db);
   await db.put({
     type: "app-state",
-    _id: "app-state",
+    _id: "app-state/db-populated",
     isPopulated: true,
   });
   render(<App db={db} />, document.getElementById("app"));

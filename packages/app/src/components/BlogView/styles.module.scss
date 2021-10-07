@@ -4,13 +4,13 @@
 .blog-view {
   .text-editor {
     @extend .text-editor;
-    width: 600px;
+    width: 50vw;
     margin: auto;
     margin-bottom: theme.$spacing * 2.5;
 
     .input {
       min-height: 300px;
-      border: 1px solid theme.colors("secondary");
+      border: 1px solid theme.colors("primary-darker");
       border-radius: 0 0 theme.$spacing theme.$spacing;
       border-radius: 5px;
     }

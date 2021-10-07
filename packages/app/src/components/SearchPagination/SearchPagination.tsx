@@ -42,7 +42,7 @@ export const SearchPagination = function SearchPagination({
       while (++i < maxPages && i < currentPage + 3) pages.push(i + 1);
 
       pages.unshift(1, "...");
-      pages.push("...", Math.floor(maxResults / 25));
+      pages.push("...", maxPages);
     } else {
       let i = maxPages - 6;
 
@@ -51,6 +51,7 @@ export const SearchPagination = function SearchPagination({
     }
 
     setPages(pages);
+    console.log(pages);
   }, [currentPage]);
 
   return (

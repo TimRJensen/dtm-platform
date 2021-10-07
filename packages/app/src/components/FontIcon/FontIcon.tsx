@@ -44,7 +44,7 @@ export const FontIcon = function FontIcon({
         if (onToggle) onToggle();
       }}
     >
-      <span className="material-icons">{type}</span>
+      <span className={`material-icons ${_styles.icon}`}>{type}</span>
       {children ? <span className={_styles.label}>{children}</span> : null}
     </span>
   );

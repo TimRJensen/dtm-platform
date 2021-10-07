@@ -1,0 +1,33 @@
+$colors: (
+  primary: #004153,
+  primary-darker: #00313E,
+  primary-darkest: #002029,
+  primary-lighter: #34626F,
+  primary-lightest: #86A3AC,
+  secondary: #FF8000,
+  secondary-darker: #E07000,
+  secondary-darkest: #C06000,
+  secondary-lighter: #FFA040,
+  secondary-lightest: #FFC080,
+  text: (
+    primary: #000,
+    secondary: #EEF4ED,
+    link: #0645ad,
+    disabled: #86A3AC,
+  ),
+  button: (
+    default: #004153,
+    default-hover: #00313E,
+    accept: #FF8000,
+    accept-hover: #E07000,
+  ),
+  font-icon: (
+    default: #86A3AC,
+    default-active: #FF8000,
+    default-hover: #E07000
+  ),
+  tag: (
+    default: #FF8000,
+    default-hover: #E07000,
+  ),
+);

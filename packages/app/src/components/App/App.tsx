@@ -28,7 +28,8 @@ export const App = function ({ db }: Props) {
     currentUser: {
       type: "user",
       _id: "users/test-user",
-      name: "Arthur Fonzarelli",
+      role: "user",
+      displayName: "Arthur Fonzarelli",
       email: "arthur.fonzarelli@gmail.com",
       stats: {
         upvotes: 0,

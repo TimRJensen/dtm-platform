@@ -30,7 +30,7 @@ export const Thread = function Thread({ doc }: Props) {
   return (
     <section className={styles.thread}>
       <Post doc={doc.post} onComment={handleShowEditor} />
-      {Array.from(doc.comments.values()).map((comment) => {
+      {doc.comments.map((comment) => {
         return <Comment key={comment._id} doc={comment} />;
       })}
       <TextEditor styles={styles} onSubmit={handleSubmit} show={showEditor()} />

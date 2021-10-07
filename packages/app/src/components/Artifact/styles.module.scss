@@ -1,16 +1,12 @@
 @use "../../themes/theme";
-@use "../FontIcon/styles.module.scss";
+@use "../../themes/mixins";
 
 .artifact {
-  display: flex;
-  flex-flow: column;
-  justify-content: center;
-  width: fit-content;
   margin: auto;
   padding: 2*theme.$spacing;
 
   .title {
-    width: fit-content;
+    width: auto;
     margin: auto;
     font-size: 3rem;
     text-align: center;
@@ -18,32 +14,33 @@
 
   .body {
     display: flex;
+    width: 90vw;
     margin: auto;
     margin-bottom: 4*theme.$spacing;
 
     .image {
-      display: inline;
+      width: 25vw;
       margin-right: 2 * theme.$spacing;
       border-radius: theme.$spacing;
     }
 
     .content {
       display: flex;
-      width: 600px;
+      width: 50vw;
       padding: theme.$spacing;
       margin-right: 4 * theme.$spacing;
       font-size: 1.25rem;
     }
 
     .panel {
-      width: 100px;
+      width: 15vw;
       height: fit-content;
-      border-left: 1px solid theme.colors("secondary");
+      border-left: 1px solid theme.colors("primary-darker");
       padding: theme.$spacing;
 
       .font-icon {
-        @extend .font-icon;
-        border-top: 1px solid theme.colors("secondary");
+        @include mixins.font-icon();
+        border-top: 1px solid theme.colors("primary-darker");
         padding: theme.$spacing;
       }
     }

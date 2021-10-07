@@ -33,7 +33,7 @@ export const SearchBar = function SearchBar() {
           value={input()}
           ref={domElement}
         />
-        <FontIcon type="search" />
+        <FontIcon type="search" styles={styles} />
       </form>
     </div>
   );

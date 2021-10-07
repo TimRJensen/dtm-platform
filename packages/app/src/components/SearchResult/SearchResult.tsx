@@ -15,12 +15,18 @@ import styles from "./styles.module.scss";
  * SearchResult functional component.
  */
 interface Props {
-  query: string;
+  queries: string[];
   result: PostDocument | CommentDocument;
 }
 
-export const SearchResult = function SearchResult({ query, result }: Props) {
-  const { nodes } = useDecorateNode(result.content, query, "strong");
+export const SearchResult = function SearchResult({ queries, result }: Props) {
+  const { nodes } = useDecorateNode({
+    htmlString: result.content,
+    tests: queries,
+    decorator: {
+      tag: "strong",
+    },
+  });
 
   return (
     <div className={styles.searchResult}>

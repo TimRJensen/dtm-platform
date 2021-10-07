@@ -51,7 +51,7 @@ export const BlogView = function BlogView({ blog }: Props) {
         show={showEditor()}
         advanced
       ></TextEditor>
-      {Array.from(blog.threads.values()).map((thread, i) => {
+      {blog.threads.map((thread, i) => {
         return <Thread key={thread._id} doc={thread} />;
       })}
     </section>

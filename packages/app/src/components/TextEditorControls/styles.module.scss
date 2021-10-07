@@ -1,9 +1,9 @@
 @use "../../themes/theme";
-@use "../FontIcon/styles.module.scss";
+@use "../../themes/mixins";
 
 .text-editor-controls {
   margin-bottom: theme.$spacing;
-  border-bottom: 1px solid theme.colors("secondary");
+  border-bottom: 1px solid theme.colors("primary-darker");
 
   .inline-controls,
   .block-controls {
@@ -12,14 +12,9 @@
     margin-left: 2 * theme.$spacing;
 
     .font-icon {
-      @extend .font-icon;
+      @include mixins.font-icon();
       margin-right: 0.5 * theme.$spacing;
       border-radius: theme.$spacing;
-
-      &.active {
-        //color: #FFF;
-        background-color: theme.colors("primary");
-      }
     }
   }
 }

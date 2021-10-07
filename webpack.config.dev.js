@@ -1,8 +1,8 @@
 const resolve = require("path").resolve;
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ReactRefreshTypeScript = require("react-refresh-typescript");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const ReactRefreshTypescript = require("react-refresh-typescript");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
@@ -17,18 +17,19 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.[jt]sx?$/,
         use: [
           {
             loader: require.resolve("ts-loader"),
             options: {
               getCustomTransformers: () => ({
-                before: [ReactRefreshTypeScript()],
+                before: [ReactRefreshTypescript],
               }),
               transpileOnly: true,
             },
           },
         ],
+        exclude: /node_modules/,
       },
       {
         test: /\.scss$/,
@@ -51,10 +52,9 @@ module.exports = {
   },
   devtool: "source-map",
   devServer: {
-    host: "0.0.0.0",
+    host: "localhost",
     port: "1234",
     historyApiFallback: true,
-    allowedHosts: [".netlify.live"],
     hot: true,
     client: {
       overlay: true,

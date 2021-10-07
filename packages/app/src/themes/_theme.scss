@@ -1,10 +1,10 @@
 @use "sass:map";
 @use "./default.scss";
-@use "./orange-theme.scss";
+@use "./green-theme.scss";
 
 $themes: (
   default: false,
-  orange-theme: true,
+  green-theme: true,
 );
 
 $spacing: 0.33rem ;
@@ -14,8 +14,8 @@ $spacing: 0.33rem ;
 
   @if map.get($themes, "default") {
     $map: default.$colors;
-  } @else if map.get($themes, "orange-theme") {
-    $map: orange-theme.$colors;
+  } @else if map.get($themes, "green-theme") {
+    $map: green-theme.$colors;
   }
 
   @each $key in $keys {

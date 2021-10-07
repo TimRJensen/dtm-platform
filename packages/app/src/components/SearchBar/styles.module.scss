@@ -1,38 +1,35 @@
 @use "../../themes/theme";
+@use "../../themes/mixins";
 
 .search-bar {
-  border: 1px solid theme.colors("secondary");
+  height: 40px;
+  width: 20vw;
+  border: 1px solid theme.colors("primary-darker");
   margin-right: theme.$spacing;
+  margin-left: auto;
   border-radius: 5px;
-  background-color: theme.colors("primary-faded");
+  background-color: theme.colors("primary-lighter");
 
   form {
-    height: 38px;
-    width: 300px;
+    height: inherit;
+    width: inherit;
     display: inline-flex;
-    justify-content: end;
     align-items: center;
 
     input {
-      width: 264px;
+      width: inherit;
       height: inherit;
+      margin-right: auto;
+      padding-left: theme.$spacing;
       border: 0;
       background-color: transparent;
+      color: theme.colors("text", "secondary");
       outline: none;
     }
 
     .font-icon {
-      font-size: 34px;
-      color: theme.colors("font-icon", "default");
-      cursor: pointer;
-
-      &.disabled {
-        color: theme.colors("font-icon", "disabled");
-      }
+      @include mixins.font-icon(24px, null, theme.colors("primary-lightest"), theme.colors("primary-lightest"));
+      cursor: default;
     }
-  }
-
-  &.focus {
-    box-shadow: 0 0 3px 0.8px theme.colors("secondary");
   }
 }

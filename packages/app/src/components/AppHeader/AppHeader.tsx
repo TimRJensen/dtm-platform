@@ -1,13 +1,11 @@
 /**
  * Vendor imports.
  */
-import { useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { AppStateContext } from "../App/app-state/context";
 import { SearchBar } from "../SearchBar/SearchBar";
 import { FontIcon } from "../FontIcon/FontIcon";
 import styles from "./styles.module.scss";
@@ -20,10 +18,14 @@ export const AppHeader = function AppHeader() {
 
   return (
     <section className={styles.appHeader}>
+      <SearchBar />
       <div className={styles.controls}>
-        <SearchBar />
-        <FontIcon type="account_circle" />
-        <FontIcon type="home" onClick={() => history.push("/")} />
+        <FontIcon
+          styles={styles}
+          type="home"
+          onClick={() => history.push("/")}
+        />
+        <FontIcon styles={styles} type="account_circle" />
       </div>
     </section>
   );

@@ -3,22 +3,24 @@
  */
 import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Fuse from "fuse.js";
 
 /**
  * Custom imports.
  */
 import { PostDocument, CommentDocument, PouchDBContext } from "db";
-import { docIncludes } from "../util/main";
 
 /**
  * useQuery hook.
  */
-export const useQuery = function useQuery() {
+export const useQuery = function useQuery(fields: string[]) {
   const db = useContext(PouchDBContext);
   const { query } = useParams<{ query: string }>();
   const [results, setResults] = useState(
-    undefined as (PostDocument | CommentDocument)[] | undefined
+    [] as (PostDocument | CommentDocument)[]
   );
+
+  const queries = query.toLowerCase().split("+");
 
   const fetch = async () => {
     const response = await db.find(["type"], {
@@ -29,26 +31,19 @@ export const useQuery = function useQuery() {
 
     if (!response) return;
 
-    const queries = query.toLowerCase().split("+");
-    const includeKeys = [
-      "content",
-      "comments",
-      "creator",
-      "user",
-      "name",
-      "timestamp",
-    ];
-
     setResults(
       response.docs.reduce((result, doc) => {
         if (doc.type === "blog") {
-          for (const thread of doc.threads.values()) {
-            if (docIncludes(thread.post, includeKeys, queries))
-              result.push(thread.post);
+          for (const thread of doc.threads) {
+            const fuse = new Fuse([thread.post, ...thread.comments], {
+              threshold: 0.2,
+              isCaseSensitive: false,
+              useExtendedSearch: true,
+              keys: fields,
+            });
 
-            for (const comment of thread.comments.values())
-              if (docIncludes(comment, includeKeys, queries))
-                result.push(comment);
+            for (const searchResult of fuse.search(queries.join("|")))
+              result.push(searchResult.item);
           }
         }
 
@@ -59,12 +54,10 @@ export const useQuery = function useQuery() {
 
   useEffect(() => {
     fetch();
-
-    return () => setResults(undefined);
   }, [query]);
 
   return {
     results,
-    query,
+    queries,
   };
 };

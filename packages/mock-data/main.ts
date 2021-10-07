@@ -49,8 +49,9 @@ export const mockData = async function mockData(
 
     users.push({
       type: "user",
-      _id: `/users/user=${email}`,
-      name: name.findName(),
+      _id: `/users/user=${i}`,
+      displayName: name.findName(),
+      role: "user",
       email,
       stats: {
         threads: datatype.number({ min: 1, max: 20 }),
@@ -87,7 +88,7 @@ export const mockData = async function mockData(
       type: "blog",
       _id: `/blogs/blog=${i}`,
       artifact,
-      threads: new Map<string, ThreadDocument>(),
+      threads: [],
       stats: {
         threads: datatype.number({ min: 3, max: 10 }),
         comments: 0,
@@ -106,13 +107,10 @@ export const mockData = async function mockData(
         const post: PostDocument = {
           type: "post",
           _id: `${_id}/post`,
-          user: {
-            name: user.name,
-            email: user.email,
-          },
+          user,
           content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
-          upvotes: new Map(),
-          downvotes: new Map(),
+          upvotes: [],
+          downvotes: [],
           stats: {
             infractions: 0,
           },
@@ -122,31 +120,24 @@ export const mockData = async function mockData(
 
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.1)
-            post.upvotes.set(
+            post.upvotes.push(
               users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
-                .email,
-              true
             );
         }
 
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.05)
-            post.downvotes.set(
+            post.downvotes.push(
               users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
-                .email,
-              true
             );
         }
 
         const thread: ThreadDocument = {
           type: "thread",
           _id,
-          user: {
-            name: user.name,
-            email: user.email,
-          },
+          user,
           post,
-          comments: new Map<string, CommentDocument>(),
+          comments: [],
           stats: {
             comments: datatype.number({ min: 5, max: 15 }),
           },
@@ -173,10 +164,7 @@ export const mockData = async function mockData(
               _id: `${post._id}/comment=${i}`,
               timestamp,
               lastModified,
-              user: {
-                name: user.name,
-                email: user.email,
-              },
+              user,
               content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
               stats: {
                 infractions:
@@ -186,11 +174,11 @@ export const mockData = async function mockData(
               },
             };
 
-            thread.comments.set(`comment=${i}`, comment);
+            thread.comments.push(comment);
             lastTimestamp = comment.timestamp;
           }
         }
-        blog.threads.set(thread._id, thread);
+        blog.threads.push(thread);
       }
     blogs.push(blog);
   }
