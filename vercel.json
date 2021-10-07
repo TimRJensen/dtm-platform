@@ -1,5 +1,6 @@
 {
-  "redirects": [
+  "trailingSlash": false,
+  "rewrites": [
     {
       "source": "/search/:query*",
       "destination": "/"
