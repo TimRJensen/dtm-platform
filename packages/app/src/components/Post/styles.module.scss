@@ -2,7 +2,7 @@
 @use "../CommentHeader/styles.module.scss";
 
 .post {
-  width: 50vw;
+  width: 40vw;
   margin-bottom: theme.$spacing * 2.5;
 
   .comment-header {
@@ -11,7 +11,7 @@
 
   .body {
     width: auto;
-    margin-left: 2.5vw;
-    margin-right: 2.5vw;
+    margin-left: 1.5vw;
+    margin-right: 1.5vw;
   }
 }

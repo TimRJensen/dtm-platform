@@ -2,11 +2,12 @@
 @use "../../themes/mixins";
 
 .artifact {
+  width: 60vw;
   margin: auto;
+  margin-bottom: 4*theme.$spacing;
   padding: 2*theme.$spacing;
 
   .title {
-    width: auto;
     margin: auto;
     font-size: 3rem;
     text-align: center;
@@ -14,26 +15,22 @@
 
   .body {
     display: flex;
-    width: 90vw;
-    margin: auto;
-    margin-bottom: 4*theme.$spacing;
 
     .image {
-      width: 25vw;
+      width: auto;
+      height: 25vh;
       margin-right: 2 * theme.$spacing;
       border-radius: theme.$spacing;
     }
 
     .content {
-      display: flex;
-      width: 50vw;
       padding: theme.$spacing;
       margin-right: 4 * theme.$spacing;
       font-size: 1.25rem;
     }
 
     .panel {
-      width: 15vw;
+      width: 10vw;
       height: fit-content;
       border-left: 1px solid theme.colors("primary-darker");
       padding: theme.$spacing;

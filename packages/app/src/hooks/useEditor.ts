@@ -42,9 +42,9 @@ export const useEditor = function useEditor(
         return;
       }
 
-      // Update/mutate the model.
+      // Update the model.
       if (doc.type === "blog") {
-        doc.threads.push({
+        doc.threads.unshift({
           type: "thread",
           _id: `${doc._id}/thread-${doc.stats.threads}`,
           user: state.currentUser,

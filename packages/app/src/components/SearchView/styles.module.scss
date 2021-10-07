@@ -1,6 +1,7 @@
 @use "../../themes/theme";
 
 .search-view {
-  width: 50vw;
+  width: 40vw;
   margin: auto;
+  margin-bottom: theme.$spacing * 2.5;
 }

@@ -8,15 +8,15 @@
   margin: auto;
   margin-bottom: 4 * theme.$spacing;
 
-  width: 50vw;
+  width: 40vw;
   border: 1px solid theme.colors("primary-darker");
   border-radius: theme.$spacing theme.$spacing 0 0;
   overflow: hidden;
 
   .text-editor {
     @extend .text-editor;
-    width: 40vw;
-    padding-left: 5vw;
+    width: 37vw;
+    padding-left: 2vw;
 
     .input {
       height: 100px;

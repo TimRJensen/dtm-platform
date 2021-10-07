@@ -24,7 +24,8 @@ export const SearchResult = function SearchResult({ queries, result }: Props) {
     htmlString: result.content,
     tests: queries,
     decorator: {
-      tag: "strong",
+      tag: "span",
+      className: styles.highlight,
     },
   });
 

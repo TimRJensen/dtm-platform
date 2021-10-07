@@ -1,3 +1,19 @@
+@use "../../themes/theme";
+
 body {
   margin: 75px 0 0 0;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: theme.colors("primary");
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: theme.colors("secondary");
+  }
+
 }
+

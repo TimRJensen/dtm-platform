@@ -1,7 +1,8 @@
 /**
  * Vendor imports.
  */
-import { date, datatype, internet, lorem, name, image } from "faker";
+// @ts-ignore
+import { date, datatype, internet, lorem, name } from "faker/locale/en_US";
 
 /**
  * Custom imports.
