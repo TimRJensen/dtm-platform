@@ -4,6 +4,6 @@
       "source": "/blogs/:blogId*",
       "destination": "/"
     },
-    { "source": "/search/:query*", "destination": "/" }
+    { "source": "/search/:query*", "destination": "/index.html" }
   ]
 }
