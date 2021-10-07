@@ -2,8 +2,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/test/:any",
-      "destination": "/index.html"
+      "source": "/test/:any*",
+      "destination": "/:any*"
     }
   ]
 }
