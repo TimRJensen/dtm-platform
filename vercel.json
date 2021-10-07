@@ -1,5 +1,12 @@
 {
-  "rewrites": [
-    {"source": "/:any*", "destination": "/"}
+  "redirects": [
+    {
+      "source": "/search/*",
+      "destination": "/"
+    },
+    {
+      "source": "/blogs/*",
+      "destination": "/"
+    }
   ]
 }
