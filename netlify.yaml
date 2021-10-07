@@ -1,4 +1,0 @@
-[[redirects]]
-  from = "/blogs/*"
-  to = "/"
-  status = 200
