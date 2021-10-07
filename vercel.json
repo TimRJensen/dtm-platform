@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    {
+      "source": "/blogs/:blogId/:threadId?/:postId?/:commentId?",
+      "destination": "/index.html"
+    },
+    { "source": "/search/:query/:pageId?", "destination": "/index.html" }
+  ]
 }
