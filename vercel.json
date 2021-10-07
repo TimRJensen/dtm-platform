@@ -2,11 +2,11 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/search/([^.])",
+      "source": "/search/(:any[^.])",
       "destination": "/"
     },
     {
-      "source": "/blogs/([^.])",
+      "source": "/blogs/:any([^.])",
       "destination": "/"
     }
   ]
