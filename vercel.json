@@ -2,7 +2,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/test",
+      "source": "/test/:any",
       "destination": "/"
     }
   ]
