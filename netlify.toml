@@ -1,6 +1,6 @@
 [[build]]
   base = "./"
-  pbulish = "./dist/"
+  publish = "./dist/"
   command = "yarn build"
 
 [[redirects]]
