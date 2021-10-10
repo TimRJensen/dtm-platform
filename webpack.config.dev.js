@@ -3,8 +3,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-//const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-//const ReactRefreshTypescript = require("react-refresh-typescript");
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
@@ -18,26 +17,14 @@ module.exports = {
   target: "web",
   module: {
     rules: [
-      /*{
-        test: /\.[jt]sx?$/,
-        use: [
-          {
-            loader: require.resolve("ts-loader"),
-            options: {
-              getCustomTransformers: () => ({
-                before: [ReactRefreshTypescript()],
-              }),
-              transpileOnly: true,
-            },
-          },
-        ],
-        exclude: /node_modules/,
-      },*/
       {
         test: /\.[jt]sx?$/,
         use: [
           {
-            loader: "ts-loader",
+            loader: require.resolve("babel-loader"),
+            options: {
+              plugins: [require.resolve("react-refresh/babel")],
+            },
           },
         ],
         exclude: /node_modules/,
@@ -89,6 +76,6 @@ module.exports = {
       title: "DNT Platform",
       template: resolve(__dirname, "./packages/app/src/index.html"),
     }),
-    //new ReactRefreshWebpackPlugin(),
+    new ReactRefreshWebpackPlugin(),
   ],
 };
