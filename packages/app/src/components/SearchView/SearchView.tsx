@@ -3,26 +3,44 @@
  */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { CommentDocument, PostDocument } from "db";
+import { Theme } from "../../themes/dtm";
 import { useQuery } from "../../hooks/";
 import { SearchPagination } from "../SearchPagination/SearchPagination";
 import { SearchResult } from "../SearchResult/SearchResult";
-import styles from "./styles.module.scss";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const {
+    spacing,
+    sizes: { searchView },
+  } = theme;
+
+  return {
+    searchView: css({
+      width: searchView.width,
+      margin: `${spacing}px auto ${2 * spacing}px auto`,
+    }),
+  };
+};
 
 /**
  * QueryView functional component.
  */
-
 export const SearchView = function SearchView() {
   const { pageId } = useParams<{ pageId?: string }>();
   const { results, queries } = useQuery(["content", "user.displayName"]);
   const [currentPage, setCurrentPage] = useState(
     pageId ? Number.parseInt(pageId.replace("page=", "")) : 0
   );
+  const css = _css(useTheme() as Theme);
 
   useEffect(() => {
     if (pageId) {
@@ -36,7 +54,7 @@ export const SearchView = function SearchView() {
   const resultsPerPage = 10;
 
   return (
-    <section className={styles.searchView}>
+    <section css={css.searchView}>
       {results
         .slice(
           currentPage * resultsPerPage,

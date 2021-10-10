@@ -2,13 +2,14 @@
  * Vendor imports.
  */
 import { useState } from "react";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { BlogDocument } from "db";
+import { Theme } from "../../themes/dtm";
 import { ArtifactCard } from "../ArtifactCard/ArtifactCard";
-import styles from "./styles.module.scss";
 
 /**
  * useOnLoad
@@ -30,6 +31,30 @@ function useOnLoad(docs: BlogDocument[]) {
 }
 
 /**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const {
+    spacing,
+    sizes: { artifactCard },
+  } = theme;
+
+  return {
+    grid: css({
+      display: "flex",
+      margin: `${2 * spacing}px auto 0 auto`,
+    }),
+    column: css({
+      display: "flex",
+      flexFlow: "column",
+      width: artifactCard.width,
+      height: "auto",
+      marginRight: spacing,
+    }),
+  };
+};
+
+/**
  * GridBox functional component.
  */
 interface Props {
@@ -37,12 +62,13 @@ interface Props {
 }
 
 export const GridBox = function GridBox({ docs }: Props) {
+  const css = _css(useTheme() as Theme);
   const { isLoading, onLoad } = useOnLoad(docs);
   const numberOfColumns = 3;
   let column = 0;
 
   return (
-    <section className={styles.grid}>
+    <section css={css.grid}>
       {docs
         .reduce((result, doc) => {
           if (!result[column]) result[column] = [];
@@ -56,7 +82,7 @@ export const GridBox = function GridBox({ docs }: Props) {
         .map((column, i) => (
           <div
             key={`grid-column-${i}`}
-            className={styles.column}
+            css={css.column}
             style={{ display: isLoading() ? "none" : "flex" }}
             onLoad={onLoad}
           >

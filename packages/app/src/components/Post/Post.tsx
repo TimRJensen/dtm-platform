@@ -1,17 +1,42 @@
 /**
  * Vendor imports.
  */
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { PostDocument } from "db";
+import { Theme } from "../../themes/dtm";
 import { useEditor, useScrollElement } from "../../hooks/";
 import { CommentHeader } from "../CommentHeader/CommentHeader";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { PostFooter } from "../PostFooter/PostFooter";
 import { TextBox } from "../TextBox/TextBox";
-import styles from "./styles.module.scss";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const {
+    spacing,
+    sizes: { thread },
+  } = theme;
+
+  return {
+    post: css({
+      width: `${thread.width}vw`,
+      marginBottom: spacing,
+    }),
+    body: css({
+      margin: `0 ${2 * spacing}px`,
+    }),
+    textEditor: css({
+      height: 100,
+      width: 0,
+    }),
+  };
+};
 
 /**
  * Post functional component.
@@ -26,16 +51,17 @@ export const Post = function Post({ doc, onComment }: Props) {
 
   const { domElement } = useScrollElement(doc);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
+  const css = _css(useTheme() as Theme);
 
   return (
-    <section className={styles.post} ref={domElement}>
-      <CommentHeader styles={styles} doc={doc} handleEdit={handleShowEditor} />
+    <section css={css.post} ref={domElement}>
+      {/* <CommentHeader doc={doc} handleEdit={handleShowEditor} /> */}
       {showEditor() ? (
-        <div className={styles.body}>
+        <div css={css.body}>
           <TextEditor content={doc.content} onSubmit={handleSubmit} advanced />
         </div>
       ) : (
-        <div className={styles.body}>
+        <div css={css.body}>
           <TextBox>{doc.content}</TextBox>
           <PostFooter doc={doc} onComment={onComment} />
         </div>

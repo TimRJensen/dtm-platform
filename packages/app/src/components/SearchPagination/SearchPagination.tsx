@@ -3,11 +3,43 @@
  */
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import styles from "./styles.module.scss";
+import { Theme, button } from "../../themes/dtm";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const { spacing, borderRadius, colors } = theme;
+
+  return {
+    searchPagination: css({
+      padding: spacing,
+    }),
+    button: css([
+      button,
+      {
+        height: "auto",
+        width: "auto",
+        marginRight: spacing * 0.5,
+        borderRadius: borderRadius * 0.5,
+        "&:hover": {
+          backgroundColor: colors.secondary,
+        },
+      },
+    ]),
+    buttonActive: css({
+      backgroundColor: colors.secondary,
+    }),
+    divider: css({
+      marginRight: spacing * 0.5,
+    }),
+  };
+};
 
 /**
  * SearchPagination functional component.
@@ -24,6 +56,7 @@ export const SearchPagination = function SearchPagination({
   resultsPerPage = 25,
 }: Props) {
   const history = useHistory();
+  const css = _css(useTheme() as Theme);
   const [pages, setPages] = useState([] as (string | number)[]);
   const maxPages = Math.floor(maxResults / resultsPerPage);
 
@@ -51,19 +84,18 @@ export const SearchPagination = function SearchPagination({
     }
 
     setPages(pages);
-    console.log(pages);
   }, [currentPage]);
 
   return (
-    <div className={styles.searchPagination}>
+    <div css={css.searchPagination}>
       {pages.map((value, i) =>
         typeof value === "number" ? (
           <button
             key={`search-pagination-${value}`}
-            className={
+            css={
               value - 1 === currentPage
-                ? `${styles.button} ${styles.active}`
-                : styles.button
+                ? [css.button, css.buttonActive]
+                : css.button
             }
             onClick={() =>
               history.push(
@@ -77,10 +109,7 @@ export const SearchPagination = function SearchPagination({
             {value}
           </button>
         ) : (
-          <span
-            key={`search-pagination-${value}-${i}`}
-            className={styles.divider}
-          >
+          <span key={`search-pagination-${value}-${i}`} css={css.divider}>
             {value}
           </span>
         )

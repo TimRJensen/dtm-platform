@@ -3,6 +3,7 @@
  */
 import { useReducer, Reducer } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { ThemeProvider, css, Global } from "@emotion/react";
 
 /**
  * Custom imports.
@@ -13,7 +14,30 @@ import { default as Index } from "../../pages/index";
 import { BlogView } from "../BlogView/BlogView";
 import { SearchView } from "../SearchView/SearchView";
 import { Test } from "../Test/Test";
-import "./styles.scss";
+//import "./styles.scss";
+import theme from "../../themes/dtm";
+
+/**
+ * Css.
+ */
+const _css = css({
+  ":root": {
+    fontFamily: `"Roboto", sans-serif`,
+    boxSizing: "border-box",
+  },
+  body: {
+    margin: 0,
+    "&::-webkit-scrollbar": {
+      width: "0.5rem",
+    },
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: theme.colors.primary,
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: theme.colors.secondary,
+    },
+  },
+});
 
 /**
  * App functional component.
@@ -48,24 +72,27 @@ export const App = function ({ db }: Props) {
   return (
     <PouchDBProvider value={db}>
       <AppStateProvider value={{ state, dispatch }}>
-        <Router>
-          <Switch>
-            <Route exact path="/" component={Index} />
-            <Route
-              path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
-              render={() => {
-                return <BlogView blog={state.currentBlog} />;
-              }}
-            />
-            <Route
-              path="/search/:query/:pageId?"
-              render={() => {
-                return <SearchView />;
-              }}
-            />
-            <Route path="/test" component={Test} />
-          </Switch>
-        </Router>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Global styles={_css} />
+            <Switch>
+              <Route exact path="/" component={Index} />
+              <Route
+                path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
+                render={() => {
+                  return <BlogView blog={state.currentBlog} />;
+                }}
+              />
+              <Route
+                path="/search/:query/:pageId?"
+                render={() => {
+                  return <SearchView />;
+                }}
+              />
+              <Route path="/test" component={Test} />
+            </Switch>
+          </Router>
+        </ThemeProvider>
       </AppStateProvider>
     </PouchDBProvider>
   );

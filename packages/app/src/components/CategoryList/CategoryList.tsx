@@ -3,13 +3,35 @@
  */
 
 import { useContext, useEffect, useState } from "react";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { BlogDocument, CategoryDocument, PouchDBContext } from "db";
+import { Theme } from "../../themes/dtm";
 import { CategoryItem } from "../CategoryItem/CategoryItem";
-import styles from "./styles.module.scss";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const {
+    colors,
+    sizes: { categoryList },
+  } = theme;
+
+  return {
+    categoryList: css({
+      display: "flex",
+      flexFlow: "column",
+      height: categoryList.height,
+      width: categoryList.width,
+      backgroundColor: colors.primary,
+      color: colors.text.secondary,
+    }),
+  };
+};
 
 /**
  * IndexPanel functional component.
@@ -20,6 +42,7 @@ interface Props {
 
 export const CategoryList = function CategoryList({ onClick }: Props) {
   const db = useContext(PouchDBContext);
+  const css = _css(useTheme() as Theme);
   const [categories, setCategories] = useState<CategoryDocument[]>([]);
   const [collapse, setCollapse] = useState(false);
 
@@ -39,7 +62,7 @@ export const CategoryList = function CategoryList({ onClick }: Props) {
 
   return (
     <section
-      className={styles.categoryList}
+      css={css.categoryList}
       onMouseLeave={() => setCollapse(true)}
       onMouseEnter={() => setCollapse(false)}
     >

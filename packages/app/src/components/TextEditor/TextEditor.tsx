@@ -11,12 +11,46 @@ import {
   RawDraftContentState,
   convertFromHTML,
 } from "draft-js";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
+import { Theme, button } from "../../themes/dtm";
 import { TextEditorControls } from "../TextEditorControls/TextEditorControls";
-import styles from "./styles.module.scss";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const { spacing, colors } = theme;
+
+  return {
+    textEditor: css({
+      //marginBottom: spacing,
+    }),
+    input: css({
+      height: "inherit",
+      marginBottom: spacing,
+      padding: spacing,
+      borderBottom: `1px solid ${colors.primary}`,
+      overflow: "auto",
+    }),
+    footer: css({
+      display: "flex",
+      justifyContent: "right",
+    }),
+    buttonCancel: css([button, { marginRight: spacing }]),
+    buttonSubmit: css([
+      button,
+      {
+        marginRight: spacing,
+        backgroundColor: colors.button.accept,
+        "&:hover": { backgroundColor: colors.button.acceptHover },
+      },
+    ]),
+  };
+};
 
 /**
  * CommentTextbox functional component - https://draftjs.org/
@@ -26,11 +60,11 @@ interface Props {
   advanced?: boolean;
   content?: string;
   onSubmit?: (content?: RawDraftContentState) => void;
-  styles?: { [key: string]: string };
+  $css?: Partial<ReturnType<typeof _css>>;
 }
 
 export const TextEditor = function TextEditor({
-  styles: _styles = styles,
+  $css,
   show = true,
   advanced = false,
   content,
@@ -48,6 +82,7 @@ export const TextEditor = function TextEditor({
           )
         )
   );
+  const css = _css(useTheme() as Theme);
 
   const handleKeyCommand = (command: string, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -65,8 +100,11 @@ export const TextEditor = function TextEditor({
   }, []);
 
   return (
-    <section className={_styles.textEditor}>
-      <div className={_styles.input} onClick={() => editorRef.current?.focus()}>
+    <section css={[css.textEditor, $css?.textEditor]}>
+      <div
+        css={[css.input, $css?.input]}
+        onClick={() => editorRef.current?.focus()}
+      >
         {advanced ? (
           <TextEditorControls
             editorState={editorState}
@@ -80,9 +118,9 @@ export const TextEditor = function TextEditor({
           ref={editorRef}
         />
       </div>
-      <div className={_styles.footer}>
+      <div css={[css.footer, $css?.footer]}>
         <button
-          className={_styles.submit}
+          css={[css.buttonSubmit, $css?.buttonSubmit]}
           onClick={() => {
             if (onSubmit)
               onSubmit(convertToRaw(editorState.getCurrentContent()));
@@ -91,6 +129,7 @@ export const TextEditor = function TextEditor({
           submit
         </button>
         <button
+          css={[css.buttonCancel, $css?.buttonCancel]}
           onClick={() => {
             if (onSubmit) onSubmit(undefined);
           }}

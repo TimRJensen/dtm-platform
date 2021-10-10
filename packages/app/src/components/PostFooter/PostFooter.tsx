@@ -1,16 +1,33 @@
 /**
  * Vendor imports.
  */
-import { PostDocument } from "db";
+
 import { useContext } from "react";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
+import { PostDocument } from "db";
+import { Theme } from "../../themes/dtm";
 import { useIsUpvoted } from "../../hooks";
 import { AppStateContext } from "../App/app-state/context";
 import { FontIcon } from "../FontIcon/FontIcon";
-import styles from "./styles.module.scss";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const { spacing } = theme;
+
+  return {
+    footer: css({
+      display: "flex",
+      justifyContent: "end",
+      padding: `${spacing}px ${spacing}px 0 0`,
+    }),
+  };
+};
 
 /**
  * PostFooter functional component.
@@ -21,11 +38,12 @@ interface Props {
 }
 
 export const PostFooter = function PostFooter({ doc, onComment }: Props) {
+  const css = _css(useTheme() as Theme);
   const { state } = useContext(AppStateContext);
   const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
 
   return (
-    <div className={styles.footer}>
+    <div css={css.footer}>
       <FontIcon
         key="footer-comment-button"
         type="question_answer"

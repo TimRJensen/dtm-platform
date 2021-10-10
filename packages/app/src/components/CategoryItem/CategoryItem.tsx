@@ -2,12 +2,48 @@
  * Vendor imports.
  */
 import { useEffect, useState } from "react";
+import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { BlogDocument, CategoryDocument } from "db";
-import styles from "./styles.module.scss";
+import { Theme } from "../../themes/dtm";
+
+/**
+ * Css.
+ */
+const _css = (theme: Theme) => {
+  const { spacing, colors } = theme;
+
+  return {
+    categoryItem: css({
+      cursor: "pointer",
+      "&:hover": {
+        backgroundColor: colors.secondary,
+      },
+    }),
+    label: css({
+      padding: `${spacing}px 0 ${spacing}px ${spacing}px`,
+    }),
+    subCategories: css({
+      maxHeight: 0,
+      overflow: "hidden",
+      transition: "max-height 1s ease",
+    }),
+    subCategoriesShow: css({
+      maxHeight: 1024,
+      transition: "max-height 2s ease",
+    }),
+    subLabel: css({
+      paddingLeft: spacing * 2,
+      backgroundColor: colors.primaryLighter,
+      "&:hover": {
+        backgroundColor: colors.primaryLightest,
+      },
+    }),
+  };
+};
 
 /**
  * CategoryItem functional component.
@@ -23,6 +59,7 @@ export const CategoryItem = function CategoryItem({
   onClick,
   collapse = false,
 }: Props) {
+  const css = _css(useTheme() as Theme);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -36,15 +73,16 @@ export const CategoryItem = function CategoryItem({
   };
 
   return doc.subCategories ? (
-    <div
-      className={styles.categoryItem}
-      onMouseEnter={() => setIsHovered(true)}
-    >
-      <div className={styles.label} onClick={handleClick}>
+    <div css={css.categoryItem} onMouseEnter={() => setIsHovered(true)}>
+      <div css={css.label} onClick={handleClick}>
         {doc.label}
       </div>
       <div
-        className={`${styles.subCategories} ${isHovered ? styles.show : ""}`}
+        css={
+          isHovered
+            ? [css.subCategories, css.subCategoriesShow]
+            : css.subCategories
+        }
       >
         {doc.subCategories.map((doc) => (
           <CategoryItem key={doc._id} doc={doc} onClick={onClick} />
@@ -52,7 +90,7 @@ export const CategoryItem = function CategoryItem({
       </div>
     </div>
   ) : (
-    <div className={styles.label} onClick={handleClick}>
+    <div css={[css.label, css.subLabel]} onClick={handleClick}>
       {doc.label}
     </div>
   );
