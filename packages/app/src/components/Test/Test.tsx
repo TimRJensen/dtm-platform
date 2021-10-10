@@ -5,17 +5,25 @@
 /**
  * Custom imports.
  */
-import { SearchResult } from "../SearchResult/SearchResult";
-import { PostDocument } from "db";
+import { BlogDocument, PostDocument } from "db";
+import { CategoryList } from "../CategoryList/CategoryList";
+import { ArtifactCard } from "../ArtifactCard/ArtifactCard";
+import { useState } from "react";
 
 /**
  * Test functional component.
  */
 
 export const Test = function Test() {
+  const [blogs, setBlogs] = useState<BlogDocument[]>();
+
   return (
-    <div style={{ width: 400, marginLeft: 50 }}>
-      <SearchResult result={comment} queries={["volup"]}></SearchResult>
+    <div>
+      <CategoryList onClick={setBlogs}></CategoryList>
+
+      <div>
+        {blogs ? blogs.map((blog) => <ArtifactCard doc={blog} />) : null}
+      </div>
     </div>
   );
 };

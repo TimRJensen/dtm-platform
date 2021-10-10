@@ -3,8 +3,8 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-const ReactRefreshTypescript = require("react-refresh-typescript");
+//const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+//const ReactRefreshTypescript = require("react-refresh-typescript");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
@@ -18,7 +18,7 @@ module.exports = {
   target: "web",
   module: {
     rules: [
-      {
+      /*{
         test: /\.[jt]sx?$/,
         use: [
           {
@@ -32,12 +32,21 @@ module.exports = {
           },
         ],
         exclude: /node_modules/,
+      },*/
+      {
+        test: /\.[jt]sx?$/,
+        use: [
+          {
+            loader: "ts-loader",
+          },
+        ],
+        exclude: /node_modules/,
       },
       {
         test: /\.scss$/,
         use: [
-          //"style-loader",
-          MiniCssExtractPlugin.loader,
+          "style-loader",
+          //MiniCssExtractPlugin.loader,
           {
             loader: "css-loader",
             options: { modules: { exportLocalsConvention: "camelCase" } },
@@ -80,6 +89,6 @@ module.exports = {
       title: "DNT Platform",
       template: resolve(__dirname, "./packages/app/src/index.html"),
     }),
-    new ReactRefreshWebpackPlugin(),
+    //new ReactRefreshWebpackPlugin(),
   ],
 };

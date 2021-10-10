@@ -15,6 +15,7 @@ import {
   PouchDB,
   ThreadDocument,
   UserDocument,
+  CategoryDocument,
 } from "db";
 
 /**
@@ -30,7 +31,7 @@ export const mockData = async function mockData(
   userOptions?: MockDataOptions
 ) {
   const defaults = {
-    numberOfBlogs: datatype.number({ min: 10, max: 15 }),
+    numberOfBlogs: datatype.number({ min: 50, max: 75 }),
     numberOfUsers: datatype.number({ min: 90, max: 200 }),
   };
   const options = {
@@ -38,11 +39,11 @@ export const mockData = async function mockData(
     ...userOptions,
   };
   const now = new Date();
-  const blogs = [];
-  const users: UserDocument[] = [];
 
-  const response = await fetch("https://picsum.photos/v2/list?limit=100");
-  const images = await response.json();
+  /**
+   * Create fake users.
+   */
+  const users: UserDocument[] = [];
 
   for (let i = 0; i < options.numberOfUsers; i++) {
     const email = internet.email();
@@ -69,6 +70,11 @@ export const mockData = async function mockData(
     });
   }
 
+  /**
+   * Create fake blogs.
+   */
+  const blogs = [];
+
   for (let i = 0; i < options.numberOfBlogs; i++) {
     const timestamp = date.past(datatype.number({ min: 5, max: 8 })).getTime();
     const lastModified = date.between(new Date(timestamp), now).getTime();
@@ -77,10 +83,17 @@ export const mockData = async function mockData(
       type: "artifact",
       _id: `/blogs/blog=${i}/artifact`,
       title: lorem.words(datatype.number({ min: 1, max: 4 })),
-      // @ts-ignore
-      image: images[datatype.number({ min: 0, max: 99 })]["download_url"],
+      image:
+        Math.random() < 0.15
+          ? "https://picsum.photos/260/520"
+          : "https://picsum.photos/260/200",
       content: lorem.sentences(datatype.number({ min: 10, max: 15 })),
       period: "",
+      category: {
+        raw: "",
+        base: { label: "", raw: "" },
+        sub: { label: "", raw: "" },
+      },
       tags: lorem.words(datatype.number({ min: 2, max: 5 })).split(" "),
       timestamp,
       lastModified,
@@ -92,6 +105,7 @@ export const mockData = async function mockData(
       threads: [],
       stats: {
         threads: datatype.number({ min: 3, max: 10 }),
+        views: datatype.number({ min: 100, mnax: 500 }),
         comments: 0,
       },
       timestamp,
@@ -122,14 +136,14 @@ export const mockData = async function mockData(
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.1)
             post.upvotes.push(
-              users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
+              users[datatype.number({ min: 0, max: users.length - 1 })]
             );
         }
 
         for (let i = 0; i < 25; i++) {
           if (Math.random() < 0.05)
             post.downvotes.push(
-              users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })]
+              users[datatype.number({ min: 0, max: users.length - 1 })]
             );
         }
 
@@ -140,7 +154,7 @@ export const mockData = async function mockData(
           post,
           comments: [],
           stats: {
-            comments: datatype.number({ min: 5, max: 15 }),
+            comments: datatype.number({ min: 3, max: 7 }),
           },
           timestamp: post.timestamp,
           lastModified: post.lastModified,
@@ -151,9 +165,7 @@ export const mockData = async function mockData(
 
           for (let i = 0; i < thread.stats.comments; i++) {
             const user =
-              users[
-                datatype.number({ min: 0, max: options.numberOfUsers - 1 })
-              ];
+              users[datatype.number({ min: 0, max: users.length - 1 })];
             const timestamp = date
               .between(new Date(lastTimestamp), now)
               .getTime();
@@ -180,8 +192,64 @@ export const mockData = async function mockData(
           }
         }
         blog.threads.push(thread);
+        blog.stats.comments += thread.comments.length;
       }
     blogs.push(blog);
   }
-  await db.putMany(blogs);
+
+  /**
+   * Create fake categories.
+   */
+  const categories = [];
+  let cursor = 0;
+
+  for (let i = 0; i < 15 && cursor < blogs.length; i++) {
+    const end = cursor + datatype.number({ min: 10, max: 20 });
+    const category: CategoryDocument = {
+      type: "category",
+      _id: `/categories/category-${i}`,
+      label: lorem.words(datatype.number({ min: 2, max: 3 })),
+      raw: datatype.number({ min: 100, max: 160 }),
+      blogs: blogs.slice(cursor, end < blogs.length ? end : blogs.length),
+      subCategories: [],
+      timestamp: now.getTime(),
+      lastModified: now.getTime(),
+    };
+
+    let _cursor = 0;
+
+    for (let i = 0; _cursor < category.blogs.length; i++) {
+      const end = _cursor + datatype.number({ min: 1, max: 9 });
+      const subCategory: CategoryDocument = {
+        type: "category",
+        _id: category._id + `/sub-category-${i}`,
+        label: lorem.words(datatype.number({ min: 1, max: 2 })),
+        raw: datatype.number({ min: 10, max: 70 }),
+        blogs: category.blogs.slice(
+          _cursor,
+          end < blogs.length ? end : blogs.length
+        ),
+        timestamp: now.getTime(),
+        lastModified: now.getTime(),
+      };
+
+      for (const blog of subCategory.blogs) {
+        const artifact = blog.artifact;
+        artifact.category.base = { label: category.label, raw: category.raw };
+        artifact.category.sub = {
+          label: subCategory.label,
+          raw: subCategory.raw,
+        };
+        artifact.category.raw = `${category.raw}.${subCategory.raw}`;
+      }
+
+      category.subCategories?.push(subCategory);
+      _cursor = end;
+    }
+
+    categories.push(category);
+    cursor = end;
+  }
+
+  await db.putMany([...blogs, ...categories, ...users]);
 };

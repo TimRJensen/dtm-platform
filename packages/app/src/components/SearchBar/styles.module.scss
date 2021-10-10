@@ -8,13 +8,13 @@
   margin-right: theme.$spacing;
   margin-left: auto;
   border-radius: 5px;
-  background-color: theme.colors("primary-lighter");
+  background-color: theme.colors("primary");
 
   form {
-    height: inherit;
-    width: inherit;
     display: inline-flex;
     align-items: center;
+    height: inherit;
+    width: inherit;
 
     input {
       width: inherit;

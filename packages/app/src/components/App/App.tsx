@@ -9,9 +9,8 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
  */
 import { PouchDB, PouchDBProvider } from "db";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
-import { AppHeader } from "../AppHeader/AppHeader";
+import { default as Index } from "../../pages/index";
 import { BlogView } from "../BlogView/BlogView";
-import { HomeView } from "../HomeView/HomeView";
 import { SearchView } from "../SearchView/SearchView";
 import { Test } from "../Test/Test";
 import "./styles.scss";
@@ -50,9 +49,8 @@ export const App = function ({ db }: Props) {
     <PouchDBProvider value={db}>
       <AppStateProvider value={{ state, dispatch }}>
         <Router>
-          <AppHeader />
           <Switch>
-            <Route exact path="/" component={HomeView} />
+            <Route exact path="/" component={Index} />
             <Route
               path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
               render={() => {

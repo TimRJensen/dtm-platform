@@ -2,13 +2,12 @@
 @use "../../themes/mixins";
 
 .app-header {
-  position: fixed;
   display: flex;
   align-items: center;
-  top: 0;
-  width: 100vw;
   height: 50px;
-  background-color: theme.colors("primary");
+  position: sticky;
+  top: 0;
+  background-color: theme.colors("secondary");
   box-shadow: 0 0 10px 2px #000;
 
   .controls {

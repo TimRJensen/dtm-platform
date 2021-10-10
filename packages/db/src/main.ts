@@ -69,6 +69,11 @@ export interface ArtifactDocument extends BaseDocument {
   image: string;
   content: string;
   period: string;
+  category: {
+    raw: string;
+    base: { raw: string; label: string };
+    sub: { raw: string; label: string };
+  };
   tags: string[];
 }
 
@@ -79,7 +84,16 @@ export interface BlogDocument extends BaseDocument {
   stats: {
     comments: number;
     threads: number;
+    views: number;
   };
+}
+
+export interface CategoryDocument extends BaseDocument {
+  type: "category";
+  label: string;
+  raw: string;
+  blogs: BlogDocument[];
+  subCategories?: CategoryDocument[];
 }
 
 export type AllDocuments =
@@ -89,7 +103,8 @@ export type AllDocuments =
   | ThreadDocument
   | ArtifactDocument
   | BlogDocument
-  | CommentDocument;
+  | CommentDocument
+  | CategoryDocument;
 
 type ExcludeKey<K> = K extends "timestamp" | "lastModified" | "key" ? never : K;
 type PutDocument<D extends AllDocuments> = D extends { type: D["type"] }

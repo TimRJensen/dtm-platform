@@ -1,0 +1,15 @@
+@use "../../themes/theme";
+
+.grid {
+  display: flex;
+  margin: 0 auto;
+  margin-top: 5*theme.$spacing;
+
+  .column {
+    display: flex;
+    flex-flow: column;
+    width: 300px;
+    height: auto;
+    margin-right:  theme.$spacing;
+  }
+}
