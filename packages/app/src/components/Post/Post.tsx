@@ -9,10 +9,10 @@ import { css, useTheme } from "@emotion/react";
 import { PostDocument } from "db";
 import { Theme } from "../../themes/dtm";
 import { useEditor, useScrollElement } from "../../hooks/";
-import { CommentHeader } from "../CommentHeader/CommentHeader";
-import { TextEditor } from "../TextEditor/TextEditor";
 import { PostFooter } from "../PostFooter/PostFooter";
+import { CommentHeader } from "../CommentHeader/CommentHeader";
 import { TextBox } from "../TextBox/TextBox";
+import { TextEditor } from "../TextEditor/TextEditor";
 
 /**
  * Css.
@@ -20,13 +20,25 @@ import { TextBox } from "../TextBox/TextBox";
 const _css = (theme: Theme) => {
   const {
     spacing,
+    borderRadius,
+    colors,
     sizes: { thread },
   } = theme;
 
   return {
     post: css({
       width: `${thread.width}vw`,
-      marginBottom: spacing,
+      margin: `0 auto 0 auto`,
+      borderRight: `1px solid ${colors.primary}`,
+      borderLeft: `1px solid ${colors.primary}`,
+      borderRadius: `${borderRadius}px ${borderRadius}px 0 0`,
+      paddingBottom: spacing,
+      boxSizing: "border-box",
+    }),
+    commentHeader: css({
+      width: `${thread.width}vw`,
+      margin: "auto",
+      boxSizing: "border-box",
     }),
     body: css({
       margin: `0 ${2 * spacing}px`,
@@ -55,7 +67,11 @@ export const Post = function Post({ doc, onComment }: Props) {
 
   return (
     <section css={css.post} ref={domElement}>
-      {/* <CommentHeader doc={doc} handleEdit={handleShowEditor} /> */}
+      <CommentHeader
+        $css={{ commentHeader: css.commentHeader }}
+        doc={doc}
+        onEdit={handleShowEditor}
+      />
       {showEditor() ? (
         <div css={css.body}>
           <TextEditor content={doc.content} onSubmit={handleSubmit} advanced />

@@ -13,7 +13,6 @@ import { useEditor } from "../../hooks/";
 import { Post } from "../Post/Post";
 import { Comment } from "../Comment/Comment";
 import { TextEditor } from "../TextEditor/TextEditor";
-import { CommentHeader } from "../CommentHeader/CommentHeader";
 
 /**
  * Css.
@@ -35,11 +34,6 @@ const _css = (theme: Theme) => {
       borderLeft: `1px solid ${colors.primary}`,
       borderRight: `1px solid ${colors.primary}`,
       borderBottom: `1px solid ${colors.primary}`,
-      boxSizing: "border-box",
-    }),
-    commentHeader: css({
-      width: `${thread.width}vw`,
-      margin: "auto",
       boxSizing: "border-box",
     }),
     textEditor: css({
@@ -71,13 +65,8 @@ export const Thread = function Thread({ doc }: Props) {
 
   return (
     <section>
-      <CommentHeader
-        $css={{ commentHeader: css.commentHeader }}
-        doc={doc.post}
-        onEdit={handleShowEditor}
-      />
+      <Post doc={doc.post} onComment={handleShowEditor} />
       <div css={css.thread}>
-        <Post doc={doc.post} onComment={handleShowEditor} />
         {doc.comments.map((comment) => {
           return <Comment key={comment._id} doc={comment} />;
         })}
