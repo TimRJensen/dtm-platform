@@ -16,19 +16,17 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
+        test: /\.[jt]sx?$/,
+        use: [
+          {
+            loader: "babel-loader",
+          },
+        ],
+        exclude: /node_modules/,
       },
       {
-        test: /\.scss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: { modules: { exportLocalsConvention: "camelCase" } },
-          },
-          "sass-loader",
-        ],
+        test: /\.css/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },

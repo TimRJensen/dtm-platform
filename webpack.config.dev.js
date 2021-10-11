@@ -34,11 +34,7 @@ module.exports = {
         use: [
           "style-loader",
           //MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: { modules: { exportLocalsConvention: "camelCase" } },
-          },
-          "sass-loader",
+          "css-loader",
         ],
       },
     ],
