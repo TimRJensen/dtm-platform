@@ -1,7 +1,6 @@
 /**
  * Vendor imports.
  */
-import { useState } from "react";
 import { css, useTheme } from "@emotion/react";
 
 /**
@@ -9,26 +8,7 @@ import { css, useTheme } from "@emotion/react";
  */
 import { BlogDocument } from "db";
 import { Theme } from "../../themes/dtm";
-import { ArtifactCard } from "../ArtifactCard/ArtifactCard";
-
-/**
- * useOnLoad
- */
-function useOnLoad(docs: BlogDocument[]) {
-  const [isLoading, setIsLoading] = useState(true);
-  let loaded = 0;
-
-  return {
-    isLoading: (flag?: boolean) => {
-      if (flag === undefined) return isLoading;
-
-      setIsLoading(flag);
-    },
-    onLoad: () => {
-      if (++loaded === docs.length) setIsLoading(false);
-    },
-  };
-}
+import { GridItem } from "../GridItem/GridItem";
 
 /**
  * Css.
@@ -59,12 +39,13 @@ const _css = (theme: Theme) => {
  */
 interface Props {
   docs: BlogDocument[];
+  columns?: number;
+  style?: { display: string };
 }
 
-export const GridBox = function GridBox({ docs }: Props) {
-  const css = _css(useTheme() as Theme);
-  const { isLoading, onLoad } = useOnLoad(docs);
-  const numberOfColumns = 3;
+export const GridBox = function GridBox({ docs, columns = 3, style }: Props) {
+  const theme = useTheme() as Theme;
+  const css = _css(theme);
   let column = 0;
 
   return (
@@ -75,19 +56,14 @@ export const GridBox = function GridBox({ docs }: Props) {
 
           result[column].push(doc);
 
-          if (++column === numberOfColumns) column = 0;
+          if (++column === columns) column = 0;
 
           return result;
         }, [] as BlogDocument[][])
         .map((column, i) => (
-          <div
-            key={`grid-column-${i}`}
-            css={css.column}
-            style={{ display: isLoading() ? "none" : "flex" }}
-            onLoad={onLoad}
-          >
+          <div key={`grid-column-${i}`} style={style} css={css.column}>
             {column.map((doc) => (
-              <ArtifactCard key={`artifact-card-${doc._id}`} doc={doc} />
+              <GridItem key={`artifact-card-${doc._id}`} doc={doc} />
             ))}
           </div>
         ))}

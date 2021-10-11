@@ -3,11 +3,13 @@
  */
 import { useContext, useEffect, useState } from "react";
 import { css, useTheme } from "@emotion/react";
+import GridLoader from "react-spinners/GridLoader";
 
 /**
  * Custom imports.
  */
 import { BlogDocument, PouchDBContext } from "db";
+import { useIsLoading } from "../hooks";
 import { Theme } from "../themes/dtm";
 import { AppHeader } from "../components/AppHeader/AppHeader";
 import { CategoryList } from "../components/CategoryList/CategoryList";
@@ -17,15 +19,20 @@ import { GridBox } from "../components/GridBox/GridBox";
  * Css.
  */
 const _css = (theme: Theme) => {
-  const { spacing, colors } = theme;
-
   return {
     banner: css({
       height: "20vh",
       backgroundColor: "#000",
     }),
-    body: css({
+    view: css({
       display: "flex",
+    }),
+    spinner: css({
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "calc(100vh - 40vh)",
+      width: "87vw",
     }),
   };
 };
@@ -34,9 +41,11 @@ const _css = (theme: Theme) => {
  * index functional component.
  */
 export default function index() {
-  const [blogs, setBlogs] = useState<BlogDocument[]>();
   const db = useContext(PouchDBContext);
-  const css = _css(useTheme() as Theme);
+  const [blogs, setBlogs] = useState<BlogDocument[]>([]);
+  const { isLoading, onLoad } = useIsLoading(blogs);
+  const theme = useTheme() as Theme;
+  const css = _css(theme);
 
   const fetch = async () => {
     const response = await db.find(["type"], {
@@ -49,16 +58,27 @@ export default function index() {
   };
 
   useEffect(() => {
-    if (!blogs) fetch();
+    if (blogs.length === 0) fetch();
   }, []);
 
   return (
     <section>
       <div css={css.banner}></div>
       <AppHeader />
-      <div css={css.body}>
+      <div css={css.view} onLoad={onLoad}>
         <CategoryList onClick={setBlogs} />
-        {blogs ? <GridBox docs={blogs} /> : null}
+        {isLoading() ? (
+          <div css={css.spinner}>
+            <GridLoader color={theme.colors.primary} loading={isLoading()} />
+          </div>
+        ) : null}
+        {blogs ? (
+          <GridBox
+            style={{ display: isLoading() ? "none" : "flex" }}
+            docs={blogs}
+            columns={3}
+          />
+        ) : null}
       </div>
     </section>
   );

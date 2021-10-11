@@ -8,9 +8,7 @@ import { css, useTheme } from "@emotion/react";
  */
 import { Theme } from "../../themes/dtm";
 import { ArtifactDocument } from "db";
-import { ArtifactInfo } from "../ArtifactInfo/ArtifactInfo";
-import { ArtifactTag } from "../ArtifactTag/ArtifactTag";
-import { FontIcon } from "../FontIcon/FontIcon";
+import { ArtifactPanel } from "../ArtifactPanel/ArtifactPanel";
 
 /**
  * Css.
@@ -25,7 +23,7 @@ const _css = (theme: Theme) => {
 
   return {
     artifact: css({
-      width: `${blog.width * 0.8}vw`,
+      width: `${blog.width * 0.7}vw`,
       margin: "auto",
       marginBottom: 2 * spacing,
       padding: spacing,
@@ -43,15 +41,9 @@ const _css = (theme: Theme) => {
       borderRadius,
     }),
     content: css({
-      maxWidth: `${blog.width * 0.5}vw`,
       padding: spacing,
       marginRight: 2 * spacing,
       fontSize: "1.25rem",
-    }),
-    panel: css({
-      width: `${blog.width * 0.1}vw`,
-      borderLeft: `1px solid ${colors.primary}`,
-      padding: spacing,
     }),
   };
 };
@@ -73,17 +65,7 @@ export const Artifact = function Artifact({ doc, onComment }: Props) {
       <div css={css.body}>
         <img css={css.image} src={doc.image} />
         <div css={css.content}>{doc.content}</div>
-        <div css={css.panel}>
-          <ArtifactInfo title="Period:">{doc.period}</ArtifactInfo>
-          <ArtifactInfo title="Tags:">
-            {doc.tags.map((tag) => (
-              <ArtifactTag key={`artifact-tag-${tag}`}>{tag}</ArtifactTag>
-            ))}
-          </ArtifactInfo>
-          <FontIcon type="chat_bubble" onClick={onComment}>
-            comment
-          </FontIcon>
-        </div>
+        <ArtifactPanel doc={doc} onComment={onComment} />
       </div>
     </section>
   );

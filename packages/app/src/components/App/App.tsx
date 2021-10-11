@@ -9,13 +9,12 @@ import { ThemeProvider, css, Global } from "@emotion/react";
  * Custom imports.
  */
 import { PouchDB, PouchDBProvider } from "db";
-import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
-import { default as Index } from "../../pages/index";
-import { BlogView } from "../BlogView/BlogView";
-import { SearchView } from "../SearchView/SearchView";
-import { Test } from "../Test/Test";
-//import "./styles.scss";
 import theme from "../../themes/dtm";
+import { default as Index } from "../../pages/index";
+import { default as Blog } from "../../pages/blogs/blog";
+import { default as Search } from "../../pages/search/search";
+import { Test } from "../Test/Test";
+import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 
 /**
  * Css.
@@ -80,13 +79,13 @@ export const App = function ({ db }: Props) {
               <Route
                 path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
                 render={() => {
-                  return <BlogView blog={state.currentBlog} />;
+                  return <Blog blog={state.currentBlog} />;
                 }}
               />
               <Route
                 path="/search/:query/:pageId?"
                 render={() => {
-                  return <SearchView />;
+                  return <Search />;
                 }}
               />
               <Route path="/test" component={Test} />

@@ -10,6 +10,7 @@ import Fuse from "fuse.js";
  */
 import { splitNode } from "../util/main";
 import { useHtmlParser } from "./useHtmlParser";
+import { SerializedStyles } from "@emotion/react";
 
 /**
  * useDecorate hook.
@@ -20,7 +21,8 @@ interface Params {
   decorator: {
     tag: string;
     className?: string;
-    styles?: string;
+    style?: string;
+    css?: SerializedStyles;
   };
 }
 
@@ -40,7 +42,7 @@ export function useDecorateNode({ htmlString, tests, decorator }: Params) {
           result.push(new Element(node.name, node.attribs, children));
       } else {
         const fuse = new Fuse(splitNode(node, regExp), {
-          threshold: 0.2,
+          threshold: 0.3,
           isCaseSensitive: false,
           useExtendedSearch: true,
           keys: ["data"],
@@ -66,7 +68,8 @@ export function useDecorateNode({ htmlString, tests, decorator }: Params) {
                 decorator.tag,
                 {
                   className: decorator.className ?? "",
-                  style: decorator.styles ?? "",
+                  style: decorator.style ?? "",
+                  css: (decorator.css as any) ?? "",
                 },
                 [node.cloneNode()]
               )

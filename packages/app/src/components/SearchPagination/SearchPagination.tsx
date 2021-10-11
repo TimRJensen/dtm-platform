@@ -19,6 +19,7 @@ const _css = (theme: Theme) => {
   return {
     searchPagination: css({
       padding: spacing,
+      textAlign: "center",
     }),
     button: css([
       button,
@@ -46,24 +47,24 @@ const _css = (theme: Theme) => {
  */
 interface Props {
   currentPage: number;
-  maxResults: number;
   resultsPerPage?: number;
+  total: number;
 }
 
 export const SearchPagination = function SearchPagination({
   currentPage,
-  maxResults,
-  resultsPerPage = 25,
+  resultsPerPage = 10,
+  total,
 }: Props) {
   const history = useHistory();
   const css = _css(useTheme() as Theme);
   const [pages, setPages] = useState([] as (string | number)[]);
-  const maxPages = Math.floor(maxResults / resultsPerPage);
+  const maxPages = Math.ceil(total / resultsPerPage);
 
   useEffect(() => {
     const pages = [];
 
-    if (currentPage < 4) {
+    if (currentPage < 5) {
       let i = -1;
 
       while (++i < maxPages && i < 5) pages.push(i + 1);

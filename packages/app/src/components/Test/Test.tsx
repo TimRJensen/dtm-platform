@@ -7,7 +7,6 @@
  */
 import { BlogDocument, PostDocument } from "db";
 import { CategoryList } from "../CategoryList/CategoryList";
-import { ArtifactCard } from "../ArtifactCard/ArtifactCard";
 import { useState } from "react";
 
 /**
@@ -21,9 +20,7 @@ export const Test = function Test() {
     <div>
       <CategoryList onClick={setBlogs}></CategoryList>
 
-      <div>
-        {blogs ? blogs.map((blog) => <ArtifactCard doc={blog} />) : null}
-      </div>
+      <div></div>
     </div>
   );
 };

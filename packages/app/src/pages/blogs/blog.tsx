@@ -11,11 +11,11 @@ import { css, useTheme } from "@emotion/react";
 import { BlogDocument, PouchDBContext } from "db";
 import { Theme } from "../../themes/dtm";
 import { useEditor } from "../../hooks";
-import { AppStateContext } from "../App/app-state/context";
-import { AppHeader } from "../AppHeader/AppHeader";
-import { Artifact } from "../Artifact/Artifact";
-import { Thread } from "../Thread/Thread";
-import { TextEditor } from "../TextEditor/TextEditor";
+import { AppStateContext } from "../../components/App/app-state/context";
+import { AppHeader } from "../../components/AppHeader/AppHeader";
+import { Artifact } from "../../components/Artifact/Artifact";
+import { Thread } from "../../components/Thread/Thread";
+import { TextEditor } from "../../components/TextEditor/TextEditor";
 
 /**
  * Css.
@@ -49,13 +49,13 @@ const _css = (theme: Theme) => {
 };
 
 /**
- * Blog functonal component.
+ * blog functonal component.
  */
 interface Props {
   blog: BlogDocument | undefined;
 }
 
-export const BlogView = function BlogView({ blog }: Props) {
+export default function blog({ blog }: Props) {
   const db = useContext(PouchDBContext);
   const css = _css(useTheme() as Theme);
   const { dispatch } = useContext(AppStateContext);
@@ -92,4 +92,4 @@ export const BlogView = function BlogView({ blog }: Props) {
       })}
     </section>
   );
-};
+}

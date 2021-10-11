@@ -6,3 +6,4 @@ export { useSearch } from "./useSearch";
 export { useHtmlParser } from "./useHtmlParser";
 export { useDecorateNode } from "./useDecorateNode";
 export { useScrollElement } from "./useScrollElement";
+export { useIsLoading } from "./useIsLoading";

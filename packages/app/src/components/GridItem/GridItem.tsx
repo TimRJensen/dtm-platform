@@ -54,7 +54,7 @@ interface Props {
   doc: BlogDocument;
 }
 
-export const ArtifactCard = function ArtifactCard({ doc }: Props) {
+export const GridItem = function GridItem({ doc }: Props) {
   const css = _css(useTheme() as Theme);
 
   return (

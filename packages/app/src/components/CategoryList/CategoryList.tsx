@@ -25,8 +25,8 @@ const _css = (theme: Theme) => {
     categoryList: css({
       display: "flex",
       flexFlow: "column",
-      height: categoryList.height,
-      width: categoryList.width,
+      minHeight: categoryList.height,
+      width: `${categoryList.width}vw`,
       backgroundColor: colors.primary,
       color: colors.text.secondary,
     }),

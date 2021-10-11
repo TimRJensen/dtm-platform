@@ -7,7 +7,7 @@ import { css, useTheme } from "@emotion/react";
 /**
  * Custom imports.
  */
-import { CommentDocument, PostDocument } from "db";
+import { ArtifactDocument } from "db";
 import { Theme } from "../../themes/dtm";
 import { formatDate } from "../../util/main";
 
@@ -37,7 +37,7 @@ const _css = (theme: Theme) => {
  * SearchResultHeader functional component.
  */
 interface Props {
-  doc: PostDocument | CommentDocument;
+  doc: ArtifactDocument;
 }
 
 export const SearchResultHeader = function SearchResultHeader({ doc }: Props) {
@@ -45,10 +45,7 @@ export const SearchResultHeader = function SearchResultHeader({ doc }: Props) {
 
   return (
     <div css={css.searchResultHeader}>
-      <div css={css.info}>
-        {`${formatDate(doc.timestamp)} by `}
-        <span>{doc.user.displayName}</span>
-      </div>
+      <div css={css.info}></div>
       <Link css={css.link} to={doc._id}>
         {"view"}
       </Link>
