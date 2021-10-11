@@ -55,6 +55,8 @@ interface Props {
 }
 
 export const GridItem = function GridItem({ doc }: Props) {
+  if (!doc) return null;
+
   const css = _css(useTheme() as Theme);
 
   return (

@@ -44,6 +44,8 @@ interface Props {
 }
 
 export const GridBox = function GridBox({ docs, columns = 3, style }: Props) {
+  if (docs.length === 0) return null;
+
   const theme = useTheme() as Theme;
   const css = _css(theme);
   let column = 0;
