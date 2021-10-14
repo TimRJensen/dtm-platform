@@ -8,62 +8,37 @@ import {
   EditorState,
   RichUtils,
   convertToRaw,
-  RawDraftContentState,
   convertFromHTML,
 } from "draft-js";
-import { css, useTheme } from "@emotion/react";
+import draftParser from "draftjs-to-html";
 
 /**
  * Custom imports.
  */
-import { Theme, button } from "../../themes/dtm";
-import { TextEditorControls } from "../TextEditorControls/TextEditorControls";
+import { useCSS } from "../../hooks";
+import { Controls } from "./Controls/Controls";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const { spacing, colors } = theme;
-
-  return {
-    textEditor: css({
-      //marginBottom: spacing,
-    }),
-    input: css({
-      height: "inherit",
-      marginBottom: spacing,
-      padding: spacing,
-      borderBottom: `1px solid ${colors.primary}`,
-      overflow: "auto",
-    }),
-    footer: css({
-      display: "flex",
-      justifyContent: "right",
-    }),
-    buttonCancel: css([button, { marginRight: spacing }]),
-    buttonSubmit: css([
-      button,
-      {
-        marginRight: spacing,
-        backgroundColor: colors.button.accept,
-        "&:hover": { backgroundColor: colors.button.acceptHover },
-      },
-    ]),
+interface Props {
+  onSubmit: (content: string | undefined, isEdit?: boolean) => void;
+  show?: boolean;
+  advanced?: boolean;
+  content?: string;
+  $css?: {
+    textEditor?: ReturnType<typeof useCSS>["css"]["string"];
+    input?: ReturnType<typeof useCSS>["css"]["string"];
+    footer?: ReturnType<typeof useCSS>["css"]["string"];
+    buttonSubmit?: ReturnType<typeof useCSS>["css"]["string"];
+    buttonCancel?: ReturnType<typeof useCSS>["css"]["string"];
   };
-};
+}
 
 /**
  * CommentTextbox functional component - https://draftjs.org/
  */
-interface Props {
-  show?: boolean;
-  advanced?: boolean;
-  content?: string;
-  onSubmit?: (content?: RawDraftContentState) => void;
-  $css?: Partial<ReturnType<typeof _css>>;
-}
-
-export const TextEditor = function TextEditor({
+export function TextEditor({
   $css,
   show = true,
   advanced = false,
@@ -72,6 +47,29 @@ export const TextEditor = function TextEditor({
 }: Props) {
   if (!show) return null;
 
+  const { css } = useCSS(({ spacing, colors, mixins: { button } }) => ({
+    textEditor: {},
+    input: {
+      height: "inherit",
+      marginBottom: spacing,
+      padding: spacing,
+      borderBottom: `1px solid ${colors.primary}`,
+      overflow: "auto",
+    },
+    footer: {
+      display: "flex",
+      justifyContent: "right",
+    },
+    buttonCancel: [button, { marginRight: spacing }],
+    buttonSubmit: [
+      button,
+      {
+        marginRight: spacing,
+        backgroundColor: colors.button.accept,
+        "&:hover": { backgroundColor: colors.button.acceptHover },
+      },
+    ],
+  }));
   const editorRef = useRef<Editor>(null);
   const [editorState, setEditorState] = useState(() =>
     !content
@@ -82,7 +80,6 @@ export const TextEditor = function TextEditor({
           )
         )
   );
-  const css = _css(useTheme() as Theme);
 
   const handleKeyCommand = (command: string, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -106,10 +103,7 @@ export const TextEditor = function TextEditor({
         onClick={() => editorRef.current?.focus()}
       >
         {advanced ? (
-          <TextEditorControls
-            editorState={editorState}
-            onToggle={setEditorState}
-          />
+          <Controls editorState={editorState} onToggle={setEditorState} />
         ) : null}
         <Editor
           editorState={editorState}
@@ -121,22 +115,22 @@ export const TextEditor = function TextEditor({
       <div css={[css.footer, $css?.footer]}>
         <button
           css={[css.buttonSubmit, $css?.buttonSubmit]}
-          onClick={() => {
-            if (onSubmit)
-              onSubmit(convertToRaw(editorState.getCurrentContent()));
-          }}
+          onClick={() =>
+            onSubmit(
+              draftParser(convertToRaw(editorState.getCurrentContent())),
+              content !== undefined
+            )
+          }
         >
           submit
         </button>
         <button
           css={[css.buttonCancel, $css?.buttonCancel]}
-          onClick={() => {
-            if (onSubmit) onSubmit(undefined);
-          }}
+          onClick={() => onSubmit(undefined)}
         >
           cancel
         </button>
       </div>
     </section>
   );
-};
+}

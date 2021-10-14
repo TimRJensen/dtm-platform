@@ -5,34 +5,38 @@
 /**
  * Custom imports.
  */
-import { UserDocument, BlogDocument, PostDocument, CommentDocument } from "db";
+import { UserType, BlogType } from "db";
 
 /**
  * Types.
  */
 export interface AppState {
-  currentUser: UserDocument | undefined;
-  currentBlog: BlogDocument | undefined;
-  currentQuery: string[] | undefined;
+  currentUser: UserType | undefined;
+  currentBlog: BlogType | undefined;
+  currentPath: { section: string; label?: string } | undefined;
   showEditor: ((flag: boolean) => void) | undefined;
 }
 
 export type Actions =
   | {
       type: "CURRENT_USER";
-      value: UserDocument | undefined;
+      value: UserType | undefined;
     }
   | {
       type: "CURRENT_BLOG";
-      value: BlogDocument | undefined;
+      value: BlogType | undefined;
     }
   | {
-      type: "CURRENT_QUERY";
-      value: string[] | undefined;
+      type: "CURRENT_PATH";
+      value: { section: string; label?: string };
     }
   | {
       type: "SHOW_EDITOR";
       value: ((flag: boolean) => void) | undefined;
+    }
+  | {
+      type: "ANY";
+      value: Partial<AppState>;
     };
 
 /**
@@ -44,10 +48,12 @@ export const reducer = function reducer(state: AppState, action: Actions) {
       return { ...state, currentBlog: action.value };
     case "CURRENT_USER":
       return { ...state, currentUser: action.value };
-    case "CURRENT_QUERY":
-      return { ...state, currentQuery: action.value };
+    case "CURRENT_PATH":
+      return { ...state, currentPath: action.value };
     case "SHOW_EDITOR":
       return { ...state, showEditor: action.value };
+    case "ANY":
+      return { ...state, ...action.value };
     default:
       throw new Error();
   }

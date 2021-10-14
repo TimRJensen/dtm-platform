@@ -1,15 +1,16 @@
 const resolve = require("path").resolve;
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const htmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
   output: {
     path: resolve(__dirname, "./dist"),
-    filename: "[contenthash].bundle.js",
+    publicPath: "/",
+    filename: "static/js/[contenthash].bundle.js",
   },
   mode: "production",
   target: "web",
@@ -24,9 +25,17 @@ module.exports = {
         ],
         exclude: /node_modules/,
       },
-      {
+      /*{
         test: /\.css/,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },*/
+      {
+        test: /\.(png|jpg|jpeg|gif)$/i,
+        type: "asset/resource",
+      },
+      {
+        test: /\.svg$/,
+        use: ["@svgr/webpack"],
       },
     ],
   },
@@ -37,7 +46,7 @@ module.exports = {
     },
   },
   optimization: {
-    minimizer: [`...`, new CssMinimizerPlugin()],
+    /*minimizer: [`...`, new CssMinimizerPlugin()],*/
     splitChunks: {
       chunks: "all",
     },
@@ -45,9 +54,17 @@ module.exports = {
   devtool: "source-map",
   plugins: [
     new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin({
+    /*new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css",
+    }),*/
+    new CopyPlugin({
+      patterns: [
+        {
+          from: resolve(__dirname, "./packages/app/src/public"),
+          to: resolve(__dirname, "./dist/public"),
+        },
+      ],
     }),
     new htmlWebpackPlugin({
       title: "DNT Platform",

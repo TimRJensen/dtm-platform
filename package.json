@@ -17,6 +17,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@emotion/babel-plugin": "^11.3.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
+    "@svgr/webpack": "^5.5.0",
     "@types/babel__core": "^7",
     "@types/babel__plugin-transform-runtime": "^7",
     "@types/babel__preset-env": "^7",
@@ -25,6 +26,7 @@
     "@types/webpack-dev-server": "^4",
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "css-minimizer-webpack-plugin": "^3.1.1",
     "events": "^3.3.0",
@@ -39,6 +41,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.15.4",
-    "@babel/runtime-corejs3": "^7.15.4"
+    "@babel/runtime-corejs3": "^7.15.4",
+    "ts-node": "^10.3.0"
   }
 }

@@ -1,8 +1,9 @@
 const spacing = 16 * 0.6666;
 const borderRadius = 10;
 
-//primary: https://coolors.co/002029-00313e-004153-34626f-86a3ac-4c4c4c-eef4ed
-//secondary: https://coolors.co/c06000-e07000-ff8000-ffa040-ffc080
+// primary: https://coolors.co/002029-00313e-004153-34626f-86a3ac-4c4c4c-eef4ed
+// secondary: https://coolors.co/c06000-e07000-ff8000-ffa040-ffc080
+// infos: https://coolors.co/d91e36-7ea172-004153-4c4c4c
 const colors = {
   primary: "#004153",
   primaryDarker: " #00313E",
@@ -14,17 +15,23 @@ const colors = {
   secondaryDarkest: "#C06000",
   secondaryLighter: "#FFA040",
   secondaryLightest: " #FFC080",
+  google: "#ff3d00",
+  facebook: "#039be5",
+  succes: "#7EA172",
+  error: "#D91E36",
+  disabled: "#86A3AC",
   text: {
     primary: "#000",
     secondary: " #EEF4ED",
     link: "#0645ad",
-    disabled: " #86A3AC",
+    disabled: "rgba(0, 0, 0, 0.2)",
   },
   button: {
     default: "#004153",
     defaultHover: " #00313E",
     accept: "#FF8000",
     acceptHover: "#E07000",
+    disabled: "rgba(0, 65, 83, 0.2)",
   },
   fontIcon: {
     default: "#86A3AC",
@@ -34,6 +41,14 @@ const colors = {
   tag: {
     default: "#FF8000",
     defaultHover: "#E07000",
+  },
+  input: {
+    default: "",
+    defaultBorder: "#004153",
+    success: "rgba(126, 161, 114, 0.2)",
+    successBorder: "#7EA172",
+    error: "rgba(217, 30, 54, 0.2)",
+    errorBorder: "#D91E36",
   },
 };
 
@@ -45,30 +60,22 @@ const appHeader = {
     width: 100,
   },
 };
-const artifact = {
-  height: "auto",
-  width: 1280,
-};
 
-const artifactCard = {
-  height: "auto",
+const gridItem = {
+  height: 400,
   width: 300,
 };
 
 const banner = {
-  height: 20,
+  height: 200,
   width: "auto",
 };
 
 const blog = {
   height: "auto",
-  width: 100,
+  width: 85,
 };
 
-const categoryList = {
-  height: `calc(100vh - ${banner.height}vh - ${appHeader.height}px)`,
-  width: 12,
-};
 const searchBar = {
   height: 35,
   width: 300,
@@ -76,12 +83,7 @@ const searchBar = {
 
 const search = {
   height: "auto",
-  width: 100,
-};
-
-const thread = {
-  height: "auto",
-  width: 40,
+  width: 85,
 };
 
 export const button = {
@@ -104,13 +106,14 @@ const theme = {
   colors,
   sizes: {
     appHeader,
-    artifact,
-    artifactCard,
+    gridItem,
+    banner,
     blog,
-    categoryList,
     searchBar,
     search,
-    thread,
+  },
+  mixins: {
+    button,
   },
 };
 

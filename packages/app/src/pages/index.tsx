@@ -1,85 +1,146 @@
 /**
  * Vendor imports.
  */
-import { useContext, useEffect, useState } from "react";
-import { css, useTheme } from "@emotion/react";
-import GridLoader from "react-spinners/GridLoader";
+import { useState, useEffect, useRef } from "react";
+import { useRouteMatch } from "react-router-dom";
+import arraySort from "array-sort";
 
 /**
  * Custom imports.
  */
-import { BlogDocument, PouchDBContext } from "db";
-import { useIsLoading } from "../hooks";
-import { Theme } from "../themes/dtm";
-import { AppHeader } from "../components/AppHeader/AppHeader";
+import { GridItemFromCategory, GridItemType } from "db";
+import { useDB, useCSS } from "../hooks";
+import { LoadBox } from "../components/LoadBox/LoadBox";
 import { CategoryList } from "../components/CategoryList/CategoryList";
 import { GridBox } from "../components/GridBox/GridBox";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  return {
-    banner: css({
-      height: "20vh",
-      backgroundColor: "#000",
-    }),
-    view: css({
-      display: "flex",
-    }),
-    spinner: css({
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "calc(100vh - 40vh)",
-      width: "87vw",
-    }),
-  };
+const path = "/categories/:categoryId/:subCategoryIds?";
+const docsPerPage = 20;
+
+type Params = {
+  categoryId: string;
+  subCategoryIds?: string;
 };
 
 /**
  * index functional component.
  */
 export default function index() {
-  const db = useContext(PouchDBContext);
-  const [blogs, setBlogs] = useState<BlogDocument[]>([]);
-  const { isLoading, onLoad } = useIsLoading(blogs);
-  const theme = useTheme() as Theme;
-  const css = _css(theme);
+  const { css } = useCSS(({ sizes: { appHeader, banner } }) => ({
+    body: {
+      display: "grid",
+      gridTemplateColumns: "min-content auto",
+      minHeight: `min(100vh - ${appHeader.height}px - ${banner.height}px)`,
+    },
+    scrollable: {
+      gridColumn: 2,
+      position: "relative",
+      top: `-${window.innerHeight}px`,
+      visibility: "hidden",
+    },
+  }));
+  const { db, queries } = useDB();
+  const [pageId, setPageId] = useState(0);
+  const [docs, setDocs] = useState<GridItemType[]>();
+
+  const { categoryId, subCategoryIds } =
+    useRouteMatch<Params>(path)?.params ?? {};
+
+  const scrollObserver = useRef(
+    new IntersectionObserver((elements, observer) => {
+      if (elements[0].isIntersecting) {
+        setPageId((pageId) => ++pageId);
+        observer.disconnect();
+      }
+    })
+  );
+  const scrollElement = useRef<HTMLDivElement>(null);
 
   const fetch = async () => {
-    const response = await db.find(["type"], {
-      selector: {
-        type: "blog",
-      },
-    });
+    const currentRange = pageId * docsPerPage;
 
-    if (response) setBlogs(response.docs.slice(0, 12) as BlogDocument[]);
+    if (categoryId === "popular" || !categoryId) {
+      const response = await db.select<GridItemType>(
+        "blogs",
+        queries.gridItem,
+        {
+          range: { from: currentRange, to: currentRange + docsPerPage },
+        }
+      );
+
+      if (!response) return;
+
+      setDocs(response);
+    } else {
+      const response = await db.selectMany<GridItemFromCategory>(
+        subCategoryIds ? "sub_categories" : "main_categories",
+        queries.gridItemFromCategory,
+        {
+          range: { from: currentRange, to: currentRange + docsPerPage },
+          filter: {
+            values: subCategoryIds ? subCategoryIds?.split("+") : [categoryId],
+          },
+        }
+      );
+
+      if (!response) return;
+
+      const result = [];
+
+      for (const element of response) result.push(...element.gridItems);
+
+      setDocs(result);
+    }
   };
 
   useEffect(() => {
-    if (blogs.length === 0) fetch();
-  }, []);
+    return () => {
+      setPageId(0);
+      setDocs(undefined);
+    };
+  }, [categoryId, subCategoryIds]);
+
+  useEffect(() => {
+    if (!docs) {
+      fetch();
+    }
+  }, [docs]);
+
+  useEffect(() => {
+    if (docs) {
+      fetch();
+    }
+  }, [pageId]);
 
   return (
-    <section>
-      <div css={css.banner}></div>
-      <AppHeader />
-      <div css={css.view} onLoad={onLoad}>
-        <CategoryList onClick={setBlogs} />
-        {isLoading() ? (
-          <div css={css.spinner}>
-            <GridLoader color={theme.colors.primary} loading={isLoading()} />
-          </div>
-        ) : null}
-        {blogs ? (
+    <LoadBox loadables={docs}>
+      <section css={css.body}>
+        <CategoryList />
+        {
           <GridBox
-            style={{ display: isLoading() ? "none" : "flex" }}
-            docs={blogs}
+            /*docs={arraySort(docs ?? [], ["stats.views"], {
+              reverse: true,
+            })}*/
+            docs={
+              docs
+                ? arraySort(docs, ["stats.views"], {
+                    reverse: true,
+                  })
+                : undefined
+            }
             columns={3}
+            onLoad={() => {
+              if (scrollElement.current) {
+                scrollObserver.current.observe(scrollElement.current);
+              }
+            }}
           />
-        ) : null}
-      </div>
-    </section>
+        }
+        <div css={css.scrollable} ref={scrollElement} />
+      </section>
+    </LoadBox>
   );
 }

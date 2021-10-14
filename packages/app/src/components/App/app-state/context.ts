@@ -9,7 +9,7 @@ import { createContext, Dispatch } from "react";
 import { AppState, Actions } from "./main";
 
 /**
- * PouchDB context.
+ * AppState context.
  */
 export const AppStateContext = createContext(
   {} as { state: AppState; dispatch: Dispatch<Actions> }

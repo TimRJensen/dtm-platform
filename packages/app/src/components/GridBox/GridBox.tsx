@@ -1,74 +1,90 @@
 /**
  * Vendor imports.
  */
-import { css, useTheme } from "@emotion/react";
+import { useState, useEffect } from "react";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 /**
  * Custom imports.
  */
-import { BlogDocument } from "db";
-import { Theme } from "../../themes/dtm";
-import { GridItem } from "../GridItem/GridItem";
+import { GridItemType } from "db";
+import { useCSS } from "../../hooks";
+import { GridItem } from "./GridItem/GridItem";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const {
-    spacing,
-    sizes: { artifactCard },
-  } = theme;
-
-  return {
-    grid: css({
-      display: "flex",
-      margin: `${2 * spacing}px auto 0 auto`,
-    }),
-    column: css({
-      display: "flex",
-      flexFlow: "column",
-      width: artifactCard.width,
-      height: "auto",
-      marginRight: spacing,
-    }),
-  };
-};
+interface Props {
+  docs: GridItemType[] | undefined;
+  columns?: number;
+  onLoad?: () => void;
+}
 
 /**
  * GridBox functional component.
  */
-interface Props {
-  docs: BlogDocument[];
-  columns?: number;
-  style?: { display: string };
-}
+export function GridBox({ docs, columns = 3, onLoad }: Props) {
+  if (!docs) return null;
 
-export const GridBox = function GridBox({ docs, columns = 3, style }: Props) {
-  if (docs.length === 0) return null;
+  const { css, theme } = useCSS(({ spacing }) => ({
+    grid: {
+      display: "grid",
+      gridTemplateColumns: `repeat(${columns}, clamp(200px, 300px, 25vw))`,
+      gridAutoRows: 25,
+      alignItems: "start",
+      justifyItems: "center",
+      columnGap: spacing,
+      rowGap: spacing,
+      margin: `${2 * spacing}px auto 100px auto`,
+    },
+    loader: {
+      display: "flex",
+      justifyContent: "center",
+      alignSelf: "center",
+      gridColumn: "span 3",
+      zIndex: -1,
+    },
+  }));
+  const [gridItems, setGridItems] = useState<GridItemType[]>([]);
+  const [loaded, setLoaded] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const theme = useTheme() as Theme;
-  const css = _css(theme);
-  let column = 0;
+  useEffect(() => {
+    if (docs[0]) {
+      setGridItems([...gridItems, ...docs]);
+    } else {
+      setLoading(false);
+    }
+    return () => setLoading(true);
+  }, [docs]);
+
+  useEffect(() => {
+    if (loaded === docs.length) {
+      if (onLoad) onLoad();
+      setLoading(false);
+      setLoaded(0);
+    }
+  }, [loaded]);
 
   return (
     <section css={css.grid}>
-      {docs
-        .reduce((result, doc) => {
-          if (!result[column]) result[column] = [];
-
-          result[column].push(doc);
-
-          if (++column === columns) column = 0;
-
-          return result;
-        }, [] as BlogDocument[][])
-        .map((column, i) => (
-          <div key={`grid-column-${i}`} style={style} css={css.column}>
-            {column.map((doc) => (
-              <GridItem key={`artifact-card-${doc._id}`} doc={doc} />
-            ))}
-          </div>
-        ))}
+      {gridItems.map((doc, i) =>
+        i < gridItems.length - docs.length ? (
+          <GridItem key={`grid-item-${doc.id}`} doc={doc} />
+        ) : (
+          <GridItem
+            key={`grid-item-${doc.id}`}
+            doc={doc}
+            show={!loading}
+            onLoad={() => setLoaded((loaded) => ++loaded)}
+          />
+        )
+      )}
+      {loading ? (
+        <div css={css.loader}>
+          <PacmanLoader color={theme.colors.secondary} />
+        </div>
+      ) : null}
     </section>
   );
-};
+}

@@ -11,7 +11,7 @@ import { AppStateContext } from "../components/App/app-state/context";
 /**
  * useShowEditor hook.
  */
-export const useShowEditor = function useShowEditor() {
+export function useShowEditor() {
   const { state, dispatch } = useContext(AppStateContext);
   const [showEditor, setShowEditor] = useState(false);
 
@@ -30,4 +30,4 @@ export const useShowEditor = function useShowEditor() {
       dispatch({ type: "SHOW_EDITOR", value: setShowEditor });
     },
   };
-};
+}

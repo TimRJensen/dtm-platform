@@ -14,8 +14,8 @@ const { textContent } = DomUtils;
  * Utility functions.
  */
 // formatDate
-export function formatDate(value: number) {
-  return new Date(value).toLocaleDateString("da-DK", {
+export function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("da-DK", {
     year: "numeric",
     month: "short",
     day: "numeric",

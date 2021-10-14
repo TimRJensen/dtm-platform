@@ -3,46 +3,37 @@
  */
 import { ReactHTML } from "react";
 import { Node } from "domhandler";
-import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { Theme } from "../../themes/dtm";
 import { formatAttributesObject } from "../../util/main";
-import { useHtmlParser } from "../../hooks/";
-import styles from "./styles.module.scss";
+import { useHtmlParser, useCSS } from "../../hooks/";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const { spacing, colors } = theme;
+interface Props {
+  children?: string | Node[];
+}
 
-  return {
-    textBox: css({
+/**
+ * TextBox functional component.
+ */
+export function TextBox({ children }: Props) {
+  if (!children) return null;
+
+  const { nodes, isText, isTag } = useHtmlParser(children);
+  const { css } = useCSS(({ spacing, colors }) => ({
+    textBox: {
       borderBottom: `1px solid ${colors.primary}`,
       padding: spacing,
       "& p": {
         display: "inline",
         margin: 0,
       },
-    }),
-  };
-};
-
-/**
- * TextBox functional component.
- */
-interface Props {
-  children?: string | Node[];
-}
-
-export const TextBox = function TextBox({ children }: Props) {
-  if (!children) return null;
-
-  const { nodes, isText, isTag } = useHtmlParser(children);
-  const css = _css(useTheme() as Theme);
+    },
+  }));
 
   return (
     <div css={css.textBox}>
@@ -72,4 +63,4 @@ export const TextBox = function TextBox({ children }: Props) {
       })}
     </div>
   );
-};
+}

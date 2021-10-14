@@ -10,7 +10,7 @@ module.exports = {
   output: {
     path: resolve(__dirname, "./dist"),
     publicPath: "/",
-    filename: "[contenthash].bundle.js",
+    filename: "static/js/[contenthash].bundle.js",
   },
   mode: "development",
 
@@ -30,12 +30,16 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.scss$/,
-        use: [
-          "style-loader",
-          //MiniCssExtractPlugin.loader,
-          "css-loader",
-        ],
+        test: /\.svg$/,
+        use: ["@svgr/webpack"],
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/i,
+        type: "asset/resource",
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
       },
     ],
   },
@@ -53,12 +57,16 @@ module.exports = {
   },
   devtool: "source-map",
   devServer: {
-    host: "localhost",
+    host: "0.0.0.0",
     port: "1234",
-    historyApiFallback: true,
+    static: {
+      directory: resolve(__dirname, "./packages/app/src/public"),
+      publicPath: "/public",
+    },
     hot: true,
+    historyApiFallback: true,
     client: {
-      overlay: true,
+      overlay: { errors: true, warnings: true },
     },
   },
   stats: "minimal",

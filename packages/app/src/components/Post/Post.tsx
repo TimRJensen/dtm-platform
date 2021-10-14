@@ -1,87 +1,91 @@
 /**
  * Vendor imports.
  */
-import { css, useTheme } from "@emotion/react";
+import arraySort from "array-sort";
 
 /**
  * Custom imports.
  */
-import { PostDocument } from "db";
-import { Theme } from "../../themes/dtm";
-import { useEditor, useScrollElement } from "../../hooks/";
-import { PostFooter } from "../PostFooter/PostFooter";
-import { CommentHeader } from "../CommentHeader/CommentHeader";
+import { PostType } from "db";
+import { useEditor, useCSS } from "../../hooks/";
+import { MessageHeader } from "../MessageHeader/MessageHeader";
+import { Comment } from "../Comment/Comment";
 import { TextBox } from "../TextBox/TextBox";
 import { TextEditor } from "../TextEditor/TextEditor";
+import { Footer } from "./Footer/Footer";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const {
-    spacing,
-    borderRadius,
-    colors,
-    sizes: { thread },
-  } = theme;
-
-  return {
-    post: css({
-      width: `${thread.width}vw`,
-      margin: `0 auto 0 auto`,
-      borderRight: `1px solid ${colors.primary}`,
-      borderLeft: `1px solid ${colors.primary}`,
-      borderRadius: `${borderRadius}px ${borderRadius}px 0 0`,
-      paddingBottom: spacing,
-      boxSizing: "border-box",
-    }),
-    commentHeader: css({
-      width: `${thread.width}vw`,
-      margin: "auto",
-      boxSizing: "border-box",
-    }),
-    body: css({
-      margin: `0 ${2 * spacing}px`,
-    }),
-    textEditor: css({
-      height: 100,
-      width: 0,
-    }),
-  };
-};
+interface Props {
+  doc: PostType;
+}
 
 /**
  * Post functional component.
  */
-interface Props {
-  doc: PostDocument;
-  onComment: () => void;
-}
-
-export const Post = function Post({ doc, onComment }: Props) {
+export function Post({ doc }: Props) {
   if (!doc) return null;
 
-  const { domElement } = useScrollElement(doc);
-  const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
-  const css = _css(useTheme() as Theme);
+  const postEditor = useEditor(doc);
+  const commentEditor = useEditor(doc);
+  const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
+    post: {
+      width: `clamp(650px, 40vw, 100%)`,
+      margin: `0 auto ${2 * spacing}px auto`,
+
+      paddingBottom: spacing,
+      overflow: "hidden",
+    },
+    body: {
+      borderBottom: `1px solid ${colors.primary}`,
+      borderLeft: `1px solid ${colors.primary}`,
+      borderRight: `1px solid ${colors.primary}`,
+      borderRadius: `0 0 ${borderRadius}px ${borderRadius}px`,
+    },
+    content: {
+      margin: `0 ${2 * spacing}px  ${2 * spacing}px  ${2 * spacing}px`,
+    },
+    textEditor: {
+      width: `clamp(600px, auto, 100%)`,
+      margin: `0 ${spacing}px ${spacing}px ${spacing * 2}px`,
+    },
+    input: {
+      height: 100,
+      border: `1px solid ${colors.primary}`,
+      borderRadius: borderRadius,
+    },
+  }));
 
   return (
-    <section css={css.post} ref={domElement}>
-      <CommentHeader
-        $css={{ commentHeader: css.commentHeader }}
-        doc={doc}
-        onEdit={handleShowEditor}
-      />
-      {showEditor() ? (
-        <div css={css.body}>
-          <TextEditor content={doc.content} onSubmit={handleSubmit} advanced />
-        </div>
-      ) : (
-        <div css={css.body}>
-          <TextBox>{doc.content}</TextBox>
-          <PostFooter doc={doc} onComment={onComment} />
-        </div>
-      )}
+    <section css={css.post}>
+      <MessageHeader doc={doc} onEdit={postEditor.handleShowEditor} />
+      <div css={css.body}>
+        {postEditor.showEditor() ? (
+          <div css={css.content}>
+            <TextEditor
+              content={doc.content}
+              onSubmit={postEditor.handleSubmit}
+              advanced
+            />
+          </div>
+        ) : (
+          <div css={css.content}>
+            <TextBox>{doc.content}</TextBox>
+            <Footer doc={doc} onComment={commentEditor.handleShowEditor} />
+          </div>
+        )}
+        <TextEditor
+          $css={{ textEditor: css.textEditor, input: css.input }}
+          onSubmit={commentEditor.handleSubmit}
+          show={commentEditor.showEditor()}
+        />
+        {arraySort(doc.comments, "createdAt", { reverse: true }).map(
+          (comment) => (
+            <Comment key={comment.id} doc={comment} />
+          )
+        )}
+      </div>
     </section>
   );
-};
+}

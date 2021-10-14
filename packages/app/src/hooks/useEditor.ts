@@ -2,93 +2,106 @@
  * Vendor imports.
  */
 import { useContext } from "react";
-import { RawDraftContentState } from "draft-js";
-import draftParser from "draftjs-to-html";
 
 /**
  * Custom imports.
  */
 import {
-  PouchDBContext,
-  BlogDocument,
-  PostDocument,
-  ThreadDocument,
-  CommentDocument,
+  DBContext,
+  BlogTable,
+  PostTable,
+  CommentTable,
+  BlogType,
+  PostType,
+  CommentType,
 } from "db";
 import { AppStateContext } from "../components/App/app-state/context";
-import { useShowEditor } from "./useShowEditor";
+import { useShowEditor, useDB } from ".";
 
 /**
  * useEditor hook.
  */
-export const useEditor = function useEditor(
-  doc:
-    | CommentDocument
-    | PostDocument
-    | ThreadDocument
-    | BlogDocument
-    | undefined
-) {
-  const db = useContext(PouchDBContext);
+export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
+  const { db, queries } = useDB();
   const { state, dispatch } = useContext(AppStateContext);
   const { showEditor, handleShowEditor } = useShowEditor();
 
   return {
     showEditor,
     handleShowEditor,
-    handleSubmit: async (content?: RawDraftContentState) => {
-      if (!doc || !content || !state.currentBlog || !state.currentUser) {
+    handleSubmit: async (content: string | undefined, isEdit?: boolean) => {
+      if (!content || !doc || !state.currentBlog || !state.currentUser) {
         showEditor(false);
         return;
       }
-
-      // Update the model.
-      if (doc.type === "blog") {
-        doc.threads.unshift({
-          type: "thread",
-          _id: `${doc._id}/thread-${doc.stats.threads}`,
-          user: state.currentUser,
-          post: {
-            type: "post",
-            _id: `${doc._id}/thread-${doc.stats.threads}/post`,
-            user: state.currentUser,
-            content: draftParser(content),
-            upvotes: [],
-            downvotes: [],
-            stats: { infractions: 0 },
-            timestamp: Date.now(),
-            lastModified: Date.now(),
-          },
-          comments: [],
-          stats: {
-            comments: 0,
-          },
-          timestamp: Date.now(),
-          lastModified: Date.now(),
-        });
-        doc.stats.threads++;
-      } else if (doc.type === "thread") {
-        doc.comments.push({
-          type: "comment",
-          _id: `${doc._id}/comment-${doc.stats.comments}`,
-          content: draftParser(content),
-          user: state.currentUser,
-          stats: { infractions: 0 },
-          timestamp: Date.now(),
-          lastModified: Date.now(),
-        });
-        doc.stats.comments++;
-      } else doc.content = draftParser(content);
-
-      //Update the db.
-      await db.put(state.currentBlog);
+      // Update the db.
+      if (isEdit && "content" in doc) {
+        const response = await db.update<PostTable | CommentTable>(
+          "comments" in doc ? "posts" : "comments",
+          {
+            id: doc.id,
+            content,
+          }
+        );
+      } else {
+        if ("comments" in doc) {
+          const response = await Promise.all([
+            db.insert<CommentTable>("comments", [
+              {
+                postId: doc.id,
+                userId: state.currentUser.id,
+                content,
+                stats: {
+                  shadowBanned: false,
+                  infractions: 0,
+                },
+              },
+            ]),
+            db.update<PostTable>("posts", {
+              id: doc.id,
+              stats: {
+                ...doc.stats,
+                totalComments: doc.stats.totalComments + 1,
+              },
+            }),
+          ]);
+        } else if ("posts" in doc) {
+          const response = await Promise.all([
+            db.insert<PostTable>("posts", [
+              {
+                blogId: doc.id,
+                userId: state.currentUser.id,
+                content,
+                upvotes: [],
+                downvotes: [],
+                stats: {
+                  shadowBanned: false,
+                  infractions: 0,
+                  totalUpvotes: 0,
+                  totalDownvotes: 0,
+                  totalComments: 0,
+                },
+              },
+            ]),
+            db.update<BlogTable>("blogs", {
+              id: doc.id,
+              stats: {
+                ...doc.stats,
+                posts: doc.stats.posts + 1,
+              },
+            }),
+          ]);
+        }
+      }
 
       // Update the view.
       dispatch({
         type: "CURRENT_BLOG",
-        value: await db.get<BlogDocument>(state.currentBlog._id),
+        value: (await db.selectExact<BlogType>("blogs", queries.blog, {
+          match: { id: state.currentBlog.id },
+        }))![0],
       });
       showEditor(false);
     },
   };
-};
+}

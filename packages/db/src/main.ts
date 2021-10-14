@@ -1,217 +1,405 @@
 /**
  * Vendor imports.
  */
-import PouchDB from "pouchdb-browser";
-import PouchDbFind from "pouchdb-find";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Types.
  */
-export interface BaseDocument {
-  _id: string;
-  type: string;
-  timestamp: number;
-  lastModified: number;
+
+/* BaseTable. */
+interface BaseTable {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface AppStateDocument extends BaseDocument {
-  type: "app-state";
-  isPopulated: boolean;
+/* ProfileTable. */
+export interface ProfileTable extends BaseTable {
+  firstName: string;
+  lastName: string;
+  city: string;
+  region: string;
+  country: string;
+  focus: string[];
 }
 
-export interface UserDocument extends BaseDocument {
-  type: "user";
-  displayName: string;
+/* UserTable & UserType. */
+export interface AccountTable extends BaseTable {
+  profileId: string;
+  role: "anon" | "authenticated";
   email: string;
-  role: "moderator" | "admin" | "user";
+  displayName: string;
   stats: {
     infractions: number;
-    upvotes: number;
-    downvotes: number;
-    comments: number;
-    threads: number;
+    totalPosts: number;
+    totalComments: number;
+    totalUpvotes: number;
+    totalDownvotes: number;
   };
 }
+export type UserType = Omit<
+  AccountTable,
+  "createdAt" | "updatedAt" | "profileId"
+>;
 
-export interface CommentDocument extends BaseDocument {
-  type: "comment";
-  user: UserDocument;
-  content: string;
-  stats: {
-    infractions: number;
-  };
-}
-
-export interface PostDocument extends BaseDocument {
-  type: "post";
-  user: UserDocument;
-  content: string;
-  upvotes: UserDocument[];
-  downvotes: UserDocument[];
-  stats: {
-    infractions: number;
-  };
-}
-
-export interface ThreadDocument extends BaseDocument {
-  type: "thread";
-  user: UserDocument;
-  post: PostDocument;
-  comments: CommentDocument[];
-  stats: {
-    comments: number;
-  };
-}
-
-export interface ArtifactDocument extends BaseDocument {
-  type: "artifact";
-  title: string;
-  image: string;
-  content: string;
-  period: string;
-  category: {
-    raw: string;
-    base: { raw: string; label: string };
-    sub: { raw: string; label: string };
-  };
-  tags: string[];
-}
-
-export interface BlogDocument extends BaseDocument {
-  type: "blog";
-  artifact: ArtifactDocument;
-  threads: ThreadDocument[];
-  stats: {
-    comments: number;
-    threads: number;
-    views: number;
-  };
-}
-
-export interface CategoryDocument extends BaseDocument {
-  type: "category";
+/* CategoryTable & CategoryType. */
+export interface CategoryTable extends BaseTable {
   label: string;
   raw: string;
-  blogs: BlogDocument[];
-  subCategories?: CategoryDocument[];
 }
+export type CategoryType = Pick<CategoryTable, "id" | "label"> & {
+  subCategories: SubCategoryType[];
+};
 
-export type AllDocuments =
-  | AppStateDocument
-  | UserDocument
-  | PostDocument
-  | ThreadDocument
-  | ArtifactDocument
-  | BlogDocument
-  | CommentDocument
-  | CategoryDocument;
-
-type ExcludeKey<K> = K extends "timestamp" | "lastModified" | "key" ? never : K;
-type PutDocument<D extends AllDocuments> = D extends { type: D["type"] }
-  ? { [K in ExcludeKey<keyof D>]: D[K] }
-  : never;
-
-interface PouchDBWrapperOptions {
-  adapter?: "idb" | "leveldb" | "http";
-  autoCompact?: boolean;
+/* SubCategoryTable & SubCategoryType. */
+export interface SubCategoryTable extends BaseTable {
+  mainCategoryId: string;
+  label: string;
+  raw: string;
 }
+export type SubCategoryType = Pick<SubCategoryTable, "id" | "label"> & {
+  mainCategory: Pick<CategoryType, "id">;
+};
+
+/* BlogTable & BlogType. */
+export interface BlogTable extends BaseTable {
+  artifactId: string;
+  stats: {
+    views: number;
+    posts: number;
+  };
+}
+export type BlogType = Pick<BlogTable, "id" | "createdAt" | "stats"> & {
+  artifact: ArtifactType;
+  posts: PostType[];
+};
+
+/* GridItemType & GridItemFromCategory. */
+export type GridItemType = Pick<
+  BlogType,
+  "id" | "createdAt" | "stats" | "artifact"
+>;
+export type GridItemFromCategory = {
+  id: string;
+  label: string;
+  gridItems: GridItemType[];
+};
+
+/* ArtifactTable & ArtifactType. */
+export interface ArtifactTable extends BaseTable {
+  blogId: string;
+  mainCategoryId: string;
+  subCategoryId: string;
+  label: string;
+  content: string;
+  image: string;
+  period: string[];
+  tags: string[];
+}
+export type ArtifactType = Pick<
+  ArtifactTable,
+  "id" | "createdAt" | "label" | "image" | "content" | "period" | "tags"
+> & {
+  blog: Pick<BlogType, "id">;
+  mainCategory: Pick<CategoryTable, "id" | "label">;
+  subCategory: Pick<SubCategoryTable, "id" | "label">;
+};
+
+/* PostTable & PostType. */
+export interface PostTable extends BaseTable {
+  blogId: string;
+  userId: string;
+  content: string;
+  upvotes: string[];
+  downvotes: string[];
+  stats: {
+    shadowBanned: boolean;
+    infractions: number;
+    totalUpvotes: number;
+    totalDownvotes: number;
+    totalComments: number;
+  };
+}
+export type PostType = Pick<
+  PostTable,
+  "id" | "createdAt" | "content" | "upvotes" | "stats"
+> & { user: Pick<AccountTable, "id" | "displayName">; comments: CommentType[] };
+
+/* CommentTable & CommentType. */
+export interface CommentTable extends BaseTable {
+  postId: string;
+  userId: string;
+  content: string;
+  stats: {
+    shadowBanned: boolean;
+    infractions: number;
+  };
+}
+export type CommentType = Pick<
+  CommentTable,
+  "id" | "content" | "createdAt" | "stats"
+> & { user: Pick<AccountTable, "id" | "displayName"> };
+
+/* AllTables. */
+export type AllTables =
+  | BaseTable
+  | ProfileTable
+  | AccountTable
+  | CategoryTable
+  | SubCategoryTable
+  | ArtifactTable
+  | CommentTable
+  | PostTable
+  | BlogTable;
+
+/* AllTableNames. */
+export type AllTableNames =
+  | "profiles"
+  | "accounts"
+  | "main_categories"
+  | "sub_categories"
+  | "artifacts"
+  | "comments"
+  | "posts"
+  | "blogs";
 
 /**
- * PouchDBWrapper - A simple class wrapper for PouchDB.
+ * SupabaBaseWrapper - A simple class wrapper for DB.
  */
-class PouchDBWrapper {
-  private db: PouchDB.Database<AllDocuments>;
-  private defaults = {
-    adapter: "idb",
-    autoCompact: true,
-  };
-  private options;
+class SupabaBaseWrapper {
+  private supabase: SupabaseClient;
 
-  constructor(options?: PouchDBWrapperOptions) {
-    this.options = { ...this.defaults, ...options };
-    this.db = new PouchDB("dnt_database", {
-      adapter: this.options.adapter,
-      auto_compaction: this.options.autoCompact,
-    });
-  }
-
-  public async put(doc: PutDocument<AllDocuments>) {
-    try {
-      await this.db.put({
-        ...(await this.db.get(doc._id)),
-        ...doc,
-        lastModified: Date.now(),
-      });
-    } catch (err: any) {
-      if (err.status === 404)
-        this.db.put({
-          ...doc,
-          timestamp: Date.now(),
-          lastModified: Date.now(),
-        });
-      if ((err as any).status === 409) {
-      }
-      console.log(err, this.get.name);
+  constructor() {
+    if (process.env.NODE_ENV === "development") {
+      console.log("dev mode");
+      this.supabase = createClient(
+        "http://localhost:8000",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew"
+      );
+    } else {
+      this.supabase = createClient(
+        "https://reyohguqhuhpukmdbeva.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMzk4NDk1NCwiZXhwIjoxOTQ5NTYwOTU0fQ.GsSQ3vpMZy5DXESqQOiu0PTBavxX1yN1TNAjncfSID4"
+      );
     }
   }
 
-  public async putMany(docs: any[]) {
-    try {
-      this.db.bulkDocs(docs);
-    } catch (err) {
-      console.log(err, this.putMany.name);
-    }
-  }
-
-  public async get<D extends AllDocuments>(
-    _id: string
-  ): Promise<D | undefined> {
-    try {
-      return await this.db.get(_id);
-    } catch (err) {
-      console.log(err, this.get.name);
-    }
-  }
-
-  public async find(
-    fields: string[],
-    selector: {
-      selector: { [key: string]: any };
-      sort?: string[];
-      limit?: number;
+  async select<T>(
+    table: AllTableNames,
+    query: string,
+    {
+      range = { from: 0, to: 100 },
+    }: {
+      range?: { from: number; to: number };
     }
   ) {
-    try {
-      await this.db.createIndex({
-        index: {
-          fields,
+    const response = await this.supabase
+      .from<T>(table)
+      .select(query)
+      .order("createdAt" as keyof T, {
+        ascending: false,
+      })
+      .range(range.from, range.to - 1);
+
+    if (response.error) console.log(response.error);
+
+    return response.data;
+  }
+
+  async selectExact<T>(
+    table: AllTableNames,
+    query: string,
+    { match }: { match: { [column: string]: string } }
+  ) {
+    const response = await this.supabase
+      .from<T>(table)
+      .select(query)
+      .match(match);
+
+    if (response.error) console.log(response.error);
+
+    return response.data;
+  }
+
+  async selectMany<T>(
+    table: AllTableNames,
+    query: string,
+    {
+      filter,
+      range = { from: 0, to: 100 },
+    }: {
+      filter: { values: string[]; foreignTable?: string };
+      range?: { from: number; to: number };
+    }
+  ) {
+    const response = await this.supabase
+      .from<T>(table)
+      .select(query)
+      .or(
+        filter.values.map((value) => "id.eq." + value).join(","),
+        filter.foreignTable ? { foreignTable: filter.foreignTable } : undefined
+      )
+      .range(range.from, range.to);
+
+    if (response.error) console.log(response.error);
+
+    return response.data;
+  }
+
+  async selectFuzzy<T>(
+    table: AllTableNames,
+    query: string,
+    {
+      filter,
+      count,
+      range = { from: 0, to: 100 },
+    }: {
+      filter: {
+        column: string;
+        values: string[];
+        type?: "plain" | "phrase" | "websearch";
+        config?: string;
+      };
+      count?: "exact";
+      range?: { from: number; to: number };
+    }
+  ) {
+    const response = await this.supabase
+      .from<T>(table)
+      .select(query, { count: count ?? null })
+      .or(
+        filter.values
+          .map((value) => `${filter.column}.ilike.%${value}%`)
+          .join(",")
+      )
+      .range(range?.from, range?.to - 1);
+
+    if (response.error) console.log(response.error);
+
+    return { count: response.count, results: response.data };
+  }
+
+  async insert<T extends AllTables>(
+    table: AllTableNames,
+    values: Omit<T, keyof BaseTable>[]
+  ) {
+    const now = new Date().toISOString();
+
+    const response = await this.supabase
+      .from<Omit<T, keyof BaseTable> & BaseTable>(table)
+      .insert(
+        values.map((value) => ({
+          ...value,
+          id: uuidv4(),
+          createdAt: now,
+          updatedAt: now,
+        }))
+      );
+
+    if (response.error) console.log(response.error);
+
+    return response.data;
+  }
+
+  async update<T extends AllTables>(
+    table: AllTableNames,
+    value: Omit<Partial<T>, keyof BaseTable> & { id: string },
+    match?: Partial<T>
+  ) {
+    const response = await this.supabase
+      .from<typeof value & Partial<BaseTable>>(table)
+      .update({ ...value, updatedAt: new Date().toISOString() })
+      .match(match ?? { id: value.id });
+
+    if (response.error) console.log(response.error);
+
+    return response.data;
+  }
+
+  async signUp(
+    email: string,
+    password: string,
+    {
+      firstName,
+      lastName,
+      city,
+      region,
+      country,
+    }: {
+      firstName: string;
+      lastName: string;
+      city: string;
+      region: string;
+      country: string;
+    }
+  ): Promise<UserType[] | null> {
+    const { user, error } = await this.supabase.auth.signUp(
+      { email, password },
+      {
+        redirectTo:
+          process.env.NODE_ENV === "dev"
+            ? "http://localhost:1234/account/verified"
+            : "https://dtm-platform-8s31ivoni-timrjensen.vercel.app/account/verified",
+      }
+    );
+
+    if (error) {
+      console.log(error);
+      return null;
+    }
+
+    const profile = await this.insert<ProfileTable>("profiles", [
+      {
+        firstName,
+        lastName,
+        region,
+        city,
+        country,
+        focus: [],
+      },
+    ]);
+
+    if (!profile) {
+      return null;
+    }
+
+    const now = new Date().toISOString();
+
+    const _user = await this.supabase.from<AccountTable>("accounts").insert([
+      {
+        id: user?.id,
+        createdAt: now,
+        updatedAt: now,
+        profileId: profile[0].id,
+        role: user?.role as AccountTable["role"],
+        email,
+        displayName: `${profile[0].firstName} ${profile[0].lastName}`,
+        stats: {
+          infractions: 0,
+          totalComments: 0,
+          totalPosts: 0,
+          totalDownvotes: 0,
+          totalUpvotes: 0,
         },
-      });
+      },
+    ]);
 
-      return this.db.find(selector);
-    } catch (err) {
-      console.log(err, this.find.name);
+    if (_user.error) {
+      console.log(_user.error);
     }
+    console.log(user);
+    console.log(profile[0]);
+    console.log(_user.data![0]);
+
+    return _user.data;
   }
 
-  public async clearView() {
-    try {
-      await this.db.viewCleanup();
-    } catch (err) {
-      console.log(err, this.clearView.name);
-    }
-  }
-
-  public async info() {
-    try {
-      return await this.db.info();
-    } catch (err) {
-      console.log(err, this.info.name);
-    }
+  currentUser() {
+    return this.supabase.auth.user();
   }
 }
 
-PouchDB.plugin(PouchDbFind);
-
-export { PouchDBWrapper as PouchDB };
-export { PouchDBContext, PouchDBProvider } from "./context";
+export { SupabaBaseWrapper as DB };
+export { DBContext, DBProvider } from "./context";

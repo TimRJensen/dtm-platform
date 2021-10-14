@@ -1,85 +1,66 @@
 /**
  * Vendor imports.
  */
-import { css, useTheme } from "@emotion/react";
+import { Link } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { ArtifactDocument } from "db";
-
-import { Link } from "react-router-dom";
-import { Theme } from "../../themes/dtm";
+import { ArtifactType } from "db";
+import { useCSS } from "../../hooks";
+import { Panel } from "./Panel/Panel";
 /*import { useDecorateNode } from "../../hooks/";
-import { SearchResultHeader } from "../SearchResultHeader/SearchResultHeader";
 import { TextBox } from "../TextBox/TextBox";*/
-import { ArtifactPanel } from "../ArtifactPanel/ArtifactPanel";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const {
-    spacing,
-    borderRadius,
-    colors,
-    sizes: { search },
-  } = theme;
-
-  return {
-    searchResult: css({
-      display: "flex",
-      width: `${search.width * 0.7}vw`,
-      minHeight: "20vh",
-      margin: `0 auto ${spacing * 3}px auto`,
-    }),
-    image: css({
-      height: "100%",
-      width: `${search.width * 0.2}vw`,
-      margin: `auto ${spacing}px auto 0`,
-      borderRadius,
-    }),
-    content: css({
-      display: "flex",
-      flexFlow: "column",
-      width: `${search.width * 0.4}vw`,
-      marginRight: spacing,
-    }),
-    info: css({
-      display: "flex",
-      alignItems: "center",
-      borderBottom: `1px solid ${colors.primary}`,
-    }),
-    title: css({
-      marginRight: "auto",
-      fontSize: "1.333rem",
-    }),
-    link: css({
-      marginRight: spacing,
-      color: colors.text.link,
-      textAlign: "right",
-      textDecoration: "none",
-    }),
-    /*highlight: css({
-      backgroundColor: `rgba(255, 128, 0, 0.66)`,
-    }),*/
-  };
-};
+interface Props {
+  query: string;
+  result: ArtifactType;
+  style?: any;
+}
 
 /**
  * SearchResult functional component.
  */
-interface Props {
-  queries: string[];
-  result: ArtifactDocument;
-  style?: any;
-}
-
-export const SearchResult = function SearchResult({
-  /*queries,*/ result,
-  style,
-}: Props) {
-  const css = _css(useTheme() as Theme);
+export function SearchResult({ /*queries,*/ result, style }: Props) {
+  const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
+    searchResult: {
+      display: "grid",
+      gridTemplateAreas: `
+        "image info panel" 
+        "image content panel"`,
+      gridTemplateColumns: `300px minmax(400px, 3fr) minmax(100px, 1fr)`,
+      gridTemplateRows: "1.5rem auto",
+      columnGap: spacing * 2,
+      width: `clamp(768px, 80vw, 100%)`,
+      margin: `0 auto ${spacing * 3}px auto`,
+    },
+    image: {
+      gridArea: "image",
+      width: "100%",
+      borderRadius,
+    },
+    info: {
+      gridArea: "info",
+      display: "flex",
+      alignItems: "center",
+      borderBottom: `1px solid ${colors.primary}`,
+    },
+    title: {
+      gridArea: "title",
+      fontSize: "1.333rem",
+    },
+    link: {
+      gridArea: "link",
+      margin: "0 0 0 auto",
+      color: colors.text.link,
+    },
+    content: {
+      gridArea: "content",
+    },
+  }));
   /*const { nodes } = useDecorateNode({
     htmlString: result.title,
     tests: queries,
@@ -92,16 +73,14 @@ export const SearchResult = function SearchResult({
   return (
     <div style={style} css={css.searchResult}>
       <img css={css.image} src={result.image} />
-      <div css={css.content}>
-        <div css={css.info}>
-          <span css={css.title}>{result.title}</span>
-          <Link css={css.link} to={result._id}>
-            link
-          </Link>
-        </div>
-        <div>{result.content}</div>
+      <div css={css.info}>
+        <span css={css.title}>{result.label}</span>
+        <Link css={css.link} to={`/blogs/${result.blog.id}`}>
+          link
+        </Link>
       </div>
-      <ArtifactPanel doc={result} advanced={false} />
+      <div css={css.content}>{result.content}</div>
+      <Panel doc={result} />
     </div>
   );
-};
+}

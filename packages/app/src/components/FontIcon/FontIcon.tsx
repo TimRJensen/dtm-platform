@@ -2,88 +2,90 @@
  * Vendor imports.
  */
 import { MouseEvent, ReactNode } from "react";
-import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { Theme } from "../../themes/dtm";
+import { useCSS } from "../../hooks";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const { spacing, colors } = theme;
+type StyleType = ReturnType<typeof useCSS>["css"][string];
 
-  return {
-    fontIcon: css({
-      display: "flex",
-      alignItems: "center",
-      marginRight: spacing,
-      color: colors.fontIcon.default,
-      cursor: "pointer",
-    }),
-    active: css({
-      color: colors.fontIcon.defaultActive,
-      "&:hover": {
-        color: colors.fontIcon.defaultHover,
-      },
-    }),
-    disabled: css({
-      cursor: "default",
-    }),
-    icon: css({
-      fontSize: 24,
-    }),
-    label: css({
-      color: colors.text.primary,
-      marginLeft: spacing * 0.25,
-    }),
-  };
-};
-
-/**
- * FontIcon functional component - Simple wrapper for material icons https://fonts.google.com/icons
- */
 interface Props {
   type: string;
   active?: boolean;
   disabled?: boolean;
-  $css?: Partial<ReturnType<typeof _css>>;
+  $css?: Partial<{
+    [key in "fontIcon" | "disabled" | "active" | "icon" | "label"]: StyleType;
+  }>;
   children?: ReactNode;
   onClick?: (event?: MouseEvent<HTMLSpanElement>) => void;
   onToggle?: (event?: MouseEvent<HTMLSpanElement>) => void;
 }
 
-export const FontIcon = function FontIcon({
+/**
+ * FontIcon functional component - Simple wrapper for material icons https://fonts.google.com/icons
+ */
+export function FontIcon({
   type,
-  active = true,
   disabled = false,
+  active = true,
   $css,
   children,
   onClick,
   onToggle,
 }: Props) {
-  const css = _css(useTheme() as Theme);
+  const { css } = useCSS(({ spacing, colors }) => ({
+    fontIcon: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      //marginRight: spacing,
+      color: colors.fontIcon.default,
+      cursor: "default",
+      "&[data-disabled=false][data-toggled=true]": {
+        color: colors.fontIcon.defaultActive,
+        cursor: "pointer",
+        "&:hover": {
+          color: colors.fontIcon.defaultHover,
+        },
+      },
+      "&[data-disabled=false][data-toggled=false]": {
+        cursor: "pointer",
+      },
+    },
+    icon: {
+      fontSize: 24,
+    },
+    label: {
+      color: colors.text.primary,
+      marginLeft: spacing * 0.25,
+    },
+  }));
 
   return (
     <span
-      css={[
-        [css.fontIcon, $css?.fontIcon],
-        disabled
-          ? [css.disabled, $css?.disabled]
-          : active
-          ? [css.active, $css?.active]
-          : {},
-      ]}
-      onClick={(event: MouseEvent) => {
-        event.preventDefault();
-        if (onClick) onClick();
-      }}
-      onMouseDown={(event: MouseEvent) => {
-        event.preventDefault();
-        if (onToggle) onToggle();
-      }}
+      css={[[css.fontIcon, $css?.fontIcon]]}
+      data-disabled={disabled}
+      data-toggled={active}
+      onClick={
+        !disabled
+          ? (event: MouseEvent) => {
+              //event.preventDefault();
+              if (onClick) onClick();
+            }
+          : undefined
+      }
+      onMouseDown={
+        !disabled
+          ? (event: MouseEvent) => {
+              event.preventDefault();
+              if (onToggle) onToggle();
+            }
+          : undefined
+      }
     >
       <span className="material-icons" css={[css.icon, $css?.icon]}>
         {type}
@@ -91,4 +93,4 @@ export const FontIcon = function FontIcon({
       {children ? <span css={[css.label, $css?.label]}>{children}</span> : null}
     </span>
   );
-};
+}

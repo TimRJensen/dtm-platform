@@ -11,7 +11,7 @@ import { useHistory } from "react-router-dom";
 /**
  * useSearch hook.
  */
-export const useSearch = function useSearch() {
+export function useSearch() {
   const history = useHistory();
   const [input, setInput] = useState("");
   const domElement = useRef<HTMLInputElement>(null);
@@ -28,7 +28,7 @@ export const useSearch = function useSearch() {
 
       setInput("");
       domElement.current?.blur();
-      history.push("/search/" + input.trim().split(" ").join("+") + "/page=0");
+      history.push("/search/" + input.trim().split(" ").join("+") + "/0");
     },
   };
-};
+}

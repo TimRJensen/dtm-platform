@@ -1,72 +1,63 @@
 /**
  * Vendor imports.
  */
-import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { Theme } from "../../themes/dtm";
-import { ArtifactDocument } from "db";
-import { ArtifactPanel } from "../ArtifactPanel/ArtifactPanel";
+import { useCSS } from "../../hooks";
+import { ArtifactType } from "db";
+import { Panel } from "./Panel/Panel";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const {
-    spacing,
-    borderRadius,
-    colors,
-    sizes: { blog },
-  } = theme;
-
-  return {
-    artifact: css({
-      width: `${blog.width * 0.7}vw`,
-      margin: "auto",
-      marginBottom: 2 * spacing,
-      padding: spacing,
-    }),
-    title: css({
-      margin: "auto",
-      fontSize: "3rem",
-      textAlign: "center",
-    }),
-    body: css({ display: "flex" }),
-    image: css({
-      minWidth: `${blog.width * 0.2}vw`,
-      height: "100%",
-      marginRight: spacing,
-      borderRadius,
-    }),
-    content: css({
-      padding: spacing,
-      marginRight: 2 * spacing,
-      fontSize: "1.25rem",
-    }),
-  };
-};
+interface Props {
+  doc: ArtifactType | undefined;
+  onComment: () => void;
+}
 
 /**
  * Artifact functional component.
  */
-interface Props {
-  doc: ArtifactDocument;
-  onComment: () => void;
-}
+export function Artifact({ doc, onComment }: Props) {
+  if (!doc) return null;
 
-export const Artifact = function Artifact({ doc, onComment }: Props) {
-  const css = _css(useTheme() as Theme);
+  const { css } = useCSS(({ spacing, borderRadius }) => ({
+    artifact: {
+      display: "grid",
+      gridTemplateColumns: `minmax(200px, 1.5fr) minmax(400px, 3fr) minmax(100px, 1fr)`,
+      gridTemplateAreas: `
+      "title title title" 
+      "image content panel"`,
+      width: `clamp(768px, 80vw, 100%)`,
+      margin: `${2 * spacing}px auto ${2 * spacing}px auto`,
+      padding: spacing,
+    },
+    title: {
+      gridArea: "title",
+      margin: `0 auto ${2 * spacing}px auto`,
+      fontSize: "3rem",
+      textAlign: "center",
+    },
+    image: {
+      gridArea: "image",
+      width: "100%",
+      borderRadius,
+    },
+    content: {
+      gridArea: "content",
+      padding: spacing,
+      fontSize: "1.25rem",
+    },
+  }));
 
   return (
     <section css={css.artifact}>
-      <div css={css.title}>{doc.title}</div>
-      <div css={css.body}>
-        <img css={css.image} src={doc.image} />
-        <div css={css.content}>{doc.content}</div>
-        <ArtifactPanel doc={doc} onComment={onComment} />
-      </div>
+      <div css={css.title}>{doc.label}</div>
+      <img css={css.image} src={doc.image} />
+      <div css={css.content}>{doc.content}</div>
+      <Panel doc={doc} onComment={onComment} />
     </section>
   );
-};
+}

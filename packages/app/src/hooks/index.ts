@@ -1,9 +1,9 @@
 export { useEditor } from "./useEditor";
 export { useShowEditor } from "./useShowEditor";
 export { useIsUpvoted } from "./useIsUpvoted";
-export { useQuery } from "./useQuery";
+export { useUserQuery } from "./useUserQuery";
 export { useSearch } from "./useSearch";
 export { useHtmlParser } from "./useHtmlParser";
 export { useDecorateNode } from "./useDecorateNode";
-export { useScrollElement } from "./useScrollElement";
-export { useIsLoading } from "./useIsLoading";
+export { useCSS } from "./useCSS";
+export { useDB } from "./useDB";

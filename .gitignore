@@ -13,11 +13,14 @@
 # VS code specific.
 /.vscode
 
-# Parcel specific
-/.parcel-cache
+# Local Vercel folder
+.vercel
+
+# Supabase
+.supabase
+
+# dist
 /dist
 
-# Local Netlify folder
-.netlify
-
-.vercel
+# mock-data
+/packages/mock-data

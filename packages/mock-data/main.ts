@@ -1,25 +1,26 @@
 /**
  * Vendor imports.
  */
-// @ts-ignore
-import { date, datatype, internet, lorem, name } from "faker/locale/en_US";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { date, datatype, internet, lorem, name, address } from "faker";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Custom imports.
  */
 import {
-  BlogDocument,
-  ArtifactDocument,
-  CommentDocument,
-  PostDocument,
-  PouchDB,
-  ThreadDocument,
-  UserDocument,
-  CategoryDocument,
+  AccountTable,
+  CategoryTable,
+  SubCategoryTable,
+  ArtifactTable,
+  CommentTable,
+  PostTable,
+  BlogTable,
+  ProfileTable,
 } from "db";
 
 /**
- * mockData - Just a single function that populates a PouchDB with mockdata.
+ * mockData - Just a single function that populates a DB with mockdata.
  */
 interface MockDataOptions {
   numberOfBlogs?: number;
@@ -27,7 +28,7 @@ interface MockDataOptions {
 }
 
 export const mockData = async function mockData(
-  db: PouchDB,
+  client: SupabaseClient,
   userOptions?: MockDataOptions
 ) {
   const defaults = {
@@ -43,213 +44,244 @@ export const mockData = async function mockData(
   /**
    * Create fake users.
    */
-  const users: UserDocument[] = [];
+  const profiles: ProfileTable[] = [];
+  const users: AccountTable[] = [];
 
   for (let i = 0; i < options.numberOfUsers; i++) {
-    const email = internet.email();
-    const timestamp = date.past(datatype.number({ min: 0, max: 8 })).getTime();
+    const createdAt = date
+      .past(datatype.number({ min: 0, max: 8 }), now)
+      .toISOString();
+
+    const profile = {
+      id: uuidv4(),
+      createdAt,
+      updatedAt: date.between(createdAt, now).toISOString(),
+      firstName: name.firstName(),
+      lastName: name.lastName(),
+      city: address.city(),
+      region: address.state(),
+      country: address.country(),
+      focus: [],
+    };
+    profiles.push(profile);
 
     users.push({
-      type: "user",
-      _id: `/users/user=${i}`,
-      displayName: name.findName(),
-      role: "user",
-      email,
+      id: profile.id,
+      profileId: profile.id,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
+      role: "authenticated",
+      displayName: `${profile.firstName} ${profile.lastName}`,
+      email: internet.email(),
       stats: {
-        threads: datatype.number({ min: 1, max: 20 }),
-        comments: datatype.number({ min: 1, max: 80 }),
-        upvotes:
+        totalPosts: datatype.number({ min: 1, max: 20 }),
+        totalComments: datatype.number({ min: 1, max: 80 }),
+        totalUpvotes:
           Math.random() < 0.15 ? datatype.number({ min: 0, max: 50 }) : 0,
-        downvotes:
+        totalDownvotes:
           Math.random() < 0.07 ? datatype.number({ min: 0, max: 20 }) : 0,
         infractions:
           Math.random() < 0.05 ? datatype.number({ min: 0, max: 10 }) : 0,
       },
-      timestamp,
-      lastModified: date.between(new Date(timestamp), now).getTime(),
     });
-  }
-
-  /**
-   * Create fake blogs.
-   */
-  const blogs = [];
-
-  for (let i = 0; i < options.numberOfBlogs; i++) {
-    const timestamp = date.past(datatype.number({ min: 5, max: 8 })).getTime();
-    const lastModified = date.between(new Date(timestamp), now).getTime();
-
-    const artifact: ArtifactDocument = {
-      type: "artifact",
-      _id: `/blogs/blog=${i}/artifact`,
-      title: lorem.words(datatype.number({ min: 1, max: 4 })),
-      image:
-        Math.random() < 0.15
-          ? "https://picsum.photos/260/520"
-          : "https://picsum.photos/260/200",
-      content: lorem.sentences(datatype.number({ min: 10, max: 15 })),
-      period: "",
-      category: {
-        raw: "",
-        base: { label: "", raw: "" },
-        sub: { label: "", raw: "" },
-      },
-      tags: lorem.words(datatype.number({ min: 2, max: 5 })).split(" "),
-      timestamp,
-      lastModified,
-    };
-    const blog: BlogDocument = {
-      type: "blog",
-      _id: `/blogs/blog=${i}`,
-      artifact,
-      threads: [],
-      stats: {
-        threads: datatype.number({ min: 3, max: 10 }),
-        views: datatype.number({ min: 100, mnax: 500 }),
-        comments: 0,
-      },
-      timestamp,
-      lastModified,
-    };
-
-    if (blog.stats.threads)
-      for (let i = 0; i < blog.stats.threads; i++) {
-        const _id = `${blog._id}/thread=${i}`;
-        const user =
-          users[datatype.number({ min: 0, max: options.numberOfUsers - 1 })];
-        const timestamp = date.between(new Date(blog.timestamp), now).getTime();
-        const lastModified = date.between(new Date(timestamp), now).getTime();
-        const post: PostDocument = {
-          type: "post",
-          _id: `${_id}/post`,
-          user,
-          content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
-          upvotes: [],
-          downvotes: [],
-          stats: {
-            infractions: 0,
-          },
-          timestamp,
-          lastModified,
-        };
-
-        for (let i = 0; i < 25; i++) {
-          if (Math.random() < 0.1)
-            post.upvotes.push(
-              users[datatype.number({ min: 0, max: users.length - 1 })]
-            );
-        }
-
-        for (let i = 0; i < 25; i++) {
-          if (Math.random() < 0.05)
-            post.downvotes.push(
-              users[datatype.number({ min: 0, max: users.length - 1 })]
-            );
-        }
-
-        const thread: ThreadDocument = {
-          type: "thread",
-          _id,
-          user,
-          post,
-          comments: [],
-          stats: {
-            comments: datatype.number({ min: 3, max: 7 }),
-          },
-          timestamp: post.timestamp,
-          lastModified: post.lastModified,
-        };
-
-        if (thread.stats.comments) {
-          let lastTimestamp = thread.timestamp;
-
-          for (let i = 0; i < thread.stats.comments; i++) {
-            const user =
-              users[datatype.number({ min: 0, max: users.length - 1 })];
-            const timestamp = date
-              .between(new Date(lastTimestamp), now)
-              .getTime();
-            const lastModified = date
-              .between(new Date(timestamp), now)
-              .getTime();
-            const comment: CommentDocument = {
-              type: "comment",
-              _id: `${post._id}/comment=${i}`,
-              timestamp,
-              lastModified,
-              user,
-              content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
-              stats: {
-                infractions:
-                  Math.random() < 0.05
-                    ? datatype.number({ min: 0, max: 5 })
-                    : 0,
-              },
-            };
-
-            thread.comments.push(comment);
-            lastTimestamp = comment.timestamp;
-          }
-        }
-        blog.threads.push(thread);
-        blog.stats.comments += thread.comments.length;
-      }
-    blogs.push(blog);
   }
 
   /**
    * Create fake categories.
    */
-  const categories = [];
-  let cursor = 0;
+  const mainCategories: CategoryTable[] = [];
+  const subCategories: SubCategoryTable[] = [];
 
-  for (let i = 0; i < 15 && cursor < blogs.length; i++) {
-    const end = cursor + datatype.number({ min: 10, max: 20 });
-    const category: CategoryDocument = {
-      type: "category",
-      _id: `/categories/category-${i}`,
-      label: lorem.words(datatype.number({ min: 2, max: 3 })),
-      raw: datatype.number({ min: 100, max: 160 }),
-      blogs: blogs.slice(cursor, end < blogs.length ? end : blogs.length),
-      subCategories: [],
-      timestamp: now.getTime(),
-      lastModified: now.getTime(),
+  for (let i = 0; i < 15; i++) {
+    const mainCategory = {
+      id: uuidv4(),
+      raw: `${datatype.number({ min: 100, max: 160 })}`,
+      label: lorem.words(datatype.number({ min: 1, max: 2 })),
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
     };
+    mainCategories.push(mainCategory);
 
-    let _cursor = 0;
-
-    for (let i = 0; _cursor < category.blogs.length; i++) {
-      const end = _cursor + datatype.number({ min: 1, max: 9 });
-      const subCategory: CategoryDocument = {
-        type: "category",
-        _id: category._id + `/sub-category-${i}`,
+    for (let i = 0; i < datatype.number({ min: 1, max: 4 }); i++) {
+      subCategories.push({
+        id: uuidv4(),
+        mainCategoryId: mainCategory.id,
+        raw: `${datatype.number({ min: 10, max: 50 })}`,
         label: lorem.words(datatype.number({ min: 1, max: 2 })),
-        raw: datatype.number({ min: 10, max: 70 }),
-        blogs: category.blogs.slice(
-          _cursor,
-          end < blogs.length ? end : blogs.length
-        ),
-        timestamp: now.getTime(),
-        lastModified: now.getTime(),
-      };
-
-      for (const blog of subCategory.blogs) {
-        const artifact = blog.artifact;
-        artifact.category.base = { label: category.label, raw: category.raw };
-        artifact.category.sub = {
-          label: subCategory.label,
-          raw: subCategory.raw,
-        };
-        artifact.category.raw = `${category.raw}.${subCategory.raw}`;
-      }
-
-      category.subCategories?.push(subCategory);
-      _cursor = end;
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      });
     }
-
-    categories.push(category);
-    cursor = end;
   }
 
-  await db.putMany([...blogs, ...categories, ...users]);
+  /**
+   * Create fake blogs.
+   */
+  const blogs: Omit<BlogTable, "artifactId">[] = [];
+  const artifacts: ArtifactTable[] = [];
+  const posts: PostTable[] = [];
+  const comments: CommentTable[] = [];
+
+  for (let i = 0; i < 100; i++) {
+    const createdAt = date
+      .past(datatype.number({ min: 3, max: 8 }), now)
+      .toISOString();
+    const mainCategory =
+      mainCategories[datatype.number(mainCategories.length - 1)];
+    const subCategory = subCategories.filter(
+      (category) => category.mainCategoryId === mainCategory.id
+    );
+
+    const blog = {
+      id: uuidv4(),
+      createdAt: createdAt,
+      updatedAt: createdAt,
+      //artifactId: "",
+      stats: {
+        posts: datatype.number({ min: 3, max: 10 }),
+        views: datatype.number({ min: 100, max: 500 }),
+      },
+    };
+    blogs.push(blog);
+
+    const artifact = {
+      id: uuidv4(),
+      createdAt: createdAt,
+      updatedAt: createdAt,
+      mainCategoryId: mainCategory.id,
+      subCategoryId: subCategory[datatype.number(subCategory.length - 1)].id,
+      blogId: blog.id,
+      label: lorem.words(datatype.number({ min: 1, max: 4 })),
+      image: `/public/image${datatype.number({ min: 1, max: 53 })}.jpg`,
+      content: lorem.sentences(datatype.number({ min: 10, max: 15 })),
+      period: ["XXXX", "YYYY"],
+      tags: lorem.words(datatype.number({ min: 2, max: 5 })).split(" "),
+    };
+    artifacts.push(artifact);
+
+    for (let i = 0; i < blog.stats.posts; i++) {
+      const createdAt = date.between(blog.createdAt, now).toISOString();
+
+      const post = {
+        id: uuidv4(),
+        createdAt: createdAt,
+        updatedAt:
+          Math.random() < 0.15
+            ? date.between(createdAt, now).toISOString()
+            : createdAt,
+        blogId: blog.id,
+        userId: profiles[datatype.number(profiles.length - 1)].id,
+        content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
+        upvotes: profiles.reduce((result, profile) => {
+          if (Math.random() < 0.099) result.push(profile.id);
+
+          return result;
+        }, [] as string[]),
+        downvotes: profiles.reduce((result, profile) => {
+          if (Math.random() < 0.033) result.push(profile.id);
+
+          return result;
+        }, [] as string[]),
+        stats: {
+          shadowBanned: false,
+          infractions: 0,
+          totalUpvotes: 0,
+          totalDownvotes: 0,
+          totalComments: datatype.number({ min: 3, max: 10 }),
+        },
+      };
+      post.stats.totalUpvotes = post.upvotes.length;
+      post.stats.totalDownvotes = post.downvotes.length;
+      posts.push(post);
+
+      for (let i = 0; i < post.stats.totalComments; i++) {
+        const createdAt = date.between(post.createdAt, now);
+
+        comments.push({
+          id: uuidv4(),
+          createdAt: createdAt.toISOString(),
+          updatedAt:
+            Math.random() < 0.15
+              ? date.between(createdAt, now).toISOString()
+              : createdAt.toISOString(),
+          userId: profiles[datatype.number(profiles.length - 1)].id,
+          postId: post.id,
+          content: lorem.sentences(datatype.number({ min: 3, max: 15 })),
+          stats: {
+            shadowBanned: false,
+            infractions:
+              Math.random() < 0.05 ? datatype.number({ min: 0, max: 5 }) : 0,
+          },
+        });
+      }
+    }
+  }
+
+  const inserts: [string, any[]][] = [
+    ["profiles", profiles],
+    ["accounts", users],
+    ["main_categories", mainCategories],
+    ["sub_categories", subCategories],
+    ["blogs", blogs],
+    ["artifacts", artifacts],
+    ["posts", posts],
+    ["comments", comments],
+  ];
+
+  for (const [table, values] of inserts) {
+    const response = await client.from(table).upsert(values);
+
+    console.log(response.error ? response.error : response.statusText);
+
+    if (table === "artifacts") {
+      const response = await client.from("blogs").upsert(
+        values.map((value) => ({
+          id: value.blogId,
+          artifactId: value.id,
+        }))
+      );
+
+      console.log(response.error ? response.error : response.statusText);
+    }
+  }
 };
+
+async function deleteData(client: SupabaseClient) {
+  const tables = [
+    "comments",
+    "posts",
+    "artifacts",
+    "blogs",
+    "sub_categories",
+    "main_categories",
+    "accounts",
+    "profiles",
+  ];
+
+  for (const table of tables) {
+    if (table === "artifacts") {
+      const response = await client.from("blogs").update({ artifactId: null });
+      console.log(response.error ? response.error : response.statusText);
+    }
+
+    const response = await client.from(table).delete();
+    console.log(response.error ? response.error : response.statusText);
+  }
+}
+
+let client;
+
+if (process.argv[2] === "dev") {
+  client = createClient(
+    "http://localhost:8000",
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew"
+  );
+} else if (process.argv[2] === "prod") {
+  client = createClient(
+    "https://reyohguqhuhpukmdbeva.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMzk4NDk1NCwiZXhwIjoxOTQ5NTYwOTU0fQ.GsSQ3vpMZy5DXESqQOiu0PTBavxX1yN1TNAjncfSID4"
+  );
+}
+
+mockData(client);
+//deleteData(client);

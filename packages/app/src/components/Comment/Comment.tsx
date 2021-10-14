@@ -1,52 +1,40 @@
 /**
  * Vendor imports.
  */
-import { css, useTheme } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { CommentDocument } from "db";
-import { Theme } from "../../themes/dtm";
-import { useEditor, useScrollElement } from "../../hooks/";
+import { CommentType } from "db";
+import { useEditor, useCSS } from "../../hooks/";
 import { TextEditor } from "../TextEditor/TextEditor";
 import { TextBox } from "../TextBox/TextBox";
-import { CommentHeader } from "../CommentHeader/CommentHeader";
+import { MessageHeader } from "../MessageHeader/MessageHeader";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const {
-    spacing,
-    sizes: { thread },
-  } = theme;
-
-  return {
-    comment: css({
-      width: `${thread.width - 4}vw`,
-      margin: `0 ${spacing * 2}px ${spacing}px auto`,
-    }),
-  };
-};
+interface Props {
+  doc: CommentType;
+}
 
 /**
  * Comment functional component.
  */
-interface Props {
-  doc: CommentDocument;
-}
-
-export const Comment = function Comment({ doc }: Props) {
+export function Comment({ doc }: Props) {
   if (!doc) return null;
 
-  const css = _css(useTheme() as Theme);
-  const { domElement } = useScrollElement(doc);
+  const { css } = useCSS(({ spacing }) => ({
+    comment: {
+      width: `clamp(600px, auto, 100%)`,
+      margin: `0 ${spacing}px ${spacing}px ${spacing * 3}px`,
+    },
+  }));
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(doc);
 
   return (
-    <section css={css.comment} ref={domElement}>
-      <CommentHeader doc={doc} onEdit={handleShowEditor} />
+    <section css={css.comment}>
+      <MessageHeader doc={doc} onEdit={handleShowEditor} />
       {showEditor() ? (
         <TextEditor content={doc.content} onSubmit={handleSubmit} />
       ) : (
@@ -54,4 +42,4 @@ export const Comment = function Comment({ doc }: Props) {
       )}
     </section>
   );
-};
+}

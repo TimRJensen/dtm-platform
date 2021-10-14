@@ -2,69 +2,77 @@
  * Vendor imports.
  */
 import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { css, useTheme } from "@emotion/react";
+import { Link, useParams, generatePath } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { Theme, button } from "../../themes/dtm";
+import { useCSS } from "../../hooks";
+import { FontIcon } from "../FontIcon/FontIcon";
 
 /**
- * Css.
+ * Types.
  */
-const _css = (theme: Theme) => {
-  const { spacing, borderRadius, colors } = theme;
+const path = "/search/:query/:pageId";
 
-  return {
-    searchPagination: css({
-      padding: spacing,
-      textAlign: "center",
-    }),
-    button: css([
-      button,
-      {
-        height: "auto",
-        width: "auto",
-        marginRight: spacing * 0.5,
-        borderRadius: borderRadius * 0.5,
-        "&:hover": {
-          backgroundColor: colors.secondary,
-        },
-      },
-    ]),
-    buttonActive: css({
-      backgroundColor: colors.secondary,
-    }),
-    divider: css({
-      marginRight: spacing * 0.5,
-    }),
-  };
-};
+type Params = { query: string; pageId: string };
 
-/**
- * SearchPagination functional component.
- */
 interface Props {
   currentPage: number;
   resultsPerPage?: number;
   total: number;
 }
 
-export const SearchPagination = function SearchPagination({
+/**
+ * SearchPagination functional component.
+ */
+export function SearchPagination({
   currentPage,
   resultsPerPage = 10,
   total,
 }: Props) {
-  const history = useHistory();
-  const css = _css(useTheme() as Theme);
-  const [pages, setPages] = useState([] as (string | number)[]);
+  if (!total) return null;
+
+  const { css } = useCSS(
+    ({ spacing, borderRadius, colors, mixins: { button } }) => ({
+      searchPagination: {
+        display: "flex",
+        alignItems: "center",
+        margin: "auto",
+        padding: spacing,
+      },
+      button: [
+        button,
+        {
+          height: "auto",
+          width: "auto",
+          marginRight: spacing * 0.5,
+          borderRadius: borderRadius * 0.5,
+          "&:hover, &[data-active=true]": {
+            backgroundColor: colors.secondary,
+          },
+        },
+      ],
+      divider: {
+        marginRight: spacing * 0.5,
+      },
+      arrow: {
+        color: colors.primary,
+
+        "&:hover": {
+          color: colors.secondary,
+        },
+      },
+    })
+  );
+  const { query } = useParams<Params>();
+  const [pages, setPages] = useState<(string | number)[]>();
   const maxPages = Math.ceil(total / resultsPerPage);
 
   useEffect(() => {
     const pages = [];
 
-    if (currentPage < 5) {
+    if (currentPage < 4) {
       let i = -1;
 
       while (++i < maxPages && i < 5) pages.push(i + 1);
@@ -87,34 +95,53 @@ export const SearchPagination = function SearchPagination({
     setPages(pages);
   }, [currentPage]);
 
-  return (
+  return pages ? (
     <div css={css.searchPagination}>
+      {currentPage !== 0 ? (
+        <Link
+          to={generatePath(path, {
+            query,
+            pageId: currentPage - 1,
+          })}
+        >
+          <FontIcon
+            type="keyboard_double_arrow_left"
+            $css={{ icon: css.arrow }}
+          />
+        </Link>
+      ) : null}
       {pages.map((value, i) =>
         typeof value === "number" ? (
-          <button
+          <Link
             key={`search-pagination-${value}`}
-            css={
-              value - 1 === currentPage
-                ? [css.button, css.buttonActive]
-                : css.button
-            }
-            onClick={() =>
-              history.push(
-                history.location.pathname.replace(
-                  /(\/page=\d*)|$/,
-                  `/page=${value - 1}`
-                )
-              )
-            }
+            to={generatePath(path, {
+              query,
+              pageId: value - 1,
+            })}
           >
-            {value}
-          </button>
+            <button css={css.button} data-active={value - 1 === currentPage}>
+              {value}
+            </button>
+          </Link>
         ) : (
           <span key={`search-pagination-${value}-${i}`} css={css.divider}>
             {value}
           </span>
         )
       )}
+      {currentPage + 1 !== maxPages ? (
+        <Link
+          to={generatePath(path, {
+            query,
+            pageId: currentPage + 1,
+          })}
+        >
+          <FontIcon
+            type="keyboard_double_arrow_right"
+            $css={{ icon: css.arrow }}
+          />
+        </Link>
+      ) : null}
     </div>
-  );
-};
+  ) : null;
+}

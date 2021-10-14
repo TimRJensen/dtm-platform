@@ -1,20 +1,23 @@
 /**
  * Vendor imports.
  */
-import { useReducer, Reducer } from "react";
+import { useReducer, Reducer, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { ThemeProvider, css, Global } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { PouchDB, PouchDBProvider } from "db";
+import { DB, DBProvider, AccountTable } from "db";
 import theme from "../../themes/dtm";
-import { default as Index } from "../../pages/index";
-import { default as Blog } from "../../pages/blogs/blog";
-import { default as Search } from "../../pages/search/search";
-import { Test } from "../Test/Test";
+import { Header } from "./Header/Header";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
+
+const _Index = lazy(() => import("../../pages"));
+const _Blog = lazy(() => import("../../pages/blogs/"));
+const _Search = lazy(() => import("../../pages/search"));
+const _Login = lazy(() => import("../../pages/login"));
+const _Account = lazy(() => import("../../pages/account"));
 
 /**
  * Css.
@@ -36,63 +39,96 @@ const _css = css({
       backgroundColor: theme.colors.secondary,
     },
   },
+  a: {
+    textDecoration: "none",
+  },
 });
 
 /**
  * App functional component.
  */
 interface Props {
-  db: PouchDB;
+  db: DB;
 }
 
-export const App = function ({ db }: Props) {
+export function App({ db }: Props) {
   const [state, dispatch] = useReducer<Reducer<AppState, Actions>>(reducer, {
-    currentUser: {
-      type: "user",
-      _id: "users/test-user",
-      role: "user",
-      displayName: "Arthur Fonzarelli",
-      email: "arthur.fonzarelli@gmail.com",
-      stats: {
-        upvotes: 0,
-        downvotes: 0,
-        infractions: 0,
-        comments: 0,
-        threads: 0,
-      },
-      timestamp: Date.now(),
-      lastModified: Date.now(),
-    },
+    currentUser: undefined,
     currentBlog: undefined,
-    currentQuery: undefined,
+    currentPath: undefined,
     showEditor: undefined,
   });
 
+  const fetch = async () => {
+    const response = await db.selectExact<AccountTable>("accounts", "*", {
+      match: { displayName: "Arthur Fonzarelli" },
+    });
+
+    if (response && response.length) {
+      //dispatch({ type: "CURRENT_USER", value: response[0] });
+    }
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
-    <PouchDBProvider value={db}>
+    <DBProvider value={db}>
       <AppStateProvider value={{ state, dispatch }}>
         <ThemeProvider theme={theme}>
-          <Router>
+          <Router basename="/">
             <Global styles={_css} />
+            <Header />
             <Switch>
-              <Route exact path="/" component={Index} />
               <Route
-                path="/blogs/:blogId/:threadId?/:postId?/:commentId?"
-                render={() => {
-                  return <Blog blog={state.currentBlog} />;
-                }}
+                exact
+                path="/blogs/:blogId"
+                render={() => (
+                  <Suspense fallback={<div />}>
+                    <_Blog blog={state.currentBlog} />
+                  </Suspense>
+                )}
               />
               <Route
+                exact
                 path="/search/:query/:pageId?"
-                render={() => {
-                  return <Search />;
-                }}
+                render={() => (
+                  <Suspense fallback={<div />}>
+                    <_Search />
+                  </Suspense>
+                )}
               />
-              <Route path="/test" component={Test} />
+              <Route
+                exact
+                path="/login/:loginId?"
+                render={() => (
+                  <Suspense fallback={<div />}>
+                    <_Login />
+                  </Suspense>
+                )}
+              />
+              <Route
+                exact
+                path="/account/:newOrExisting?"
+                render={() => (
+                  <Suspense fallback={<div />}>
+                    <_Account />
+                  </Suspense>
+                )}
+              />
+              <Route
+                path="/"
+                render={() => (
+                  <Suspense fallback={<div />}>
+                    <_Index />
+                  </Suspense>
+                )}
+              />
             </Switch>
           </Router>
         </ThemeProvider>
       </AppStateProvider>
-    </PouchDBProvider>
+    </DBProvider>
   );
-};
+}

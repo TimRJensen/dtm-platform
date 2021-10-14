@@ -4,25 +4,30 @@
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.4.1",
+    "@supabase/supabase-js": "^1.24.0",
+    "array-sort": "^1.0.0",
     "db": "workspace:packages/db",
     "dom-serializer": "^1.3.2",
     "domhandler": "^4.2.2",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",
+    "email-validator": "^2.0.4",
     "fuse.js": "^6.4.6",
     "htmlparser2": "^7.1.2",
-    "mock-data": "workspace:packages/mock-data",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",
-    "react-spinners": "^0.11.0"
+    "react-spinners": "^0.11.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/array-sort": "^1",
     "@types/draft-js": "^0",
     "@types/draftjs-to-html": "^0",
     "@types/react": "^17",
     "@types/react-dom": "^17",
     "@types/react-router-dom": "^5",
+    "@types/uuid": "^8",
     "typescript": "^4.4.2"
   }
 }

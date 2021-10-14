@@ -6,10 +6,10 @@ import { createContext } from "react";
 /**
  * Custom imports.
  */
-import { PouchDB } from "./main";
+import { DB } from "./main";
 
 /**
- * PouchDB context.
+ * DB context.
  */
-export const PouchDBContext = createContext({} as PouchDB);
-export const PouchDBProvider = PouchDBContext.Provider;
+export const DBContext = createContext<DB>({} as DB);
+export const DBProvider = DBContext.Provider;

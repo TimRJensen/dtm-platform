@@ -6,8 +6,17 @@
         "modules": "auto"
       }
     ],
-   [ "@babel/preset-react", {"runtime": "automatic", "importSource": "@emotion/react"}],
-    "@babel/preset-typescript"
+    ["@babel/preset-typescript", { "onlyRemoveTypeImports": true }],
+    [
+      "@babel/preset-react",
+      { "runtime": "automatic", "importSource": "@emotion/react" }
+    ]
   ],
-  "plugins": [ "@emotion",["@babel/plugin-transform-runtime", {"regenerator": true, "absoluteRuntime": true}]]
+  "plugins": [
+    "@emotion",
+    [
+      "@babel/plugin-transform-runtime",
+      { "regenerator": true, "absoluteRuntime": true }
+    ]
+  ]
 }
