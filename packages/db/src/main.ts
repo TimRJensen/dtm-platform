@@ -22,7 +22,7 @@ export interface ProfileTable extends BaseTable {
   city: string;
   region: string;
   country: string;
-  focus: string[];
+  interests: string[];
 }
 
 /* UserTable & UserType. */
@@ -110,7 +110,7 @@ export type ArtifactType = Pick<
 /* PostTable & PostType. */
 export interface PostTable extends BaseTable {
   blogId: string;
-  userId: string;
+  accountId: string;
   content: string;
   upvotes: string[];
   downvotes: string[];
@@ -130,7 +130,7 @@ export type PostType = Pick<
 /* CommentTable & CommentType. */
 export interface CommentTable extends BaseTable {
   postId: string;
-  userId: string;
+  accountId: string;
   content: string;
   stats: {
     shadowBanned: boolean;
@@ -357,7 +357,7 @@ class SupabaBaseWrapper {
         region,
         city,
         country,
-        focus: [],
+        interests: [],
       },
     ]);
 

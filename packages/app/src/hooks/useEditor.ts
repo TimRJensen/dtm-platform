@@ -49,7 +49,7 @@ export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
             db.insert<CommentTable>("comments", [
               {
                 postId: doc.id,
-                userId: state.currentUser.id,
+                accountId: state.currentUser.id,
                 content,
                 stats: {
                   shadowBanned: false,
@@ -70,7 +70,7 @@ export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
             db.insert<PostTable>("posts", [
               {
                 blogId: doc.id,
-                userId: state.currentUser.id,
+                accountId: state.currentUser.id,
                 content,
                 upvotes: [],
                 downvotes: [],

@@ -39,13 +39,13 @@ const queries = {
       createdAt,
       content,
       upvotes,
-      user:userId(id, displayName),
+      user:accountId(id, displayName),
       stats,
       comments(
         id,
         createdAt,
         content, 
-        user:userId(id, displayName),
+        user:accountId(id, displayName),
         stats
       )
     )
