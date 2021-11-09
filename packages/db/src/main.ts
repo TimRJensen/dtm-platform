@@ -1,7 +1,6 @@
 /**
  * Vendor imports.
  */
-import dotenv from "dotenv";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -402,6 +401,5 @@ class SupabaBaseWrapper {
   }
 }
 
-dotenv.config();
 export { SupabaBaseWrapper as DB };
 export { DBContext, DBProvider } from "./context";
