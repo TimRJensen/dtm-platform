@@ -168,22 +168,25 @@ export type AllTableNames =
 /**
  * SupabaBaseWrapper - A simple class wrapper for DB.
  */
+const host =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:8000"
+    : "https://reyohguqhuhpukmdbeva.supabase.co";
+const key =
+  process.env.NODE_ENV === "development"
+    ? process.env.SUPABASE_DEV_ANON_KEY
+    : process.env.SUPABASE_PROD_ANON_KEY;
+const redirectURL = `${
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:1234"
+    : "https://dtmplatform.vercel.app/"
+}/account/verified`;
+
 class SupabaBaseWrapper {
   private supabase: SupabaseClient;
 
   constructor() {
-    if (process.env.NODE_ENV === "development") {
-      console.log("dev mode");
-      this.supabase = createClient(
-        "http://localhost:8000",
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew"
-      );
-    } else {
-      this.supabase = createClient(
-        "https://reyohguqhuhpukmdbeva.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMzk4NDk1NCwiZXhwIjoxOTQ5NTYwOTU0fQ.GsSQ3vpMZy5DXESqQOiu0PTBavxX1yN1TNAjncfSID4"
-      );
-    }
+    this.supabase = createClient(host, key ?? "");
   }
 
   async select<T>(
@@ -338,10 +341,7 @@ class SupabaBaseWrapper {
     const { user, error } = await this.supabase.auth.signUp(
       { email, password },
       {
-        redirectTo:
-          process.env.NODE_ENV === "dev"
-            ? "http://localhost:1234/account/verified"
-            : "https://dtm-platform-8s31ivoni-timrjensen.vercel.app/account/verified",
+        redirectTo: redirectURL,
       }
     );
 

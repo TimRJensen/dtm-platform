@@ -1,9 +1,10 @@
 const resolve = require("path").resolve;
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+//const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const DotenvPlugin = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
-const htmlWebpackPlugin = require("html-webpack-plugin");
+const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: resolve(__dirname, "./packages/app/src/index.tsx"),
@@ -53,6 +54,7 @@ module.exports = {
   },
   devtool: "source-map",
   plugins: [
+    new DotenvPlugin({ path: "./packages/db/.env" }),
     new CleanWebpackPlugin(),
     /*new MiniCssExtractPlugin({
       filename: "[name].css",
@@ -66,7 +68,7 @@ module.exports = {
         },
       ],
     }),
-    new htmlWebpackPlugin({
+    new HTMLWebpackPlugin({
       title: "DNT Platform",
       template: resolve(__dirname, "./packages/app/src/index.html"),
     }),

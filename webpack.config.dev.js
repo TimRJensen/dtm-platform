@@ -1,8 +1,9 @@
 const resolve = require("path").resolve;
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const DotenvPlugin = require("dotenv-webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+//const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 module.exports = {
@@ -50,7 +51,7 @@ module.exports = {
     },
   },
   optimization: {
-    minimizer: [`...`, new CssMinimizerPlugin()],
+    //minimizer: [`...`, new CssMinimizerPlugin()],
     splitChunks: {
       chunks: "all",
     },
@@ -71,11 +72,12 @@ module.exports = {
   },
   stats: "minimal",
   plugins: [
+    new DotenvPlugin({ path: "./packages/db/.env" }),
     new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin({
+    /*new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css",
-    }),
+    }),*/
     new HtmlWebpackPlugin({
       title: "DNT Platform",
       template: resolve(__dirname, "./packages/app/src/index.html"),

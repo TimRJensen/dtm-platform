@@ -14,13 +14,16 @@
 /.vscode
 
 # Local Vercel folder
-.vercel
+/.vercel
 
 # Supabase
-.supabase
+/.supabase
 
 # dist
 /dist
 
 # mock-data
 /packages/mock-data
+
+# .env
+*.env
