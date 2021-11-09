@@ -3635,6 +3635,7 @@ __metadata:
     "@supabase/supabase-js": ^1.24.0
     "@types/react": ^17
     "@types/uuid": ^8
+    dotenv: ^10.0.0
     react: ^17.0.2
     uuid: ^8.3.2
   languageName: unknown
@@ -3907,6 +3908,13 @@ __metadata:
     no-case: ^3.0.4
     tslib: ^2.0.3
   checksum: a65e3519414856df0228b9f645332f974f2bf5433370f544a681122eab59e66038fc3349b4be1cdc47152779dac71a5864f1ccda2f745e767c46e9c6543b1169
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "dotenv@npm:10.0.0"
+  checksum: f412c5fe8c24fbe313d302d2500e247ba8a1946492db405a4de4d30dd0eb186a88a43f13c958c5a7de303938949c4231c56994f97d05c4bc1f22478d631b4005
   languageName: node
   linkType: hard
 
