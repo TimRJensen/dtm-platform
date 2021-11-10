@@ -1,29 +1,26 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * Custom imports.
  */
-import { CategoryType, ProfileTable } from "db";
+import { AccountType, CategoryType, ProfileTable } from "db";
 import { useCSS, useDB } from "../../hooks";
-import { AppStateContext } from "../../components/App/app-state/main";
 import { LoadBox } from "../../components/LoadBox/LoadBox";
-import { FormSuggestion } from "../../components/FormSuggestion/FormSuggestion";
+import {
+  FormSuggestion,
+  InputType,
+} from "../../components/FormSuggestion/FormSuggestion";
 import { FontIcon } from "../../components/FontIcon/FontIcon";
 import { Button } from "../../components/Button/Button";
 
 /**
  * Types.
  */
-type ResponseType = {
-  key: string;
-  data: { [key in keyof CategoryType]: any }[];
-};
-
 interface Props {
-  doc: UserType;
+  doc: AccountType | undefined;
 }
 
 /**
@@ -58,7 +55,7 @@ export default function success({ doc }: Props) {
         gridColumn: "span 2",
       },
     },
-    buttonAdd: {
+    buttonModify: {
       gridArea: "add",
       alignSelf: "start",
       height: 24,
@@ -77,15 +74,14 @@ export default function success({ doc }: Props) {
       margin: `0 0 ${spacing}px 0`,
       padding: `0 0 0 3px`,
     },
+    item: {
+      display: "flex",
+      alignItems: "center",
+    },
   }));
   const { db, queries } = useDB();
-  const { dispatch } = useContext(AppStateContext);
-  const [data, setData] = useState<ResponseType>();
-  const [list, handleUpdate] = useUpdate<ProfileTable, string[]>(
-    "profiles",
-    "focus",
-    doc
-  );
+  const [data, setData] = useState<InputType<CategoryType, "label">>();
+  const [list, setList] = useState<string[]>([]);
   const value = useRef("");
 
   const fetch = async () => {
@@ -95,31 +91,55 @@ export default function success({ doc }: Props) {
       {}
     );
 
-    if (!response) return;
+    if ("error" in response) {
+      return;
+    }
 
     setData({ key: "label", data: response });
   };
 
   useEffect(() => {
     fetch();
-
-    console.log(db.currentUser());
-
-    dispatch({
-      type: "CURRENT_PATH",
-      value: { section: "account", label: "new" },
-    });
   }, []);
 
+  const handleSubmit = async () => {
+    if (!doc) {
+      return;
+    }
+
+    const response = await db.update<ProfileTable>("profiles", {
+      id: doc.profileId,
+      interests: list,
+    });
+
+    if ("error" in response) {
+      return;
+    }
+
+    setList([]);
+  };
+
+  const handleAdd = () => {
+    if (value.current !== "") {
+      setList([...list, value.current]);
+    }
+  };
+
+  const handleRemove = (index: number) => {
+    return () => {
+      setList([...list.slice(0, index), ...list.slice(index + 1)]);
+    };
+  };
+
   return (
-    <LoadBox loadables={data?.data} fetchOnly>
+    <LoadBox loadables={doc ? [doc] : undefined} fetchOnly>
       <section css={css.success}>
         <div css={css.label}>{`(>‿◠)✌`}</div>
         <div css={css.text}>
           {`Your account was succesfully created, but in order to login, it needs to
         be verified.`}
           <br />
-          {`An email has been sent to ... with a verification link.`}
+          {`An email has been sent to ${doc?.email} with a verification link.`}
         </div>
         <div css={css.text}>
           {`While you wait for the email to arrive, consider taking the time to add 
@@ -135,58 +155,30 @@ export default function success({ doc }: Props) {
               value.current = _value;
             }}
           />
-          <Button
-            $css={{ button: css.buttonAdd }}
-            onClick={() => {
-              if (value.current !== "") {
-                list([...(list() ?? []), value.current]);
-              }
-            }}
-          >
+          <Button $css={{ button: css.buttonModify }} onClick={handleAdd}>
             <FontIcon type="add" />
           </Button>
           <div css={css.items}>
-            {list()
-              ? list()!.map((item, i) => (
-                  <div key={`interest-${item}-${i}`}>{item}</div>
-                ))
-              : null}
+            {list.map((item, i) => (
+              <div key={`interest-${item}-${i}`} css={css.item}>
+                <Button
+                  $css={{ button: css.buttonModify }}
+                  onClick={handleRemove(i)}
+                >
+                  <FontIcon type="remove" />
+                </Button>
+                {item}
+              </div>
+            ))}
           </div>
           <Button
             $css={{ button: css.buttonSubmit }}
             type="accept"
-            disabled={!list}
-            onClick={handleUpdate}
+            disabled={!list[0]}
+            onClick={handleSubmit}
           >{`Submit`}</Button>
         </div>
       </section>
     </LoadBox>
   );
-}
-
-import { AllTables, AllTableNames, UserType } from "db";
-
-function useUpdate<T extends AllTables, S extends T[keyof T]>(
-  table: AllTableNames,
-  field: keyof T,
-  doc: UserType
-): [(value?: S) => S | undefined, () => Promise<void>] {
-  const { db } = useDB();
-  const [value, setValue] = useState<S>();
-
-  const handleUpdate = async () => {
-    const response = await db.update(table, {
-      id: doc.id,
-      [field]: value,
-    });
-  };
-
-  return [
-    (_value?: S) => {
-      if (!_value) return value;
-
-      setValue(_value);
-    },
-    handleUpdate,
-  ];
 }

@@ -2,14 +2,15 @@
  * Vendor imports.
  */
 
-import { lazy } from "react";
+import { useEffect, lazy } from "react";
 import { Switch, Route } from "react-router-dom";
 
 /**
  * Custom imports.
  */
+import { useDB } from "../../hooks";
+
 const Create = lazy(() => import("./create"));
-const Success = lazy(() => import("./success"));
 const Verified = lazy(() => import("./verified"));
 
 /**
@@ -21,11 +22,20 @@ interface Props {}
  * account functional component.
  */
 export default function account({}: Props) {
+  const { db } = useDB();
+
+  useEffect(() => {
+    db.onAuthChange((event, session) => {
+      console.log(event, session);
+    });
+  }, []);
+
   return (
     <section>
       <Switch>
-        <Route path="/account/new" component={Create} />
-        <Route path="/account/success" component={Success} />
+        <Route path="/account/(new|success|error)" component={Create} />
+        {/* <Route path="/account/success" component={Create} />
+        <Route path="/account/error" component={Create} /> */}
         <Route path="/account/verified" component={Verified} />
       </Switch>
     </section>
