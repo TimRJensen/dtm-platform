@@ -37,8 +37,6 @@ export default function verified({}: Props) {
   const { dispatch } = useContext(AppStateContext);
 
   useEffect(() => {
-    console.log(db.currentUser());
-
     dispatch({
       type: "CURRENT_PATH",
       value: { section: "account", label: "new" },
@@ -47,7 +45,7 @@ export default function verified({}: Props) {
 
   return (
     <section css={css.verified}>
-      <div css={css.label}>{`(>‿◠)✌`}</div>
+      <div css={css.label}>{`ヽ(•‿•)ノ`}</div>
       <div css={css.text}>
         {`Your account has been verified and you can now login.`}
       </div>

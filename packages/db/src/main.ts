@@ -37,6 +37,7 @@ export interface AccountTable extends BaseTable {
   profileId: string;
   role: "anon" | "authenticated";
   email: string;
+  verified: boolean;
   displayName: string;
   stats: {
     infractions: number;

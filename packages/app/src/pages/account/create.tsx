@@ -15,6 +15,7 @@ import { InputType } from "../../components/FormSuggestion/FormSuggestion";
 const Form = lazy(() => import("./form"));
 const Success = lazy(() => import("./success"));
 const Error = lazy(() => import("./error"));
+const Pending = lazy(() => import("./pending"));
 
 /**
  * Types.
@@ -65,6 +66,7 @@ export default function create({}: Props) {
         path="/account/new/success"
         render={() => <Success doc={user} />}
       />
+      <Route path="/account/new/pending" component={Pending} />
       <Route path="/account/new/error" render={() => <Error error={error} />} />
     </Switch>
   );

@@ -88,6 +88,12 @@ export default function form({ suggestions, onSubmit, onError }: Props) {
   };
 
   const handleSubmit = async () => {
+    history.push(
+      generatePath(path, {
+        errorOrSuccess: "pending",
+      })
+    );
+
     const [email, password, , firstName, lastName, city, region] =
       validating.current;
 

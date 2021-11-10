@@ -1,9 +1,6 @@
 const resolve = require("path").resolve;
 const { EnvironmentPlugin } = require("webpack");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-//const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-//const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-//const DotenvPlugin = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 
@@ -27,10 +24,6 @@ module.exports = {
         ],
         exclude: /node_modules/,
       },
-      /*{
-        test: /\.css/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },*/
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
         type: "asset/resource",
@@ -48,7 +41,6 @@ module.exports = {
     },
   },
   optimization: {
-    /*minimizer: [`...`, new CssMinimizerPlugin()],*/
     splitChunks: {
       chunks: "all",
     },
@@ -59,12 +51,7 @@ module.exports = {
       BASE_URL: "",
       SUPABASE_PROD_ANON_KEY: "",
     }),
-    //new DotenvPlugin({ path: "./packages/db/.env" }),
     new CleanWebpackPlugin(),
-    /*new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "[id].css",
-    }),*/
     new CopyPlugin({
       patterns: [
         {
