@@ -12,9 +12,17 @@ import { Dropdown } from "../Dropdown/Dropdown";
 /**
  * Types.
  */
+export type InputType<
+  T = { [key: string]: string },
+  K extends keyof T = keyof T
+> = {
+  key: K;
+  data: Pick<T, K>[];
+};
+
 interface Props {
   label: string;
-  suggestions: { key: string; data: { [key: string]: string }[] } | undefined;
+  suggestions: InputType | undefined;
   beginIndex?: number;
   validate?: (value: string) => boolean;
   onChange?: (value: string) => void;
@@ -97,7 +105,7 @@ export function FormSuggestion({
     },
   }));
   const [items, setItems] = useState<string[]>();
-  const [value, setValue] = useState("Rødovre");
+  const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
 
   useEffect(() => {
