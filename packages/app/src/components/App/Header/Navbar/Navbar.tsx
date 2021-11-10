@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
  * Custom imports.
  */
 import { useCSS } from "../../../../hooks";
+import { Button } from "../../../Button/Button";
 import { FontIcon } from "../../../FontIcon/FontIcon";
 import { AppStateContext } from "../../app-state/main";
 import { Searchbar } from "./Searchbar/Searchbar";
@@ -41,14 +42,11 @@ export function Navbar() {
     delimeter: {
       margin: `0 ${spacing}px 0 ${spacing}px`,
     },
-    controls: {
-      display: "flex",
-      justifyContent: "center",
-      backgroundColor: colors.secondary,
-    },
-    fontIcon: {
+    buttonHome: {
+      height: "auto",
+      width: "auto",
+      margin: `0 ${spacing}px 0 0`,
       color: colors.primary,
-      fontSize: 36,
     },
   }));
   const { state } = useContext(AppStateContext);
@@ -71,9 +69,9 @@ export function Navbar() {
         </div>
       ) : null}
       <Searchbar />
-      <div css={css.controls}>
-        <FontIcon $css={{ icon: css.fontIcon }} type="account_circle" />
-      </div>
+      <Button $css={{ button: css.buttonHome }} type="transparent">
+        <FontIcon type="account_circle" size={42} />
+      </Button>
     </section>
   );
 }

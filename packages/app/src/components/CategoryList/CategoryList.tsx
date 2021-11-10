@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
  */
 import { CategoryType } from "db";
 import { useDB, useCSS } from "../../hooks";
+import { Button } from "../Button/Button";
 import { FontIcon } from "../FontIcon/FontIcon";
 import { ListItem } from "./ListItem/ListItem";
 
@@ -44,11 +45,13 @@ export function CategoryList() {
       display: "flex",
       alignItems: "center",
     },
-    fontIcon: {
+    button: {
       height: 24,
       width: 24,
-      left: 240,
       margin: `0 ${spacing}px 0 auto`,
+      color: colors.secondary,
+    },
+    fontIcon: {
       transform: "rotate(180deg)",
       transition: "transform 1s ease",
     },
@@ -92,11 +95,13 @@ export function CategoryList() {
         <div css={css.label} data-type="title">
           CATEGORIES
         </div>
-        <FontIcon
-          $css={{ fontIcon: css.fontIcon }}
-          type="double_arrow"
+        <Button
+          $css={{ button: css.button }}
+          type="transparent"
           onClick={() => setShow(!show)}
-        />
+        >
+          <FontIcon $css={{ fontIcon: css.fontIcon }} type="double_arrow" />
+        </Button>
       </header>
       <ListItem doc={{ id: "popular", label: "popular", subCategories: [] }} />
       {categories

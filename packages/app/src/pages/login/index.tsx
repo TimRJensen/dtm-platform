@@ -63,10 +63,9 @@ export default function login({}: Props) {
     },
     magicLink: {
       color: "#6851FF",
-      fontSize: 36,
     },
     artiFACT: {
-      fontSize: 42,
+      color: colors.secondary,
     },
     link: {
       color: colors.text.link,
@@ -120,6 +119,7 @@ export default function login({}: Props) {
                     <FontIcon
                       $css={{ fontIcon: css.fontIcon, icon: css.magicLink }}
                       type="auto_fix_high"
+                      size={38}
                     />
                     Login with magiclink
                   </Button>
@@ -134,6 +134,7 @@ export default function login({}: Props) {
                     <FontIcon
                       $css={{ fontIcon: css.fontIcon, icon: css.artiFACT }}
                       type="account_circle"
+                      size={48}
                     />
                     Login with ArtiFACT
                   </Button>

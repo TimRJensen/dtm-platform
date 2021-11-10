@@ -60,6 +60,7 @@ export default function search() {
       }));
 
     if ("error" in response) {
+      console.log(response);
       return;
     }
 

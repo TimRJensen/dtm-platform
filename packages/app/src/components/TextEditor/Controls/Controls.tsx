@@ -6,6 +6,7 @@ import { EditorState, RichUtils } from "draft-js";
 /**
  * Custom imports.
  */
+import { Button } from "../../Button/Button";
 import { FontIcon } from "../../FontIcon/FontIcon";
 import { useCSS } from "../../../hooks";
 
@@ -41,28 +42,45 @@ export function Controls({ editorState, onToggle }: Props) {
       height: "inherit",
       marginLeft: spacing,
     },
+    button: {
+      width: "auto",
+      color: colors.secondary,
+      "&[data-disabled=false]:hover": {
+        color: colors.secondaryDarker,
+      },
+      ":not(:last-of-type)": {
+        margin: `0 ${spacing / 4}px 0 0`,
+      },
+    },
   }));
 
   return (
     <div css={css.textEditorControls}>
       <span css={css.controlGroup}>
         {inlineControls.map((control) => (
-          <FontIcon
+          <Button
             key={`text-control-button-${control.type}`}
-            type={control.fontIcon}
-            active={editorState.getCurrentInlineStyle().has(control.type)}
+            $css={{ button: css.button }}
+            type="transparent"
+            toggled={editorState.getCurrentInlineStyle().has(control.type)}
             onToggle={() =>
               onToggle(RichUtils.toggleInlineStyle(editorState, control.type))
             }
-          />
+          >
+            <FontIcon
+              key={`text-control-button-${control.type}`}
+              type={control.fontIcon}
+            />
+          </Button>
         ))}
       </span>
       <span css={css.controlGroup}>
         {blockControls.map((control) => (
-          <FontIcon
+          <Button
             key={`text-control-button-${control.type}`}
-            type={control.fontIcon}
-            active={
+            $css={{ button: css.button }}
+            type="transparent"
+            toggled={
               editorState
                 .getCurrentContent()
                 .getBlockForKey(editorState.getSelection().getStartKey())
@@ -71,7 +89,9 @@ export function Controls({ editorState, onToggle }: Props) {
             onToggle={() =>
               onToggle(RichUtils.toggleBlockType(editorState, control.type))
             }
-          />
+          >
+            <FontIcon type={control.fontIcon} />
+          </Button>
         ))}
       </span>
     </div>

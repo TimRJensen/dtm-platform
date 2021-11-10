@@ -21,10 +21,9 @@ export function Searchbar() {
       searchBar: {
         height: searchBar.height,
         width: searchBar.width,
-        border: `1px solid ${colors.primary}`,
         margin: `0 ${spacing}px 0 auto`,
         borderRadius,
-        backgroundColor: colors.primaryLighter,
+        backgroundColor: colors.primary,
       },
       form: {
         display: "flex",
@@ -35,12 +34,15 @@ export function Searchbar() {
       input: {
         height: "inherit",
         width: "inherit",
-        marginRight: "auto",
         paddingLeft: spacing,
         border: 0,
         outline: "none",
         backgroundColor: "transparent",
         color: colors.text.secondary,
+      },
+      fontIcon: {
+        margin: `0 ${spacing}px 0 0`,
+        color: colors.secondary,
       },
     })
   );
@@ -56,7 +58,7 @@ export function Searchbar() {
           value={input()}
           ref={domElement}
         />
-        <FontIcon type="search" disabled />
+        <FontIcon $css={{ fontIcon: css.fontIcon }} type="search" />
       </form>
     </div>
   );

@@ -11,6 +11,7 @@ import { ArtifactType } from "db";
 import { AppStateContext } from "../../App/app-state/main";
 import { InfoBox } from "./InfoBox/InfoBox";
 import { Tag } from "./Tag/Tag";
+import { Button } from "../../Button/Button";
 import { FontIcon } from "../../FontIcon/FontIcon";
 
 /**
@@ -35,8 +36,15 @@ export function Panel({ doc, onComment }: Props) {
       borderLeft: `1px solid ${colors.primary}`,
       padding: spacing,
     },
-    fontIcon: {
-      paddingTop: spacing,
+    button: {
+      color: colors.secondary,
+      "&[data-disabled=false]:hover": {
+        color: colors.secondaryDarker,
+      },
+    },
+    divider: {
+      width: "calc(100% - 20px)",
+      margin: `${spacing}px 0`,
       borderTop: `1px solid ${colors.primary}`,
     },
   }));
@@ -51,14 +59,15 @@ export function Panel({ doc, onComment }: Props) {
           <Tag key={`${doc.id}-${tag}-${i}`}>{tag}</Tag>
         ))}
       </InfoBox>
-      <FontIcon
-        $css={{ fontIcon: css.fontIcon }}
-        type="chat_bubble"
+      <div css={css.divider}></div>
+      <Button
+        $css={{ button: css.button }}
+        type="transparent"
         onClick={onComment}
         disabled={!state.currentUser}
       >
-        comment
-      </FontIcon>
+        <FontIcon type="chat_bubble">comment</FontIcon>
+      </Button>
     </div>
   );
 }

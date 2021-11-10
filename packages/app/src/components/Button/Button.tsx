@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { ReactNode } from "react";
+import { ReactNode, MouseEvent } from "react";
 
 /**
  * Custom imports.
@@ -15,9 +15,11 @@ interface Props {
   $css?: {
     button: ReturnType<typeof useCSS>["css"][string];
   };
-  type?: "default" | "accept";
+  type?: "default" | "accept" | "transparent";
+  toggled?: boolean;
   disabled?: boolean;
   onClick?: () => void;
+  onToggle?: () => void;
   children?: ReactNode;
 }
 
@@ -28,7 +30,9 @@ export function Button({
   $css,
   type = "default",
   disabled = false,
+  toggled,
   onClick,
+  onToggle,
   children,
   ...rest
 }: Props) {
@@ -47,7 +51,11 @@ export function Button({
         cursor: "pointer",
       },
       "&[data-disabled=true]": {
-        backgroundColor: colors.button.disabled,
+        backgroundColor: colors.button[`${type}Disabled`],
+        color: colors.text.disabled,
+      },
+      "&[data-toggled=false]": {
+        backgroundColor: colors.button[`${type}Disabled`],
         color: colors.text.disabled,
       },
     },
@@ -68,11 +76,21 @@ export function Button({
     }
   };
 
+  const handleToggle = (event: MouseEvent) => {
+    event.preventDefault();
+
+    if (onToggle) {
+      onToggle();
+    }
+  };
+
   return (
     <button
       css={[css.button, $css?.button]}
       onClick={!disabled ? handleClick : undefined}
+      onMouseDown={!disabled ? handleToggle : undefined}
       data-disabled={disabled}
+      data-toggled={toggled}
     >
       {children}
     </button>

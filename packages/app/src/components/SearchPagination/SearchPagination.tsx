@@ -8,6 +8,7 @@ import { Link, useParams, generatePath } from "react-router-dom";
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
+import { Button } from "../Button/Button";
 import { FontIcon } from "../FontIcon/FontIcon";
 
 /**
@@ -33,38 +34,40 @@ export function SearchPagination({
 }: Props) {
   if (!total) return null;
 
-  const { css } = useCSS(
-    ({ spacing, borderRadius, colors, mixins: { button } }) => ({
-      searchPagination: {
-        display: "flex",
-        alignItems: "center",
-        margin: "auto",
-        padding: spacing,
-      },
-      button: [
-        button,
-        {
-          height: "auto",
-          width: "auto",
-          marginRight: spacing * 0.5,
-          borderRadius: borderRadius * 0.5,
-          "&:hover, &[data-active=true]": {
-            backgroundColor: colors.secondary,
-          },
-        },
-      ],
-      divider: {
-        marginRight: spacing * 0.5,
-      },
-      arrow: {
-        color: colors.primary,
+  const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
+    searchPagination: {
+      display: "flex",
+      alignItems: "center",
+      margin: "auto",
+      padding: spacing,
+    },
+    button: {
+      height: 25,
+      width: 25,
+      borderRadius: borderRadius * 0.5,
+      margin: `0 ${spacing / 2}px 0 0`,
 
-        "&:hover": {
-          color: colors.secondary,
-        },
+      "&[data-toggled=true]": {
+        backgroundColor: colors.secondary,
       },
-    })
-  );
+      "&[data-toggled=false]": {
+        backgroundColor: colors.primary,
+        color: colors.text.secondary,
+      },
+    },
+    divider: {
+      margin: `0 ${spacing / 2}px 0 0`,
+    },
+    arrow: {
+      color: colors.primary,
+      ":not(:last-of-type)": {
+        margin: `0 ${spacing / 2}px 0 0`,
+      },
+      "&:hover": {
+        color: colors.secondary,
+      },
+    },
+  }));
   const { query } = useParams<Params>();
   const [pages, setPages] = useState<(string | number)[]>();
   const maxPages = Math.ceil(total / resultsPerPage);
@@ -103,12 +106,15 @@ export function SearchPagination({
             query,
             pageId: currentPage - 1,
           })}
-        >
-          <FontIcon
-            type="keyboard_double_arrow_left"
-            $css={{ icon: css.arrow }}
-          />
-        </Link>
+          component={(rest) => (
+            <Button $css={{ button: css.button }} type="transparent" {...rest}>
+              <FontIcon
+                type="keyboard_double_arrow_left"
+                $css={{ icon: css.arrow }}
+              />
+            </Button>
+          )}
+        />
       ) : null}
       {pages.map((value, i) =>
         typeof value === "number" ? (
@@ -118,11 +124,16 @@ export function SearchPagination({
               query,
               pageId: value - 1,
             })}
-          >
-            <button css={css.button} data-active={value - 1 === currentPage}>
-              {value}
-            </button>
-          </Link>
+            component={(rest) => (
+              <Button
+                $css={{ button: css.button }}
+                toggled={value - 1 === currentPage}
+                {...rest}
+              >
+                {value}
+              </Button>
+            )}
+          />
         ) : (
           <span key={`search-pagination-${value}-${i}`} css={css.divider}>
             {value}
@@ -135,12 +146,15 @@ export function SearchPagination({
             query,
             pageId: currentPage + 1,
           })}
-        >
-          <FontIcon
-            type="keyboard_double_arrow_right"
-            $css={{ icon: css.arrow }}
-          />
-        </Link>
+          component={(rest) => (
+            <Button $css={{ button: css.button }} type="transparent" {...rest}>
+              <FontIcon
+                type="keyboard_double_arrow_right"
+                $css={{ icon: css.arrow }}
+              />
+            </Button>
+          )}
+        />
       ) : null}
     </div>
   ) : null;

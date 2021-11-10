@@ -63,7 +63,7 @@ export function FormSelect({ items, label, validate }: Props) {
     },
     fontIcon: {
       margin: "0 0 0 auto",
-      "&:hover": {},
+      color: colors.secondary,
     },
     items: {
       border: `1px solid ${colors.input.defaultBorder}`,

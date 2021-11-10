@@ -7,6 +7,7 @@ import { useState } from "react";
  * Custom imports.
  */
 import { useCSS } from "../../../hooks";
+import { Button } from "../../Button/Button";
 import { FontIcon } from "../../FontIcon/FontIcon";
 
 /**
@@ -36,7 +37,7 @@ export function Dropdown({ onEdit }: Props) {
         },
       },
     },
-    label: {
+    text: {
       color: colors.text.secondary,
     },
     controls: {
@@ -58,31 +59,25 @@ export function Dropdown({ onEdit }: Props) {
       onClick={() => setShow(!show)}
     >
       <div css={css.controls} data-show={show}>
-        <FontIcon
-          $css={{ fontIcon: css.fontIcon, label: css.label }}
-          type="edit"
-          onClick={onEdit}
-        >
-          edit
-        </FontIcon>
-        <FontIcon
-          $css={{ fontIcon: css.fontIcon, label: css.label }}
-          type="delete"
-        >
-          delete
-        </FontIcon>
-        <FontIcon
-          $css={{ fontIcon: css.fontIcon, label: css.label }}
-          type="not_interested"
-        >
-          ban
-        </FontIcon>
+        <Button onClick={onEdit}>
+          <FontIcon $css={{ text: css.text }} type="edit">
+            edit
+          </FontIcon>
+        </Button>
+        <Button onClick={undefined}>
+          <FontIcon $css={{ text: css.text }} type="delete">
+            delete
+          </FontIcon>
+        </Button>
+        <Button onClick={undefined}>
+          <FontIcon $css={{ text: css.text }} type="not_interested">
+            ban
+          </FontIcon>
+        </Button>
       </div>
-      <FontIcon
-        $css={{ fontIcon: css.fontIcon }}
-        type="more_horiz"
-        disabled={false}
-      ></FontIcon>
+      <Button>
+        <FontIcon type="more_horiz"></FontIcon>
+      </Button>
     </div>
   );
 }

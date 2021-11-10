@@ -29,14 +29,13 @@ const colors = {
   button: {
     default: "#004153",
     defaultHover: " #00313E",
+    defaultDisabled: "rgba(0, 65, 83, 0.2)",
     accept: "#FF8000",
     acceptHover: "#E07000",
-    disabled: "rgba(0, 65, 83, 0.2)",
-  },
-  fontIcon: {
-    default: "#86A3AC",
-    defaultActive: "#FF8000",
-    defaultHover: "#E07000",
+    acceptDisabled: "rgba(0, 65, 83, 0.2)",
+    transparent: "transparent",
+    transparentHover: "transparent",
+    transparentDisabled: "transparent",
   },
   tag: {
     default: "#FF8000",
