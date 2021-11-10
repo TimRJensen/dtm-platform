@@ -77,9 +77,8 @@ export function Button({
   };
 
   const handleToggle = (event: MouseEvent) => {
-    event.preventDefault();
-
     if (onToggle) {
+      event.preventDefault();
       onToggle();
     }
   };

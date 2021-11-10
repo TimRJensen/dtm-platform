@@ -27,7 +27,7 @@ interface Props {
  * success functional component.
  */
 export default function success({ doc }: Props) {
-  const { css } = useCSS(({ spacing }) => ({
+  const { css } = useCSS(({ spacing, colors }) => ({
     success: {
       display: "flex",
       flexFlow: "column",
@@ -60,9 +60,9 @@ export default function success({ doc }: Props) {
       alignSelf: "start",
       height: 24,
       width: 24,
-      backgroundColor: "transparent",
+      color: colors.secondary,
       "&[data-disabled=false]:hover": {
-        backgroundColor: "transparent",
+        color: colors.secondaryDarker,
       },
     },
     buttonSubmit: {
@@ -155,7 +155,11 @@ export default function success({ doc }: Props) {
               value.current = _value;
             }}
           />
-          <Button $css={{ button: css.buttonModify }} onClick={handleAdd}>
+          <Button
+            $css={{ button: css.buttonModify }}
+            type="transparent"
+            onClick={handleAdd}
+          >
             <FontIcon type="add" />
           </Button>
           <div css={css.items}>
@@ -163,6 +167,7 @@ export default function success({ doc }: Props) {
               <div key={`interest-${item}-${i}`} css={css.item}>
                 <Button
                   $css={{ button: css.buttonModify }}
+                  type="transparent"
                   onClick={handleRemove(i)}
                 >
                   <FontIcon type="remove" />
