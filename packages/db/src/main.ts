@@ -186,7 +186,7 @@ const key =
 const redirectURL = `${
   process.env.NODE_ENV === "development"
     ? "http://localhost:1234"
-    : "https://dtmplatform.vercel.app/"
+    : /*"https://dtmplatform.vercel.app/"*/ process.env.BASE_URL
 }/account/verified`;
 
 // N.B. Remove this eventually
