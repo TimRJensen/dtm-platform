@@ -299,6 +299,11 @@ class SupabaBaseWrapper {
       )
       .range(range?.from, range?.to - 1);
 
+    if (!response.error) {
+      // @ts-ignore
+      delete response.error;
+    }
+
     return response;
   }
 
