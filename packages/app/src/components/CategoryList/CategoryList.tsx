@@ -75,7 +75,9 @@ export function CategoryList() {
       {}
     );
 
-    if (!response) return;
+    if ("error" in response) {
+      return;
+    }
 
     setCategories(response);
   };

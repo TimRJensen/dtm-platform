@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
