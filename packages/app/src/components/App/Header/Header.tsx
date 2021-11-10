@@ -66,15 +66,15 @@ export function Header() {
         animation: `${rotate(2)} 8s ease 2s`,
       },
     },
+    divider: {
+      height: 115,
+      borderRight: `5px solid ${colors.text.secondary}`,
+      transform: "translateY(10px)",
+    },
     logo: {
-      color: colors.text.secondary,
-      fontSize: 100,
-      ":nth-of-type(3)": {
+      overflow: "hidden",
+      "& img": {
         width: 430,
-        overflow: "hidden",
-      },
-      "& .image": {
-        width: "inherit",
         position: "relative",
         left: -25,
         transform: "translateX(-430px)",
@@ -91,9 +91,9 @@ export function Header() {
           <Gear css={css.gear} />
           <Gear css={css.gear} />
         </div>
-        {<div css={css.logo}>|</div>}
+        <div css={css.divider}>|</div>
         <div css={[css.logo]}>
-          <img className="image" src={logo} />
+          <img src={logo} />
         </div>
       </div>
       <Navbar />
