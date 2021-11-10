@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useRef, ReactNode, ReactElement } from "react";
+import { useState, useRef, ReactNode, ReactElement } from "react";
 
 /**
  * Custom imports.
@@ -30,7 +30,7 @@ interface Props {
 export function Dropdown({
   $css,
   label,
-  conditional,
+  conditional = true,
   focusable = false,
   children,
   ...props
@@ -63,18 +63,12 @@ export function Dropdown({
         items.style.left = `${element?.getBoundingClientRect()?.left}px`;
       }
 
-      setToggled(conditional ?? true);
+      setToggled(true);
     } else {
       dropdownElement.current?.blur();
       setToggled(false);
     }
   };
-
-  useEffect(() => {
-    if (conditional !== undefined) {
-      setToggled(conditional);
-    }
-  }, [conditional]);
 
   return (
     <div
@@ -93,11 +87,11 @@ export function Dropdown({
         }
       }}
       onBlur={() => setToggled(false)}
-      data-toggled={toggled}
+      data-toggled={conditional && toggled}
       {...props}
     >
       {typeof label === "string" ? <div css={$css?.label}>{label}</div> : label}
-      <div css={[css.items, $css?.items]} data-toggled={toggled}>
+      <div css={[css.items, $css?.items]} data-toggled={conditional && toggled}>
         {children}
       </div>
     </div>
