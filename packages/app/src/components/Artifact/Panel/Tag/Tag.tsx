@@ -7,6 +7,7 @@ import { Link, generatePath } from "react-router-dom";
  * Custom imports.
  */
 import { useCSS } from "../../../../hooks";
+import { Button } from "../../../Button/Button";
 
 /**
  * Types.
@@ -22,15 +23,14 @@ interface Props {
  */
 export function Tag({ children }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
-    artifactTag: {
-      display: "inline-block",
+    button: {
+      height: "auto",
+      width: "auto",
       margin: `0 ${0.5 * spacing}px ${0.5 * spacing}px 0`,
       padding: `0 ${spacing}px`,
       backgroundColor: colors.tag.default,
       borderRadius,
-      color: colors.text.secondary,
-      textAlign: "center",
-      "&:hover": {
+      "&[data-disabled=false]:hover": {
         backgroundColor: colors.tag.defaultHover,
       },
     },
@@ -38,11 +38,15 @@ export function Tag({ children }: Props) {
 
   return (
     <Link
-      css={css.artifactTag}
       to={generatePath(path, {
         query: children.split(" ").join("+"),
         page: 0,
       })}
+      component={(rest) => (
+        <Button $css={{ button: css.button }} {...rest}>
+          {children}
+        </Button>
+      )}
     >
       {children}
     </Link>
