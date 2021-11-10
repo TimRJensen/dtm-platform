@@ -71,7 +71,9 @@ export default function index() {
         }
       );
 
-      if (!response) return;
+      if ("error" in response) {
+        return;
+      }
 
       setDocs(response);
     } else {
@@ -86,7 +88,9 @@ export default function index() {
         }
       );
 
-      if (!response) return;
+      if ("error" in response) {
+        return; //return 404
+      }
 
       const result = [];
 

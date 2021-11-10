@@ -1,12 +1,19 @@
 /**
  * Vendor imports.
  */
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  SupabaseClient,
+  AuthChangeEvent,
+  Session,
+  PostgrestError,
+} from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
 /**
  * Types.
  */
+export type ErrorType = PostgrestError | { message: string; status: number };
 
 /* BaseTable. */
 interface BaseTable {
@@ -39,6 +46,7 @@ export interface AccountTable extends BaseTable {
     totalDownvotes: number;
   };
 }
+export type AccountType = AccountTable;
 export type UserType = Omit<
   AccountTable,
   "createdAt" | "updatedAt" | "profileId"
@@ -144,7 +152,6 @@ export type CommentType = Pick<
 
 /* AllTables. */
 export type AllTables =
-  | BaseTable
   | ProfileTable
   | AccountTable
   | CategoryTable
@@ -182,6 +189,11 @@ const redirectURL = `${
     : "https://dtmplatform.vercel.app/"
 }/account/verified`;
 
+// N.B. Remove this eventually
+if (process.env.NODE_ENV === "development") {
+  console.log("dev");
+}
+
 class SupabaBaseWrapper {
   private supabase: SupabaseClient;
 
@@ -206,7 +218,9 @@ class SupabaBaseWrapper {
       })
       .range(range.from, range.to - 1);
 
-    if (response.error) console.log(response.error);
+    if (response.error) {
+      return response;
+    }
 
     return response.data;
   }
@@ -219,9 +233,13 @@ class SupabaBaseWrapper {
     const response = await this.supabase
       .from<T>(table)
       .select(query)
-      .match(match);
+      .match(match)
+      .limit(1)
+      .single();
 
-    if (response.error) console.log(response.error);
+    if (response.error) {
+      return response;
+    }
 
     return response.data;
   }
@@ -246,7 +264,9 @@ class SupabaBaseWrapper {
       )
       .range(range.from, range.to);
 
-    if (response.error) console.log(response.error);
+    if (response.error) {
+      return response;
+    }
 
     return response.data;
   }
@@ -279,9 +299,24 @@ class SupabaBaseWrapper {
       )
       .range(range?.from, range?.to - 1);
 
-    if (response.error) console.log(response.error);
+    return response;
+  }
 
-    return { count: response.count, results: response.data };
+  async has<T extends AllTables>(
+    table: AllTableNames,
+    query: string,
+    match: Partial<T>
+  ) {
+    const response = await this.supabase
+      .from<T>(table)
+      .select(query, { head: true, count: "exact" })
+      .match(match);
+
+    if (response.error) {
+      return response;
+    }
+
+    return response.count! > 0;
   }
 
   async insert<T extends AllTables>(
@@ -301,7 +336,9 @@ class SupabaBaseWrapper {
         }))
       );
 
-    if (response.error) console.log(response.error);
+    if (response.error) {
+      return response;
+    }
 
     return response.data;
   }
@@ -316,7 +353,9 @@ class SupabaBaseWrapper {
       .update({ ...value, updatedAt: new Date().toISOString() })
       .match(match ?? { id: value.id });
 
-    if (response.error) console.log(response.error);
+    if (response.error) {
+      return response;
+    }
 
     return response.data;
   }
@@ -337,7 +376,7 @@ class SupabaBaseWrapper {
       region: string;
       country: string;
     }
-  ): Promise<UserType[] | null> {
+  ) {
     const { user, error } = await this.supabase.auth.signUp(
       { email, password },
       {
@@ -347,10 +386,10 @@ class SupabaBaseWrapper {
 
     if (error) {
       console.log(error);
-      return null;
+      return { error };
     }
 
-    const profile = await this.insert<ProfileTable>("profiles", [
+    const profileInsert = await this.insert<ProfileTable>("profiles", [
       {
         firstName,
         lastName,
@@ -361,39 +400,44 @@ class SupabaBaseWrapper {
       },
     ]);
 
-    if (!profile) {
-      return null;
+    if ("error" in profileInsert) {
+      return profileInsert;
     }
 
-    const now = new Date().toISOString();
-
-    const _user = await this.supabase.from<AccountTable>("accounts").insert([
-      {
-        id: user?.id,
-        createdAt: now,
-        updatedAt: now,
-        profileId: profile[0].id,
-        role: user?.role as AccountTable["role"],
-        email,
-        displayName: `${profile[0].firstName} ${profile[0].lastName}`,
-        stats: {
-          infractions: 0,
-          totalComments: 0,
-          totalPosts: 0,
-          totalDownvotes: 0,
-          totalUpvotes: 0,
+    const [profile] = profileInsert;
+    const accountInsert = await this.supabase
+      .from<AccountTable>("accounts")
+      .insert([
+        {
+          id: user?.id,
+          createdAt: profile.createdAt,
+          updatedAt: profile.updatedAt,
+          profileId: profile.id,
+          role: user?.role as AccountTable["role"],
+          email,
+          displayName: `${profile.firstName} ${profile.lastName}`,
+          stats: {
+            infractions: 0,
+            totalComments: 0,
+            totalPosts: 0,
+            totalDownvotes: 0,
+            totalUpvotes: 0,
+          },
         },
-      },
-    ]);
+      ]);
 
-    if (_user.error) {
-      console.log(_user.error);
+    if (accountInsert.error) {
+      console.log(accountInsert.error);
+      return accountInsert;
     }
-    console.log(user);
-    console.log(profile[0]);
-    console.log(_user.data![0]);
 
-    return _user.data;
+    return accountInsert.data[0];
+  }
+
+  onAuthChange(
+    callback: (event: AuthChangeEvent, session: Session | null) => void
+  ) {
+    this.supabase.auth.onAuthStateChange(callback);
   }
 
   currentUser() {

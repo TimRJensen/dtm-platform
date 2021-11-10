@@ -21,8 +21,8 @@ const resultsPerPage = 10;
 
 type Params = { query: string; pageId: string };
 type ResponseType = {
-  count: number | null;
-  results: ArtifactType[] | null;
+  count: number;
+  data: ArtifactType[];
 };
 
 /**
@@ -44,7 +44,7 @@ export default function search() {
   const [results, setResults] = useState<ArtifactType[]>();
   const cache = useRef(new Map<string, ResponseType>());
 
-  const [total, setTotal] = useState<number>(0);
+  const [total, setTotal] = useState(0);
 
   const fetch = async () => {
     const currentRange = Number.parseInt(pageId) * resultsPerPage;
@@ -59,11 +59,13 @@ export default function search() {
         },
       }));
 
-    if (!response.results) return;
+    if ("error" in response) {
+      return;
+    }
 
     cache.current.set(query + pageId, response);
-    setResults(response.results);
-    setTotal(response.count!);
+    setResults(response.data);
+    setTotal(response.count);
     dispatch({
       type: "CURRENT_PATH",
       value: { section: "search", label: query.split("+").join(" & ") },

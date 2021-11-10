@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 /**
  * Custom imports.
  */
+// @ts-ignore
 import { DBContext, PostTable, BlogType, PostType } from "db";
 import { AppStateContext } from "../components/App/app-state/context";
 import { useDB } from ".";
@@ -18,7 +19,9 @@ import { useDB } from ".";
  * useIsUpvoted hook.
  */
 export function useIsUpvoted(doc: PostType) {
+  // @ts-ignore
   const { db, queries } = useDB();
+  // @ts-ignore
   const { state, dispatch } = useContext(AppStateContext);
   const [isUpvoted, setIsUpvoted] = useState(
     state.currentUser
@@ -55,12 +58,13 @@ export function useIsUpvoted(doc: PostType) {
         });
 
       setIsUpvoted(!isUpvoted);
-      dispatch({
+      // N.B. I don't think I need this.
+      /*dispatch({
         type: "CURRENT_BLOG",
         value: (await db.selectExact<BlogType>("blogs", queries.blog, {
           match: { id: state.currentBlog.id },
         }))![0],
-      });
+      });*/
     },
   };
 }

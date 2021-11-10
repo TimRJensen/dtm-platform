@@ -59,19 +59,15 @@ export function App({ db }: Props) {
     showEditor: undefined,
   });
 
-  const fetch = async () => {
+  /*const fetch = async () => {
     const response = await db.selectExact<AccountTable>("accounts", "*", {
       match: { displayName: "Arthur Fonzarelli" },
     });
-
-    if (response && response.length) {
-      //dispatch({ type: "CURRENT_USER", value: response[0] });
-    }
   };
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, []);*/
 
   return (
     <DBProvider value={db}>
@@ -110,7 +106,7 @@ export function App({ db }: Props) {
               />
               <Route
                 exact
-                path="/account/:newOrExisting?"
+                path="/account/:newOrExisting?/:errorOrSucces?"
                 render={() => (
                   <Suspense fallback={<div />}>
                     <_Account />

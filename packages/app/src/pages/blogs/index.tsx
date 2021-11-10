@@ -48,13 +48,15 @@ export default function blog({ blog }: Props) {
       match: { id: blogId },
     });
 
-    if (!response) return;
+    if ("error" in response) {
+      return; //return 404
+    }
 
     dispatch({
       type: "ANY",
       value: {
-        currentBlog: response[0],
-        currentPath: { section: "artifact", label: response[0].artifact.label },
+        currentBlog: response,
+        currentPath: { section: "artifact", label: response.artifact.label },
       },
     });
   };

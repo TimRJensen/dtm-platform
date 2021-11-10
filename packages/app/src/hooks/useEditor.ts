@@ -7,7 +7,6 @@ import { useContext } from "react";
  * Custom imports.
  */
 import {
-  DBContext,
   BlogTable,
   PostTable,
   CommentTable,
@@ -43,6 +42,10 @@ export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
             content,
           }
         );
+
+        if ("error" in response) {
+          return;
+        }
       } else {
         if ("comments" in doc) {
           const response = await Promise.all([
@@ -65,6 +68,10 @@ export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
               },
             }),
           ]);
+
+          if ("error" in response) {
+            return;
+          }
         } else if ("posts" in doc) {
           const response = await Promise.all([
             db.insert<PostTable>("posts", [
@@ -91,15 +98,25 @@ export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
               },
             }),
           ]);
+
+          if ("error" in response) {
+            return;
+          }
         }
       }
 
       // Update the view.
+      const response = await db.selectExact<BlogType>("blogs", queries.blog, {
+        match: { id: state.currentBlog.id },
+      });
+
+      if ("error" in response) {
+        return;
+      }
+
       dispatch({
         type: "CURRENT_BLOG",
-        value: (await db.selectExact<BlogType>("blogs", queries.blog, {
-          match: { id: state.currentBlog.id },
-        }))![0],
+        value: response,
       });
       showEditor(false);
     },
