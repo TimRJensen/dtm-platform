@@ -55,7 +55,10 @@ module.exports = {
   },
   devtool: "source-map",
   plugins: [
-    new EnvironmentPlugin([BASE_URL, SUPABASE_PROD_ANON_KEY]),
+    new EnvironmentPlugin({
+      BASE_URL: "",
+      SUPABASE_PROD_ANON_KEY: "",
+    }),
     //new DotenvPlugin({ path: "./packages/db/.env" }),
     new CleanWebpackPlugin(),
     /*new MiniCssExtractPlugin({
