@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef } from "react";
+import { useState, KeyboardEvent } from "react";
 
 /**
  * Custom imports.
@@ -41,6 +41,9 @@ export default function FormSelect({ items, label, validate }: Props) {
       cursor: "default",
       "&:focus": {
         border: `1px solid ${colors.input.defaultBorder}`,
+        borderRadius: borderRadius / 2,
+      },
+      "&[data-toggled=true]:focus": {
         borderBottom: "1px solid transparent",
         borderRadius: `${borderRadius / 2}px ${borderRadius / 2}px 0 0`,
       },
@@ -73,27 +76,50 @@ export default function FormSelect({ items, label, validate }: Props) {
     item: {
       padding: `0 0 0 2px`,
       clear: "both",
-      "&:hover, &[data-toggled=true]": {
+      "&[data-toggled=true]": {
         backgroundColor: colors.secondary,
         color: colors.text.secondary,
       },
     },
   }));
+  const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
-  const value = useRef<string>();
+
+  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
+    switch (event.key) {
+      case "ArrowUp": {
+        const i = items.indexOf(value) - 1;
+
+        setValue(i > -1 ? items[i] : items[items.length - 1]);
+        break;
+      }
+      case "ArrowDown": {
+        const i = items.indexOf(value) + 1;
+
+        setValue(i < items.length ? items[i] : items[0]);
+        break;
+      }
+      case "Escape":
+      case "Enter": {
+        (event.target as HTMLDivElement).blur();
+        break;
+      }
+    }
+  };
 
   return (
     <div
       css={css.formSelect}
       onFocus={() => setValidated(undefined)}
-      onBlur={() => setValidated(validate(value.current ?? ""))}
+      onBlur={() => setValidated(validate(value))}
+      onKeyDown={handleKeyPress}
     >
       <div css={css.label}>{label}</div>
       <Dropdown
         $css={{ dropdown: css.dropdown, items: css.items }}
         label={
           <div css={css.selected} data-validated={validated ?? ""}>
-            {value.current}
+            {value}
             <FontIcon $css={{ fontIcon: css.fontIcon }} type="expand_more" />
           </div>
         }
@@ -104,10 +130,9 @@ export default function FormSelect({ items, label, validate }: Props) {
           <div
             key={`formSelect-option-${item}`}
             css={css.item}
-            data-toggled={value.current === item}
-            onMouseDown={() => {
-              value.current = item;
-            }}
+            data-toggled={value === item}
+            onMouseOver={() => setValue(item)}
+            onMouseDown={() => setValue(item)}
           >
             {item}
           </div>

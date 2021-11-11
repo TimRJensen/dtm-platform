@@ -112,11 +112,6 @@ export default function Dropdown({
         }
         handleToggle();
       }}
-      onFocus={() => {
-        if (!toggled) {
-          handleToggle();
-        }
-      }}
       onBlur={() => setToggled(false)}
       data-toggled={conditional && toggled}
       {...props}

@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent } from "react";
 
 /**
  * Custom imports.
@@ -98,7 +98,7 @@ export default function FormSuggestion({
     item: {
       padding: `0 0 0 2px`,
       clear: "both",
-      "&:hover": {
+      "&[data-toggled=true]": {
         backgroundColor: colors.secondary,
         color: colors.text.secondary,
       },
@@ -106,6 +106,7 @@ export default function FormSuggestion({
   }));
   const [items, setItems] = useState<string[]>();
   const [value, setValue] = useState("");
+  const [suggestion, setSuggestion] = useState<number>();
   const [validated, setValidated] = useState<boolean>();
 
   useEffect(() => {
@@ -134,11 +135,45 @@ export default function FormSuggestion({
     }
   }, [value]);
 
+  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!items) {
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowUp": {
+        const i = suggestion !== undefined ? suggestion - 1 : 0;
+
+        setSuggestion(i > -1 ? i : items.length - 1);
+        break;
+      }
+      case "ArrowDown": {
+        const i = suggestion !== undefined ? suggestion + 1 : 0;
+
+        setSuggestion(i < items.length ? i : 0);
+        break;
+      }
+      case "Escape": {
+        (event.target as HTMLDivElement).blur();
+        break;
+      }
+      case "Enter": {
+        (event.target as HTMLDivElement).blur();
+
+        if (suggestion) {
+          setValue(items[suggestion]);
+        }
+        break;
+      }
+    }
+  };
+
   return (
     <div
       css={css.formCityInput}
       onFocus={() => setValidated(undefined)}
       onBlur={validate ? () => setValidated(validate(value)) : undefined}
+      onKeyDown={handleKeyPress}
     >
       <label css={css.label}>{label}</label>
       <Dropdown
@@ -158,6 +193,8 @@ export default function FormSuggestion({
               <div
                 key={`formCityInput-item-${item}-${i}`}
                 css={css.item}
+                data-toggled={suggestion === i}
+                onMouseOver={() => setSuggestion(i)}
                 onMouseDown={() => setValue(item)}
               >
                 {item}
