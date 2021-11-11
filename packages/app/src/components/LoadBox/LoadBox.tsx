@@ -20,21 +20,15 @@ import { useCSS } from "../../hooks";
  * Types.
  */
 interface Props {
-  loadables: any[] | undefined;
+  data: any[] | any;
+  loadable?: boolean;
   children: ReactElement[] | ReactElement | null;
-  once?: boolean;
-  fetchOnly?: boolean;
 }
 
 /**
  * LoadBox functional component.
  */
-export default function LoadBox({
-  loadables,
-  once = true,
-  fetchOnly = false,
-  children,
-}: Props) {
+export default function LoadBox({ data, loadable = false, children }: Props) {
   const { css, theme } = useCSS(({ sizes: { appHeader, banner } }) => ({
     loader: {
       display: "none",
@@ -53,14 +47,23 @@ export default function LoadBox({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!once) return () => setLoading(true);
-    if (fetchOnly && loadables) setLoading(false);
-  }, [loadables]);
+    if (!loadable && data) {
+      setLoading(false);
+    }
+
+    return () => {
+      if (!loading) {
+        setLoading(true);
+      }
+    };
+  }, [data, loading]);
 
   useEffect(() => {
-    if (!loadables) return;
+    if (!data) {
+      return;
+    }
 
-    if (loaded === loadables.length) {
+    if (loaded === data.length) {
       setLoading(false);
       setLoaded(0);
     }

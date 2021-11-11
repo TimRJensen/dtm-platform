@@ -8,7 +8,6 @@ import { useState, useEffect, useRef } from "react";
  */
 import { AccountType, CategoryType, ProfileTable } from "db";
 import { useCSS, useDB } from "../../hooks";
-import LoadBox from "../../components/LoadBox/LoadBox";
 import FormSuggestion, {
   InputType,
 } from "../../components/FormSuggestion/FormSuggestion";
@@ -131,58 +130,56 @@ export default function success({ doc }: Props) {
   };
 
   return (
-    <LoadBox loadables={doc ? [doc] : undefined} fetchOnly>
-      <section css={css.success}>
-        <div css={css.label}>{`(>‿◠)✌`}</div>
-        <div css={css.text}>
-          {`Your account was succesfully created, but in order to login, it needs to
+    <section css={css.success}>
+      <div css={css.label}>{`(>‿◠)✌`}</div>
+      <div css={css.text}>
+        {`Your account was succesfully created, but in order to login, it needs to
         be verified.`}
-          <br />
-          {`An email has been sent to ${doc?.email} with a verification link.`}
-        </div>
-        <div css={css.text}>
-          {`While you wait for the email to arrive, consider taking the time to add 
+        <br />
+        {`An email has been sent to ${doc?.email} with a verification link.`}
+      </div>
+      <div css={css.text}>
+        {`While you wait for the email to arrive, consider taking the time to add 
           some of your interests below:
         `}
+      </div>
+      <div css={css.interestsGroup}>
+        <FormSuggestion
+          label="Interests"
+          suggestions={data}
+          beginIndex={1}
+          onChange={(_value) => {
+            value.current = _value;
+          }}
+        />
+        <Button
+          $css={{ button: css.buttonModify }}
+          type="transparent"
+          onClick={handleAdd}
+        >
+          <FontIcon type="add" />
+        </Button>
+        <div css={css.items}>
+          {list.map((item, i) => (
+            <div key={`interest-${item}-${i}`} css={css.item}>
+              <Button
+                $css={{ button: css.buttonModify }}
+                type="transparent"
+                onClick={handleRemove(i)}
+              >
+                <FontIcon type="remove" />
+              </Button>
+              {item}
+            </div>
+          ))}
         </div>
-        <div css={css.interestsGroup}>
-          <FormSuggestion
-            label="Interests"
-            suggestions={data}
-            beginIndex={1}
-            onChange={(_value) => {
-              value.current = _value;
-            }}
-          />
-          <Button
-            $css={{ button: css.buttonModify }}
-            type="transparent"
-            onClick={handleAdd}
-          >
-            <FontIcon type="add" />
-          </Button>
-          <div css={css.items}>
-            {list.map((item, i) => (
-              <div key={`interest-${item}-${i}`} css={css.item}>
-                <Button
-                  $css={{ button: css.buttonModify }}
-                  type="transparent"
-                  onClick={handleRemove(i)}
-                >
-                  <FontIcon type="remove" />
-                </Button>
-                {item}
-              </div>
-            ))}
-          </div>
-          <Button
-            $css={{ button: css.buttonSubmit }}
-            type="accept"
-            disabled={!list[0]}
-            onClick={handleSubmit}
-          >{`Submit`}</Button>
-        </div>
-      </section>
-    </LoadBox>
+        <Button
+          $css={{ button: css.buttonSubmit }}
+          type="accept"
+          disabled={!list[0]}
+          onClick={handleSubmit}
+        >{`Submit`}</Button>
+      </div>
+    </section>
   );
 }

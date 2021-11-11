@@ -41,31 +41,34 @@ export default function search() {
 
   const { db, queries } = useDB();
   const { query, pageId } = useParams<Params>();
-  const [results, setResults] = useState<ArtifactType[]>();
+  const [result, setResult] = useState<ResponseType>();
   const cache = useRef(new Map<string, ResponseType>());
-
-  const [total, setTotal] = useState(0);
 
   const fetch = async () => {
     const currentRange = Number.parseInt(pageId) * resultsPerPage;
-    const response =
-      cache.current.get(query + pageId) ??
-      (await db.selectFuzzy<ArtifactType>("artifacts", queries.artifact, {
-        range: { from: currentRange, to: currentRange + resultsPerPage },
-        count: "exact",
-        filter: {
-          column: "label",
-          values: query.split("+"),
-        },
-      }));
 
-    if ("error" in response) {
-      return; // 404
+    if (cache.current.has(query + pageId)) {
+      setResult(cache.current.get(query + pageId));
+    } else {
+      const response =
+        cache.current.get(query + pageId) ??
+        (await db.selectFuzzy<ArtifactType>("artifacts", queries.artifact, {
+          range: { from: currentRange, to: currentRange + resultsPerPage },
+          count: "exact",
+          filter: {
+            column: "label",
+            values: query.split("+"),
+          },
+        }));
+
+      if ("error" in response) {
+        return; // 404
+      }
+
+      cache.current.set(query + pageId, response);
+      setResult(response);
     }
 
-    cache.current.set(query + pageId, response);
-    setResults(response.data);
-    setTotal(response.count);
     dispatch({
       type: "CURRENT_PATH",
       value: { section: "search", label: query.split("+").join(" & ") },
@@ -75,26 +78,28 @@ export default function search() {
   useEffect(() => {
     fetch();
     return () => {
-      setResults(undefined);
-      setTotal(0);
+      setResult(undefined);
     };
   }, [query, pageId]);
 
   useEffect(() => {
     window.scroll(0, 0);
-  }, [results]);
+  }, [result]);
 
   return (
-    <LoadBox loadables={results} once={false}>
+    <LoadBox data={result?.data} loadable>
       <section css={css.body}>
-        {results?.map((result) => (
+        {result?.data.map((result) => (
           <SearchResult
             key={`search-result-${result.id}`}
             query={query}
             result={result}
           />
         ))}
-        <SearchPagination currentPage={Number.parseInt(pageId)} total={total} />
+        <SearchPagination
+          currentPage={Number.parseInt(pageId)}
+          total={result?.count ?? 0}
+        />
       </section>
     </LoadBox>
   );

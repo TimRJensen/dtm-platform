@@ -75,7 +75,11 @@ export default function index() {
         return;
       }
 
-      setDocs(response);
+      setDocs(
+        arraySort(response, ["stats.views"], {
+          reverse: true,
+        })
+      );
     } else {
       const response = await db.selectMany<GridItemFromCategory>(
         subCategoryIds ? "sub_categories" : "main_categories",
@@ -120,21 +124,12 @@ export default function index() {
   }, [pageId]);
 
   return (
-    <LoadBox loadables={docs}>
+    <LoadBox data={docs} loadable>
       <section css={css.body}>
         <CategoryList />
         {
           <GridBox
-            /*docs={arraySort(docs ?? [], ["stats.views"], {
-              reverse: true,
-            })}*/
-            docs={
-              docs
-                ? arraySort(docs, ["stats.views"], {
-                    reverse: true,
-                  })
-                : undefined
-            }
+            docs={docs}
             columns={3}
             onLoad={() => {
               if (scrollElement.current) {

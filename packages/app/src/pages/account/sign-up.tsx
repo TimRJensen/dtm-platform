@@ -11,7 +11,6 @@ import { Switch, Route } from "react-router-dom";
 import { ErrorType } from "db";
 import { AppStateContext } from "../../components/App/app-state/main";
 import { InputType } from "../../components/FormSuggestion/FormSuggestion";
-import LoadBox from "../../components/LoadBox/LoadBox";
 
 const Create = lazy(() => import("./create"));
 const Success = lazy(() => import("./success"));
@@ -57,19 +56,17 @@ export default function signUp({}: Props) {
   }, []);
 
   return (
-    <LoadBox loadables={[user ?? true]} fetchOnly>
-      <Switch>
-        <Route
-          exact
-          path={path}
-          render={() => (
-            <Create suggestions={data} onSubmit={setUser} onError={setError} />
-          )}
-        />
-        <Route path={path + "/success"} render={() => <Success doc={user} />} />
-        {/* <Route path="/account/new/pending" component={Pending} /> */}
-        <Route path={path + "/error"} render={() => <Error error={error} />} />
-      </Switch>
-    </LoadBox>
+    <Switch>
+      <Route
+        exact
+        path={path}
+        render={() => (
+          <Create suggestions={data} onSubmit={setUser} onError={setError} />
+        )}
+      />
+      <Route path={path + "/success"} render={() => <Success doc={user} />} />
+      {/* <Route path="/account/new/pending" component={Pending} /> */}
+      <Route path={path + "/error"} render={() => <Error error={error} />} />
+    </Switch>
   );
 }

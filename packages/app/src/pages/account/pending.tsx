@@ -16,5 +16,5 @@ interface Props {}
  * pending functional component.
  */
 export default function pending({}: Props) {
-  return <LoadBox loadables={undefined}>{null}</LoadBox>;
+  return <LoadBox data={undefined}>{null}</LoadBox>;
 }

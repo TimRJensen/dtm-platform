@@ -83,7 +83,7 @@ export default function blog({ blog }: Props) {
   }, [blog]);
 
   return (
-    <LoadBox loadables={[blog]}>
+    <LoadBox data={[blog]} loadable>
       {blog ? (
         <section>
           <Artifact doc={blog.artifact} onComment={handleShowEditor} />

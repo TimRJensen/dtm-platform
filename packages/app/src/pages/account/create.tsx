@@ -66,6 +66,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   }));
   const { db } = useDB();
   const history = useHistory();
+  const [forceLoad, setForceLoad] = useState(false);
   const [validated, setValidated] = useState(false);
   const password = useRef("");
   const validating = useRef<string[]>([]);
@@ -87,17 +88,10 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   };
 
   const handleSubmit = async () => {
-    /*history.push(
-      generatePath(path, {
-        errorOrSuccess: "pending",
-      })
-    );*/
-    if (onSubmit) {
-      onSubmit(undefined);
-    }
-
     const [email, password, , firstName, lastName, city, region] =
       validating.current;
+
+    setForceLoad(true);
 
     const response = await db.signUp(email, password, {
       firstName,
@@ -108,6 +102,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     });
 
     if ("error" in response) {
+      console.log(response.error); //N.B. remove this eventually.
       history.push(
         generatePath(path, {
           errorOrSuccess: "error",
@@ -119,14 +114,16 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       return;
     }
 
-    if (onSubmit) {
-      history.push(
-        generatePath(path, {
-          errorOrSuccess: "success",
-        })
-      );
-      onSubmit(response);
-    }
+    setTimeout(() => {
+      if (onSubmit) {
+        history.push(
+          generatePath(path, {
+            errorOrSuccess: "success",
+          })
+        );
+        onSubmit(response);
+      }
+    }, 5000);
   };
 
   useEffect(() => {
@@ -138,7 +135,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   }, []);
 
   return (
-    <LoadBox loadables={suggestions?.data} fetchOnly>
+    <LoadBox data={forceLoad ? undefined : suggestions}>
       <section css={css.form}>
         <FormInput
           type="email"
