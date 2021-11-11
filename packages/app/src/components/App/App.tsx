@@ -70,22 +70,33 @@ export function App({ db }: Props) {
     }
 
     const { user } = session;
-    const response = await db.selectExact<UserType>(
-      "accounts",
-      `
-        id,
-        role,
-        email,
-        displayName,
-        verified,
-        stats,
-    `,
-      {
-        match: { email: user?.email ?? "" },
-      }
-    );
 
-    console.log("app", response);
+    switch (event) {
+      case "SIGNED_IN": {
+        const response = await db.selectExact<UserType>(
+          "accounts",
+          `
+            id,
+            role,
+            email,
+            displayName,
+            verified,
+            stats
+        `,
+          {
+            match: { email: user?.email ?? "" },
+          }
+        );
+
+        console.log("app", response);
+        if ("error" in response) {
+          break;
+        }
+
+        dispatch({ type: "CURRENT_USER", value: response });
+        break;
+      }
+    }
   };
 
   useEffect(() => {
