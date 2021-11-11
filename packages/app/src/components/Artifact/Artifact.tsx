@@ -1,13 +1,19 @@
 /**
  * Vendor imports.
  */
+import { useContext } from "react";
 
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
 import { ArtifactType } from "db";
+import { useCSS } from "../../hooks";
+import { AppStateContext } from "../App/app-state/main";
 import InfoPanel from "../InfoPanel/InfoPanel";
+import InfoPanelItem from "../InfoPanelItem/InfoPanelItem";
+import Tag from "../Tag/Tag";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -23,7 +29,7 @@ interface Props {
 export default function Artifact({ doc, onComment }: Props) {
   if (!doc) return null;
 
-  const { css } = useCSS(({ spacing, borderRadius }) => ({
+  const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     artifact: {
       display: "grid",
       gridTemplateColumns: `minmax(200px, 1.5fr) minmax(400px, 3fr) minmax(100px, 1fr)`,
@@ -50,14 +56,48 @@ export default function Artifact({ doc, onComment }: Props) {
       padding: spacing,
       fontSize: "1.25rem",
     },
+    button: {
+      color: colors.secondary,
+      "&[data-disabled=false]:hover": {
+        color: colors.secondaryDarker,
+      },
+    },
+    divider: {
+      width: "calc(100% - 20px)",
+      margin: `${spacing}px 0`,
+      borderTop: `1px solid ${colors.primary}`,
+    },
   }));
+  const { state } = useContext(AppStateContext);
 
   return (
     <section css={css.artifact}>
       <div css={css.title}>{doc.label}</div>
       <img css={css.image} src={doc.image} />
       <div css={css.content}>{doc.content}</div>
-      <InfoPanel doc={doc} onComment={onComment} />
+      <InfoPanel>
+        <InfoPanelItem title="Category:">
+          {doc.mainCategory.label}
+        </InfoPanelItem>
+        <InfoPanelItem title="Subcategory:">
+          {doc.subCategory.label}
+        </InfoPanelItem>
+        <InfoPanelItem title="Period:">{doc.period.join(" - ")}</InfoPanelItem>
+        <InfoPanelItem title="Tags:">
+          {doc.tags.map((tag, i) => (
+            <Tag key={`${doc.id}-${tag}-${i}`}>{tag}</Tag>
+          ))}
+        </InfoPanelItem>
+        <div css={css.divider}></div>
+        <Button
+          $css={{ button: css.button }}
+          type="transparent"
+          onClick={onComment}
+          disabled={!state.currentUser}
+        >
+          <FontIcon type="chat_bubble">comment</FontIcon>
+        </Button>
+      </InfoPanel>
     </section>
   );
 }

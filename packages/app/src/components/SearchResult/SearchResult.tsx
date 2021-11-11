@@ -8,7 +8,8 @@ import { Link } from "react-router-dom";
  */
 import { ArtifactType } from "db";
 import { useCSS } from "../../hooks";
-import { Panel } from "./Panel/Panel";
+import InfoPanel from "../InfoPanel/InfoPanel";
+import InfoPanelItem from "../InfoPanelItem/InfoPanelItem";
 /*import { useDecorateNode } from "../../hooks/";
 import { TextBox } from "../TextBox/TextBox";*/
 
@@ -80,7 +81,17 @@ export default function SearchResult({ /*queries,*/ result, style }: Props) {
         </Link>
       </div>
       <div css={css.content}>{result.content}</div>
-      <Panel doc={result} />
+      <InfoPanel>
+        <InfoPanelItem title="Category:">
+          {result.mainCategory.label}
+        </InfoPanelItem>
+        <InfoPanelItem title="Subcategory:">
+          {result.subCategory.label}
+        </InfoPanelItem>
+        <InfoPanelItem title="Period:">
+          {result.period.join(" - ")}
+        </InfoPanelItem>
+      </InfoPanel>
     </div>
   );
 }
