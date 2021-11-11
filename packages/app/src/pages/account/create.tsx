@@ -144,7 +144,6 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
           type="email"
           label={labels[0]}
           validate={validate(0, validateEmail)}
-          initial="timrjensen@gmail.com"
         />
         <br />
         <FormInput
@@ -154,7 +153,6 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
             password.current = value;
           }}
           validate={validate(1, (value) => value !== "")}
-          initial="2900Happiness"
         />
         <FormInput
           type="password"
@@ -163,20 +161,17 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
             2,
             (value) => value !== "" && password.current === value
           )}
-          initial="2900Happiness"
         />
         <br />
         <FormInput
           type="text"
           label={labels[3]}
           validate={validate(3, (value) => value !== "")}
-          initial="Tim"
         />
         <FormInput
           type="text"
           label={labels[4]}
           validate={validate(4, (value) => value !== "")}
-          initial="Jensen"
         />
         <br />
         <FormSuggestion

@@ -15,20 +15,13 @@ interface Props {
   type: HTMLInputTypeAttribute;
   label: string;
   validate?: (value: string) => boolean;
-  initial?: string;
   onBlur?: (value: string) => void;
 }
 
 /**
  * FormInput functional component.
  */
-export default function FormInput({
-  type,
-  label,
-  initial,
-  validate,
-  onBlur,
-}: Props) {
+export default function FormInput({ type, label, validate, onBlur }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formInput: {
       display: "flex",
@@ -61,7 +54,7 @@ export default function FormInput({
       },
     },
   }));
-  const [value, setValue] = useState(initial ?? "");
+  const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
 
   const handleFocus = () => {

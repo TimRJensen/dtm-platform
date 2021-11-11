@@ -80,7 +80,7 @@ export default function FormSelect({ items, label, validate }: Props) {
     },
   }));
   const [validated, setValidated] = useState<boolean>();
-  const value = useRef<string>("Region Hovedstaden");
+  const value = useRef<string>();
 
   return (
     <div
