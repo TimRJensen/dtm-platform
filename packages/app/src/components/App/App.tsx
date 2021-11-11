@@ -8,7 +8,7 @@ import { ThemeProvider, css, Global } from "@emotion/react";
 /**
  * Custom imports.
  */
-import { DB, DBProvider, AccountTable } from "db";
+import { DB, DBProvider, UserType, Session, AuthChangeEvent } from "db";
 import theme from "../../themes/dtm";
 import { Header } from "./Header/Header";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
@@ -59,15 +59,40 @@ export function App({ db }: Props) {
     showEditor: undefined,
   });
 
-  /*const fetch = async () => {
-    const response = await db.selectExact<AccountTable>("accounts", "*", {
-      match: { displayName: "Arthur Fonzarelli" },
-    });
+  const handleAuthChange = async (
+    event: AuthChangeEvent,
+    session: Session | null
+  ) => {
+    console.log(event, session);
+
+    if (!session) {
+      return;
+    }
+
+    const { user } = session;
+    const response = await db.selectExact<UserType>(
+      "accounts",
+      `
+        id,
+        role,
+        email,
+        displayName,
+        verified,
+        stats,
+    `,
+      {
+        match: { email: user?.email ?? "" },
+      }
+    );
+
+    console.log("app", response);
   };
 
   useEffect(() => {
-    fetch();
-  }, []);*/
+    db.onAuthChange(handleAuthChange);
+
+    console.log("dbUser", db.currentUser());
+  }, []);
 
   return (
     <DBProvider value={db}>

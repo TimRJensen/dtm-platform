@@ -8,6 +8,7 @@ import {
   Session,
   PostgrestError,
 } from "@supabase/supabase-js";
+
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -391,7 +392,6 @@ class SupabaBaseWrapper {
     );
 
     if (error) {
-      console.log(error);
       return { error };
     }
 
@@ -433,7 +433,6 @@ class SupabaBaseWrapper {
       ]);
 
     if (accountInsert.error) {
-      console.log(accountInsert.error);
       return accountInsert;
     }
 
@@ -453,3 +452,5 @@ class SupabaBaseWrapper {
 
 export { SupabaBaseWrapper as DB };
 export { DBContext, DBProvider } from "./context";
+export { AuthChangeEvent };
+export { Session };
