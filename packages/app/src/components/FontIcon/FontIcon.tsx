@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { MouseEvent, ReactNode } from "react";
+import { ReactNode } from "react";
 
 /**
  * Custom imports.
@@ -25,7 +25,7 @@ interface Props {
 /**
  * FontIcon functional component - Simple wrapper for material icons https://fonts.google.com/icons
  */
-export function FontIcon({ type, size = 24, $css, children }: Props) {
+export default function FontIcon({ type, size = 24, $css, children }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     fontIcon: {
       display: "flex",

@@ -8,11 +8,11 @@ import arraySort from "array-sort";
  */
 import { PostType } from "db";
 import { useEditor, useCSS } from "../../hooks/";
-import { MessageHeader } from "../MessageHeader/MessageHeader";
-import { Comment } from "../Comment/Comment";
-import { TextBox } from "../TextBox/TextBox";
-import { TextEditor } from "../TextEditor/TextEditor";
-import { Footer } from "./Footer/Footer";
+import MessageHeader from "../MessageHeader/MessageHeader";
+import Comment from "../Comment/Comment";
+import TextBox from "../TextBox/TextBox";
+import TextEditor from "../TextEditor/TextEditor";
+import PostFooter from "../PostFooter/PostFooter";
 
 /**
  * Types.
@@ -24,7 +24,7 @@ interface Props {
 /**
  * Post functional component.
  */
-export function Post({ doc }: Props) {
+export default function Post({ doc }: Props) {
   if (!doc) return null;
 
   const postEditor = useEditor(doc);
@@ -72,7 +72,7 @@ export function Post({ doc }: Props) {
         ) : (
           <div css={css.content}>
             <TextBox>{doc.content}</TextBox>
-            <Footer doc={doc} onComment={commentEditor.handleShowEditor} />
+            <PostFooter doc={doc} onComment={commentEditor.handleShowEditor} />
           </div>
         )}
         <TextEditor

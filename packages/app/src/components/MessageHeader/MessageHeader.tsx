@@ -21,7 +21,7 @@ interface Props {
 /**
  * MessageHeader functional component.
  */
-export function MessageHeader({ doc, onEdit }: Props) {
+export default function MessageHeader({ doc, onEdit }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     messageHeader: {
       display: "flex",

@@ -7,8 +7,8 @@ import { useState } from "react";
  * Custom imports.
  */
 import { useCSS } from "../../../hooks";
-import { Button } from "../../Button/Button";
-import { FontIcon } from "../../FontIcon/FontIcon";
+import Button from "../../Button/Button";
+import FontIcon from "../../FontIcon/FontIcon";
 
 /**
  * Types.

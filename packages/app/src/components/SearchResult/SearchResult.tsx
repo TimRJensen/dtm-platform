@@ -24,7 +24,7 @@ interface Props {
 /**
  * SearchResult functional component.
  */
-export function SearchResult({ /*queries,*/ result, style }: Props) {
+export default function SearchResult({ /*queries,*/ result, style }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     searchResult: {
       display: "grid",

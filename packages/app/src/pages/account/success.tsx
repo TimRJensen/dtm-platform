@@ -8,13 +8,12 @@ import { useState, useEffect, useRef } from "react";
  */
 import { AccountType, CategoryType, ProfileTable } from "db";
 import { useCSS, useDB } from "../../hooks";
-import { LoadBox } from "../../components/LoadBox/LoadBox";
-import {
-  FormSuggestion,
+import LoadBox from "../../components/LoadBox/LoadBox";
+import FormSuggestion, {
   InputType,
 } from "../../components/FormSuggestion/FormSuggestion";
-import { FontIcon } from "../../components/FontIcon/FontIcon";
-import { Button } from "../../components/Button/Button";
+import FontIcon from "../../components/FontIcon/FontIcon";
+import Button from "../../components/Button/Button";
 
 /**
  * Types.

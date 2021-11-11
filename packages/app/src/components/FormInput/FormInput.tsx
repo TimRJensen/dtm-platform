@@ -22,7 +22,13 @@ interface Props {
 /**
  * FormInput functional component.
  */
-export function FormInput({ type, label, initial, validate, onBlur }: Props) {
+export default function FormInput({
+  type,
+  label,
+  initial,
+  validate,
+  onBlur,
+}: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formInput: {
       display: "flex",

@@ -9,7 +9,7 @@ import PacmanLoader from "react-spinners/PacmanLoader";
  */
 import { GridItemType } from "db";
 import { useCSS } from "../../hooks";
-import { GridItem } from "./GridItem/GridItem";
+import GridItem from "../GridItem/GridItem";
 
 /**
  * Types.
@@ -23,7 +23,7 @@ interface Props {
 /**
  * GridBox functional component.
  */
-export function GridBox({ docs, columns = 3, onLoad }: Props) {
+export default function GridBox({ docs, columns = 3, onLoad }: Props) {
   if (!docs) return null;
 
   const { css, theme } = useCSS(({ spacing }) => ({

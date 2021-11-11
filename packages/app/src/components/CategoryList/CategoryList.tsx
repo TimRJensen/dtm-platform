@@ -8,9 +8,9 @@ import { useState, useEffect } from "react";
  */
 import { CategoryType } from "db";
 import { useDB, useCSS } from "../../hooks";
-import { Button } from "../Button/Button";
-import { FontIcon } from "../FontIcon/FontIcon";
-import { ListItem } from "./ListItem/ListItem";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
+import ListItem from "../CategoryItem/CategoryItem";
 
 /**
  * Types.
@@ -19,7 +19,7 @@ import { ListItem } from "./ListItem/ListItem";
 /**
  * ListItem functional component.
  */
-export function CategoryList() {
+export default function CategoryList() {
   const { css } = useCSS(({ spacing, colors }) => ({
     categoryList: {
       display: "flex",

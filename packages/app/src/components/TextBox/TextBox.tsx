@@ -20,7 +20,7 @@ interface Props {
 /**
  * TextBox functional component.
  */
-export function TextBox({ children }: Props) {
+export default function TextBox({ children }: Props) {
   if (!children) return null;
 
   const { nodes, isText, isTag } = useHtmlParser(children);

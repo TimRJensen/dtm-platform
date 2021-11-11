@@ -7,7 +7,7 @@
  */
 import { useCSS } from "../../hooks";
 import { ArtifactType } from "db";
-import { Panel } from "./Panel/Panel";
+import InfoPanel from "../InfoPanel/InfoPanel";
 
 /**
  * Types.
@@ -20,7 +20,7 @@ interface Props {
 /**
  * Artifact functional component.
  */
-export function Artifact({ doc, onComment }: Props) {
+export default function Artifact({ doc, onComment }: Props) {
   if (!doc) return null;
 
   const { css } = useCSS(({ spacing, borderRadius }) => ({
@@ -57,7 +57,7 @@ export function Artifact({ doc, onComment }: Props) {
       <div css={css.title}>{doc.label}</div>
       <img css={css.image} src={doc.image} />
       <div css={css.content}>{doc.content}</div>
-      <Panel doc={doc} onComment={onComment} />
+      <InfoPanel doc={doc} onComment={onComment} />
     </section>
   );
 }

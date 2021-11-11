@@ -5,8 +5,8 @@
 /**
  * Custom imports.
  */
-import { useSearch, useCSS } from "../../../../../hooks";
-import { FontIcon } from "../../../../FontIcon/FontIcon";
+import { useSearch, useCSS } from "../../hooks";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -15,7 +15,7 @@ import { FontIcon } from "../../../../FontIcon/FontIcon";
 /**
  * Searchbar functional component.
  */
-export function Searchbar() {
+export default function Searchbar() {
   const { css } = useCSS(
     ({ spacing, borderRadius, colors, sizes: { searchBar } }) => ({
       searchBar: {

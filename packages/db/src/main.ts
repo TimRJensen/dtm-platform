@@ -450,7 +450,8 @@ class SupabaBaseWrapper {
   }
 }
 
-export { SupabaBaseWrapper as DB };
-export { DBContext, DBProvider } from "./context";
-export { AuthChangeEvent };
-export { Session };
+export {
+  SupabaseContext as DBContext,
+  SupabaseProvider as DBProvider,
+} from "./context";
+export { SupabaBaseWrapper as default, AuthChangeEvent, Session };

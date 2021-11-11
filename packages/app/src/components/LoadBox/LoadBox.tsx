@@ -29,7 +29,7 @@ interface Props {
 /**
  * LoadBox functional component.
  */
-export function LoadBox({
+export default function LoadBox({
   loadables,
   once = true,
   fetchOnly = false,

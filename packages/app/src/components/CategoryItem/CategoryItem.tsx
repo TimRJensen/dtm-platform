@@ -8,9 +8,9 @@ import { Link, useRouteMatch, generatePath } from "react-router-dom";
  * Custom imports.
  */
 import { CategoryType } from "db";
-import { useCSS } from "../../../hooks";
-import { AppStateContext } from "../../App/app-state/main";
-import { ListItemMinor } from "./ListItemMinor/ListItemMinor";
+import { useCSS } from "../../hooks";
+import { AppStateContext } from "../App/app-state/main";
+import CategoryItemMinor from "../CategoryItemMinor/CategoryItemMinor";
 
 /**
  * Types.
@@ -27,9 +27,9 @@ interface Props {
 }
 
 /**
- * ListItem functional component.u
+ * CategoryItem functional component.u
  */
-export function ListItem({ doc }: Props) {
+export default function CategoryItem({ doc }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     label: {
       display: "block",
@@ -83,7 +83,7 @@ export function ListItem({ doc }: Props) {
       </Link>
       <div css={css.subCategories} data-show={categoryId === doc.id}>
         {doc.subCategories.map((subCategory) => (
-          <ListItemMinor key={subCategory.id} doc={subCategory} />
+          <CategoryItemMinor key={subCategory.id} doc={subCategory} />
         ))}
       </div>
     </div>

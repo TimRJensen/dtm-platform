@@ -6,7 +6,7 @@ import { useEffect, useContext } from "react";
 /**
  * Custom imports.
  */
-import { useCSS, useDB } from "../../hooks";
+import { useCSS } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/context";
 
 /**
@@ -33,7 +33,6 @@ export default function verified({}: Props) {
       textAlign: "center",
     },
   }));
-  const { db } = useDB();
   const { dispatch } = useContext(AppStateContext);
 
   useEffect(() => {
@@ -46,9 +45,7 @@ export default function verified({}: Props) {
   return (
     <section css={css.verified}>
       <div css={css.label}>{`ヽ(•‿•)ノ`}</div>
-      <div css={css.text}>
-        {`Your account has been verified and you can now login.`}
-      </div>
+      <div css={css.text}>{`Your account has been verified.`}</div>
     </section>
   );
 }

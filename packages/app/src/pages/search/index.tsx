@@ -10,9 +10,9 @@ import { useParams } from "react-router-dom";
 import { ArtifactType } from "db";
 import { useDB, useCSS } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
-import { LoadBox } from "../../components/LoadBox/LoadBox";
-import { SearchPagination } from "../../components/SearchPagination/SearchPagination";
-import { SearchResult } from "../../components/SearchResult/SearchResult";
+import LoadBox from "../../components/LoadBox/LoadBox";
+import SearchPagination from "../../components/SearchPagination/SearchPagination";
+import SearchResult from "../../components/SearchResult/SearchResult";
 
 /**
  * Types.
@@ -60,8 +60,7 @@ export default function search() {
       }));
 
     if ("error" in response) {
-      console.log(response);
-      return;
+      return; // 404
     }
 
     cache.current.set(query + pageId, response);

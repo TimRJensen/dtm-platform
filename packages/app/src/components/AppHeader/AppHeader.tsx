@@ -6,10 +6,10 @@ import { keyframes } from "@emotion/react";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../../hooks";
-import { Navbar } from "./Navbar/Navbar";
-import Gear from "../../../public/gear.svg";
-import logo from "../../../public/logo.png";
+import { useCSS } from "../../hooks";
+import Navbar from "../AppNavbar/AppNavbar";
+import Gear from "../../public/gear.svg";
+import logo from "../../public/logo.png";
 
 /**
  * Types.
@@ -30,7 +30,7 @@ const moveX = keyframes({
 /**
  * AppHeader functional component.
  */
-export function Header() {
+export default function AppHeader() {
   const { css } = useCSS(({ colors, sizes: { banner } }) => ({
     banner: {
       display: "flex",

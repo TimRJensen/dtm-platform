@@ -8,9 +8,9 @@ import { ThemeProvider, css, Global } from "@emotion/react";
 /**
  * Custom imports.
  */
-import { DB, DBProvider, UserType, Session, AuthChangeEvent } from "db";
+import DB, { DBProvider, UserType, Session, AuthChangeEvent } from "db";
 import theme from "../../themes/dtm";
-import { Header } from "./Header/Header";
+import Header from "../AppHeader/AppHeader";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 
 const _Index = lazy(() => import("../../pages"));
@@ -51,7 +51,7 @@ interface Props {
   db: DB;
 }
 
-export function App({ db }: Props) {
+export default function App({ db }: Props) {
   const [state, dispatch] = useReducer<Reducer<AppState, Actions>>(reducer, {
     currentUser: undefined,
     currentBlog: undefined,

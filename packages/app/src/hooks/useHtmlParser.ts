@@ -11,7 +11,7 @@ import { DomHandler, Node, isTag, isText } from "domhandler";
 /**
  * useHtmlParser
  */
-export function useHtmlParser(htmlStringOrNodes: string | Node[]) {
+export default function useHtmlParser(htmlStringOrNodes: string | Node[]) {
   let nodes = [] as Node[];
 
   if (typeof htmlStringOrNodes === "string") {

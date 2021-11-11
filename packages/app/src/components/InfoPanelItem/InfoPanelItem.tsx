@@ -6,7 +6,7 @@ import { ReactNode, Children } from "react";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../../../hooks";
+import { useCSS } from "../../hooks";
 
 /**
  * Types.
@@ -17,9 +17,9 @@ interface Props {
 }
 
 /**
- * InfoBox functional component.
+ * InfoPanelItem functional component.
  */
-export function InfoBox({ title, children }: Props) {
+export default function InfoPanelItem({ title, children }: Props) {
   const { css } = useCSS(({ spacing }) => ({
     artifactInfo: {
       marginBottom: 0.5 * spacing,

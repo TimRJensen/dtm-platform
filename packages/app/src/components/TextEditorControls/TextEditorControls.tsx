@@ -6,9 +6,9 @@ import { EditorState, RichUtils } from "draft-js";
 /**
  * Custom imports.
  */
-import { Button } from "../../Button/Button";
-import { FontIcon } from "../../FontIcon/FontIcon";
-import { useCSS } from "../../../hooks";
+import { useCSS } from "../../hooks";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -29,9 +29,9 @@ interface Props {
 }
 
 /**
- * Controls functional component.
+ * TextEditorControls functional component.
  */
-export function Controls({ editorState, onToggle }: Props) {
+export default function TextEditorControls({ editorState, onToggle }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     textEditorControls: {
       marginBottom: spacing,

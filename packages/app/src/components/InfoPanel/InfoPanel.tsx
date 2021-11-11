@@ -6,13 +6,13 @@ import { useContext } from "react";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../../hooks";
 import { ArtifactType } from "db";
-import { AppStateContext } from "../../App/app-state/main";
-import { InfoBox } from "./InfoBox/InfoBox";
-import { Tag } from "./Tag/Tag";
-import { Button } from "../../Button/Button";
-import { FontIcon } from "../../FontIcon/FontIcon";
+import { useCSS } from "../../hooks";
+import { AppStateContext } from "../App/app-state/main";
+import InfoPanelItem from "../InfoPanelItem/InfoPanelItem";
+import Tag from "../Tag/Tag";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -23,9 +23,9 @@ interface Props {
 }
 
 /**
- * Panel functional component.
+ * InfoPanel functional component.
  */
-export function Panel({ doc, onComment }: Props) {
+export default function InfoPanel({ doc, onComment }: Props) {
   const { state } = useContext(AppStateContext);
   const { css } = useCSS(({ spacing, colors }) => ({
     panel: {
@@ -51,14 +51,16 @@ export function Panel({ doc, onComment }: Props) {
 
   return (
     <div css={css.panel}>
-      <InfoBox title="Category:">{doc.mainCategory.label}</InfoBox>
-      <InfoBox title="Subcategory:">{doc.subCategory.label}</InfoBox>
-      <InfoBox title="Period:">{doc.period.join(" - ")}</InfoBox>
-      <InfoBox title="Tags:">
+      <InfoPanelItem title="Category:">{doc.mainCategory.label}</InfoPanelItem>
+      <InfoPanelItem title="Subcategory:">
+        {doc.subCategory.label}
+      </InfoPanelItem>
+      <InfoPanelItem title="Period:">{doc.period.join(" - ")}</InfoPanelItem>
+      <InfoPanelItem title="Tags:">
         {doc.tags.map((tag, i) => (
           <Tag key={`${doc.id}-${tag}-${i}`}>{tag}</Tag>
         ))}
-      </InfoBox>
+      </InfoPanelItem>
       <div css={css.divider}></div>
       <Button
         $css={{ button: css.button }}

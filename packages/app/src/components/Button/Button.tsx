@@ -26,7 +26,7 @@ interface Props {
 /**
  * Button functional component.
  */
-export function Button({
+export default function Button({
   $css,
   type = "default",
   disabled = false,

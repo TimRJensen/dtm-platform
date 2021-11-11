@@ -8,8 +8,8 @@ import { Link, useParams, generatePath } from "react-router-dom";
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
-import { Button } from "../Button/Button";
-import { FontIcon } from "../FontIcon/FontIcon";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -27,7 +27,7 @@ interface Props {
 /**
  * SearchPagination functional component.
  */
-export function SearchPagination({
+export default function SearchPagination({
   currentPage,
   resultsPerPage = 10,
   total,

@@ -11,10 +11,10 @@ import arraySort from "array-sort";
 import { BlogTable, BlogType } from "db";
 import { useDB, useEditor, useCSS } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/context";
-import { LoadBox } from "../../components/LoadBox/LoadBox";
-import { Artifact } from "../../components/Artifact/Artifact";
-import { Post } from "../../components/Post/Post";
-import { TextEditor } from "../../components/TextEditor/TextEditor";
+import LoadBox from "../../components/LoadBox/LoadBox";
+import Artifact from "../../components/Artifact/Artifact";
+import Post from "../../components/Post/Post";
+import TextEditor from "../../components/TextEditor/TextEditor";
 
 /**
  * Types.

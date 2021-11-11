@@ -20,7 +20,9 @@ import { useShowEditor, useDB } from ".";
 /**
  * useEditor hook.
  */
-export function useEditor(doc: BlogType | PostType | CommentType | undefined) {
+export default function useEditor(
+  doc: BlogType | PostType | CommentType | undefined
+) {
   const { db, queries } = useDB();
   const { state, dispatch } = useContext(AppStateContext);
   const { showEditor, handleShowEditor } = useShowEditor();

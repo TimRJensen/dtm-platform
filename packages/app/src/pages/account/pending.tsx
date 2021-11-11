@@ -5,7 +5,7 @@
 /**
  * Custom imports.
  */
-import { LoadBox } from "../../components/LoadBox/LoadBox";
+import LoadBox from "../../components/LoadBox/LoadBox";
 
 /**
  * Types.

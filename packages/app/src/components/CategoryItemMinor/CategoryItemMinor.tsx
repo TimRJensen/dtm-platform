@@ -8,7 +8,7 @@ import { Link, useRouteMatch, generatePath } from "react-router-dom";
  * Custom imports.
  */
 import { SubCategoryType } from "db";
-import { useCSS } from "../../../../hooks";
+import { useCSS } from "../../hooks";
 
 /**
  * Types.
@@ -27,7 +27,7 @@ interface Props {
 /**
  * ListItemMinor functional component.
  */
-export function ListItemMinor({ doc }: Props) {
+export default function ListItemMinor({ doc }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     label: {
       display: "flex",

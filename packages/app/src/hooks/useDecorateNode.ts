@@ -2,6 +2,7 @@
  * Vendor imports.
  */
 import { Node, Text, Element, isText } from "domhandler";
+import { SerializedStyles } from "@emotion/react";
 import htmlRender from "dom-serializer";
 import Fuse from "fuse.js";
 
@@ -9,8 +10,7 @@ import Fuse from "fuse.js";
  * Custom imports.
  */
 import { splitNode } from "../util/main";
-import { useHtmlParser } from "./useHtmlParser";
-import { SerializedStyles } from "@emotion/react";
+import { useHtmlParser } from "./";
 
 /**
  * useDecorate hook.
@@ -26,7 +26,11 @@ interface Params {
   };
 }
 
-export function useDecorateNode({ htmlString, tests, decorator }: Params) {
+export default function useDecorateNode({
+  htmlString,
+  tests,
+  decorator,
+}: Params) {
   const test = tests.join("|");
   const regExp = new RegExp(`(${test})`, "gi");
 

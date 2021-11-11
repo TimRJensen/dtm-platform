@@ -18,7 +18,7 @@ interface Params<T> {
   resultsPerPage?: number;
 }
 
-export function useUserQuery<T>({
+export default function useQuery<T>({
   docs,
   fields,
   resultsPerPage = 10,

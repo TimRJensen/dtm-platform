@@ -23,7 +23,7 @@ type ClassType = {
 /**
  * useCSS hook.
  */
-export function useCSS<T extends ClassType>(
+export default function useCSS<T extends ClassType>(
   withTheme: (theme: Theme) => ClassType | T
 ) {
   const theme = useTheme() as Theme;

@@ -7,7 +7,7 @@
  */
 import { ArtifactType } from "db";
 import { useCSS } from "../../../hooks";
-import { InfoBox } from "../../Artifact/Panel/InfoBox/InfoBox";
+import InfoPanelItem from "../../InfoPanelItem/InfoPanelItem";
 
 /**
  * Types.
@@ -34,9 +34,11 @@ export function Panel({ doc }: Props) {
 
   return (
     <div css={css.panel}>
-      <InfoBox title="Category:">{doc.mainCategory.label}</InfoBox>
-      <InfoBox title="Subcategory:">{doc.subCategory.label}</InfoBox>
-      <InfoBox title="Period:">{doc.period.join(" - ")}</InfoBox>
+      <InfoPanelItem title="Category:">{doc.mainCategory.label}</InfoPanelItem>
+      <InfoPanelItem title="Subcategory:">
+        {doc.subCategory.label}
+      </InfoPanelItem>
+      <InfoPanelItem title="Period:">{doc.period.join(" - ")}</InfoPanelItem>
     </div>
   );
 }

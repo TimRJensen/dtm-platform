@@ -91,7 +91,7 @@ const queries = {
 /**
  * useDB hook.
  */
-export function useDB() {
+export default function useDB() {
   const db = useContext(DBContext);
 
   return {

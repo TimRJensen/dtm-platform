@@ -11,7 +11,7 @@ import { Switch, Route } from "react-router-dom";
 import { ErrorType } from "db";
 import { AppStateContext } from "../../components/App/app-state/main";
 import { InputType } from "../../components/FormSuggestion/FormSuggestion";
-import { LoadBox } from "../../components/LoadBox/LoadBox";
+import LoadBox from "../../components/LoadBox/LoadBox";
 
 const Create = lazy(() => import("./create"));
 const Success = lazy(() => import("./success"));

@@ -10,9 +10,9 @@ import arraySort from "array-sort";
  */
 import { GridItemFromCategory, GridItemType } from "db";
 import { useDB, useCSS } from "../hooks";
-import { LoadBox } from "../components/LoadBox/LoadBox";
-import { CategoryList } from "../components/CategoryList/CategoryList";
-import { GridBox } from "../components/GridBox/GridBox";
+import LoadBox from "../components/LoadBox/LoadBox";
+import CategoryList from "../components/CategoryList/CategoryList";
+import GridBox from "../components/GridBox/GridBox";
 
 /**
  * Types.

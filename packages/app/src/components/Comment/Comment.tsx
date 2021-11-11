@@ -7,9 +7,9 @@
  */
 import { CommentType } from "db";
 import { useEditor, useCSS } from "../../hooks/";
-import { TextEditor } from "../TextEditor/TextEditor";
-import { TextBox } from "../TextBox/TextBox";
-import { MessageHeader } from "../MessageHeader/MessageHeader";
+import TextEditor from "../TextEditor/TextEditor";
+import TextBox from "../TextBox/TextBox";
+import MessageHeader from "../MessageHeader/MessageHeader";
 
 /**
  * Types.
@@ -21,7 +21,7 @@ interface Props {
 /**
  * Comment functional component.
  */
-export function Comment({ doc }: Props) {
+export default function Comment({ doc }: Props) {
   if (!doc) return null;
 
   const { css } = useCSS(({ spacing }) => ({

@@ -11,7 +11,7 @@ import { useHistory } from "react-router-dom";
 /**
  * useSearch hook.
  */
-export function useSearch() {
+export default function useSearch() {
   const history = useHistory();
   const [input, setInput] = useState("");
   const domElement = useRef<HTMLInputElement>(null);

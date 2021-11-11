@@ -9,8 +9,8 @@ import { Switch, Link, Route, generatePath } from "react-router-dom";
  */
 import { useCSS } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
-import { FontIcon } from "../../components/FontIcon/FontIcon";
-import { Button } from "../../components/Button/Button";
+import FontIcon from "../../components/FontIcon/FontIcon";
+import Button from "../../components/Button/Button";
 import GoogleLogo from "../../public/google-logo.svg";
 import FacebookLogo from "../../public/facebook-logo.svg";
 

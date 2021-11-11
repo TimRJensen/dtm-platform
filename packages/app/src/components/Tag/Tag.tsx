@@ -6,8 +6,8 @@ import { Link, generatePath } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../../../hooks";
-import { Button } from "../../../Button/Button";
+import { useCSS } from "../../hooks";
+import Button from "../Button/Button";
 
 /**
  * Types.
@@ -21,7 +21,7 @@ interface Props {
 /**
  * Tag funtioncal component.
  */
-export function Tag({ children }: Props) {
+export default function Tag({ children }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     button: {
       height: "auto",

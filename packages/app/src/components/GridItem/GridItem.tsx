@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
  * Custom imports.
  */
 import { GridItemType } from "db";
-import { useCSS } from "../../../hooks";
+import { useCSS } from "../../hooks";
 
 /**
  * Types.
@@ -22,7 +22,7 @@ interface Props {
 /**
  * GridItem functional component.
  */
-export const GridItem = function GridItem({ doc, show = true, onLoad }: Props) {
+export default function GridItem({ doc, show = true, onLoad }: Props) {
   if (!doc) return null;
 
   const { css } = useCSS(({ spacing, colors }) => ({
@@ -102,4 +102,4 @@ export const GridItem = function GridItem({ doc, show = true, onLoad }: Props) {
       </Link>
     </div>
   );
-};
+}

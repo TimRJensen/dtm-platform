@@ -7,8 +7,8 @@ import { useState, useRef } from "react";
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
-import { Dropdown } from "../Dropdown/Dropdown";
-import { FontIcon } from "../FontIcon/FontIcon";
+import Dropdown from "../Dropdown/Dropdown";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -22,7 +22,7 @@ interface Props {
 /**
  * FormSelect functional component.
  */
-export function FormSelect({ items, label, validate }: Props) {
+export default function FormSelect({ items, label, validate }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formSelect: {
       display: "flex",

@@ -16,7 +16,7 @@ import draftParser from "draftjs-to-html";
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
-import { Controls } from "./Controls/Controls";
+import TextEditorControls from "../TextEditorControls/TextEditorControls";
 
 /**
  * Types.
@@ -36,9 +36,9 @@ interface Props {
 }
 
 /**
- * CommentTextbox functional component - https://draftjs.org/
+ * TextEditor functional component - https://draftjs.org/
  */
-export function TextEditor({
+export default function TextEditor({
   $css,
   show = true,
   advanced = false,
@@ -103,7 +103,10 @@ export function TextEditor({
         onClick={() => editorRef.current?.focus()}
       >
         {advanced ? (
-          <Controls editorState={editorState} onToggle={setEditorState} />
+          <TextEditorControls
+            editorState={editorState}
+            onToggle={setEditorState}
+          />
         ) : null}
         <Editor
           editorState={editorState}

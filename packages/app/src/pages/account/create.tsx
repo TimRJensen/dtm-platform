@@ -10,14 +10,13 @@ import { validate as validateEmail } from "email-validator";
  */
 import { AccountType, ErrorType } from "db";
 import { useCSS, useDB } from "../../hooks";
-import { LoadBox } from "../../components/LoadBox/LoadBox";
-import { FormInput } from "../../components/FormInput/FormInput";
-import {
-  FormSuggestion,
+import LoadBox from "../../components/LoadBox/LoadBox";
+import FormInput from "../../components/FormInput/FormInput";
+import FormSuggestion, {
   InputType,
 } from "../../components/FormSuggestion/FormSuggestion";
-import { FormSelect } from "../../components/FormSelect/FormSelect";
-import { Button } from "../../components/Button/Button";
+import FormSelect from "../../components/FormSelect/FormSelect";
+import Button from "../../components/Button/Button";
 
 /**
  * Types.

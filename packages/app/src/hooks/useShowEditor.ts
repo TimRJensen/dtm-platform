@@ -11,7 +11,7 @@ import { AppStateContext } from "../components/App/app-state/context";
 /**
  * useShowEditor hook.
  */
-export function useShowEditor() {
+export default function useShowEditor() {
   const { state, dispatch } = useContext(AppStateContext);
   const [showEditor, setShowEditor] = useState(false);
 

@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
-import { Dropdown } from "../Dropdown/Dropdown";
+import Dropdown from "../Dropdown/Dropdown";
 
 /**
  * Types.
@@ -31,7 +31,7 @@ interface Props {
 /**
  * FormSuggestion functional component.
  */
-export function FormSuggestion({
+export default function FormSuggestion({
   label,
   suggestions,
   beginIndex = 2,

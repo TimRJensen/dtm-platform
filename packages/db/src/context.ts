@@ -6,10 +6,10 @@ import { createContext } from "react";
 /**
  * Custom imports.
  */
-import { DB } from "./main";
+import Supabase from "./main";
 
 /**
  * DB context.
  */
-export const DBContext = createContext<DB>({} as DB);
-export const DBProvider = DBContext.Provider;
+export const SupabaseContext = createContext<Supabase>({} as Supabase);
+export const SupabaseProvider = SupabaseContext.Provider;

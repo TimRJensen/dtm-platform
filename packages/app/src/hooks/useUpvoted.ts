@@ -18,12 +18,10 @@ import { useDB } from ".";
 /**
  * useIsUpvoted hook.
  */
-export function useIsUpvoted(doc: PostType) {
-  // @ts-ignore
-  const { db, queries } = useDB();
-  // @ts-ignore
-  const { state, dispatch } = useContext(AppStateContext);
-  const [isUpvoted, setIsUpvoted] = useState(
+export default function useIsUpvoted(doc: PostType) {
+  const { db } = useDB();
+  const { state } = useContext(AppStateContext);
+  const [upvoted, setUpvoted] = useState(
     state.currentUser
       ? doc.upvotes.indexOf(state.currentUser.id) > -1
         ? true
@@ -32,11 +30,11 @@ export function useIsUpvoted(doc: PostType) {
   );
 
   return {
-    isUpvoted,
+    isUpvoted: upvoted,
     handleUpvote: async () => {
       if (!state.currentUser || !state.currentBlog) return;
 
-      if (isUpvoted) {
+      if (upvoted) {
         const i = doc.upvotes.indexOf(state.currentUser.id);
 
         db.update<PostTable>("posts", {
@@ -57,14 +55,7 @@ export function useIsUpvoted(doc: PostType) {
           },
         });
 
-      setIsUpvoted(!isUpvoted);
-      // N.B. I don't think I need this.
-      /*dispatch({
-        type: "CURRENT_BLOG",
-        value: (await db.selectExact<BlogType>("blogs", queries.blog, {
-          match: { id: state.currentBlog.id },
-        }))![0],
-      });*/
+      setUpvoted(!upvoted);
     },
   };
 }

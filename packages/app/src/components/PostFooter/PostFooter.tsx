@@ -8,10 +8,10 @@ import { useContext } from "react";
  * Custom imports.
  */
 import { PostType } from "db";
-import { useCSS, useIsUpvoted } from "../../../hooks";
-import { AppStateContext } from "../../App/app-state/context";
-import { Button } from "../../Button/Button";
-import { FontIcon } from "../../FontIcon/FontIcon";
+import { useCSS, useUpvoted } from "../../hooks";
+import { AppStateContext } from "../App/app-state/context";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -22,9 +22,9 @@ interface Props {
 }
 
 /**
- * Footer functional component.
+ * PostFooter functional component.
  */
-export function Footer({ doc, onComment }: Props) {
+export default function PostFooter({ doc, onComment }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     footer: {
       display: "flex",
@@ -43,7 +43,7 @@ export function Footer({ doc, onComment }: Props) {
     },
   }));
   const { state } = useContext(AppStateContext);
-  const { isUpvoted, handleUpvote } = useIsUpvoted(doc);
+  const { isUpvoted, handleUpvote } = useUpvoted(doc);
 
   return (
     <div css={css.footer}>

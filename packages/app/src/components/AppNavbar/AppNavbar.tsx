@@ -7,20 +7,20 @@ import { Link } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../../../hooks";
-import { Button } from "../../../Button/Button";
-import { FontIcon } from "../../../FontIcon/FontIcon";
-import { AppStateContext } from "../../app-state/main";
-import { Searchbar } from "./Searchbar/Searchbar";
+import { useCSS } from "../../hooks";
+import { AppStateContext } from "../App/app-state/main";
+import Searchbar from "../Searchbar/Searchbar";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
  */
 
 /**
- * Navbar functional component.
+ * AppNavbar functional component.
  */
-export function Navbar() {
+export default function AppNavbar() {
   const { css } = useCSS(({ spacing, colors, sizes: { appHeader } }) => ({
     navbar: {
       display: "flex",

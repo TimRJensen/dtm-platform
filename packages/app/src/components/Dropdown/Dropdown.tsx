@@ -27,7 +27,7 @@ interface Props {
 /**
  * Dropdown functional component.
  */
-export function Dropdown({
+export default function Dropdown({
   $css,
   label,
   conditional = true,
