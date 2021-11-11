@@ -11,9 +11,11 @@ import { useCSS } from "../../hooks";
 /**
  * Types.
  */
+type StyleType = ReturnType<typeof useCSS>["css"][string];
+
 interface Props {
   $css?: {
-    button: ReturnType<typeof useCSS>["css"][string];
+    button: StyleType | StyleType[];
   };
   type?: "default" | "accept" | "transparent";
   toggled?: boolean;

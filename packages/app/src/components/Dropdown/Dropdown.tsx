@@ -1,7 +1,13 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef, ReactNode, ReactElement } from "react";
+import {
+  useState,
+  useRef,
+  ReactNode,
+  ReactElement,
+  useLayoutEffect,
+} from "react";
 
 /**
  * Custom imports.
@@ -18,6 +24,7 @@ interface Props {
     items?: ReturnType<typeof useCSS>["css"][string];
   };
   label: ReactElement | string;
+  direction?: "down" | "left" | "right";
   focusable?: boolean;
   conditional?: boolean;
   children?: ReactNode;
@@ -30,6 +37,7 @@ interface Props {
 export default function Dropdown({
   $css,
   label,
+  direction = "down",
   conditional = true,
   focusable = false,
   children,
@@ -42,7 +50,6 @@ export default function Dropdown({
       visibility: "hidden",
       width: "inherit",
       position: "absolute",
-      left: 0,
       padding: `0 0 ${spacing}px 0`,
       backgroundColor: "#FFF",
       "&[data-toggled=true]": {
@@ -54,15 +61,39 @@ export default function Dropdown({
   const [toggled, setToggled] = useState(false);
   const dropdownElement = useRef<HTMLDivElement>(null);
 
+  useLayoutEffect(() => {
+    if (!toggled) return;
+
+    const element = dropdownElement.current!;
+    const items = element.children[1] as HTMLDivElement;
+
+    switch (direction) {
+      case "left": {
+        const top = window.scrollY + element.getBoundingClientRect().top;
+        const right =
+          element.getBoundingClientRect().left -
+          items.getBoundingClientRect().width;
+
+        items.style.top = top + "px";
+        items.style.left = right + "px";
+        break;
+      }
+      case "right": {
+        const top = window.scrollY + element.getBoundingClientRect().top;
+        const left = element.getBoundingClientRect().right;
+
+        items.style.top = top + "px";
+        items.style.left = left + "px";
+        break;
+      }
+      default: {
+        items.style.left = element.getBoundingClientRect().left + "px";
+      }
+    }
+  }, [toggled]);
+
   const handleToggle = () => {
     if (!toggled) {
-      const element = dropdownElement.current;
-      const items = element?.children[1] as HTMLDivElement;
-
-      if (items) {
-        items.style.left = `${element?.getBoundingClientRect()?.left}px`;
-      }
-
       setToggled(true);
     } else {
       dropdownElement.current?.blur();
@@ -73,7 +104,7 @@ export default function Dropdown({
   return (
     <div
       css={[css.dropdown, $css?.dropdown]}
-      tabIndex={focusable ? 0 : undefined}
+      tabIndex={focusable ? 0 : -1}
       ref={dropdownElement}
       onMouseDown={(event) => {
         if (document.activeElement === dropdownElement.current) {

@@ -8,7 +8,10 @@
 import { PostType, CommentType } from "db";
 import { useCSS } from "../../hooks";
 import { formatDate } from "../../util/main";
-import { Dropdown } from "./Dropdown/Dropdown";
+//import { Dropdown } from "./Dropdown/Dropdown";
+import Dropdown from "../Dropdown/Dropdown";
+import Button from "../Button/Button";
+import FontIcon from "../FontIcon/FontIcon";
 
 /**
  * Types.
@@ -25,12 +28,11 @@ export default function MessageHeader({ doc, onEdit }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     messageHeader: {
       display: "flex",
+      alignItems: "center",
       height: `calc(1rem + ${2 * spacing}px)`,
       overflow: "hidden",
-      padding: `0 0 0 ${spacing}px`,
       borderRadius: `${borderRadius}px ${borderRadius}px 0 0`,
       backgroundColor: colors.primary,
-      lineHeight: `calc(1rem + ${2 * spacing}px)`,
       color: colors.text.secondary,
     },
     link: {
@@ -40,7 +42,31 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       cursor: "default",
       color: colors.text.disabled,
     },
-    info: { marginRight: "auto" },
+    info: {
+      margin: `0 auto 0 ${spacing}px`,
+    },
+    dropdown: {
+      height: "inherit",
+      margin: 0,
+      padding: 0,
+    },
+    items: {
+      height: "inherit",
+      margin: 0,
+      padding: 0,
+    },
+    button: {
+      height: "inherit",
+      backgroundColor: colors.secondary,
+      color: colors.text.secondary,
+      borderRadius: 0,
+      "&[data-disabled=false]:hover": {
+        backgroundColor: colors.secondaryDarker,
+      },
+    },
+    buttonExpand: {
+      width: 45,
+    },
   }));
 
   return (
@@ -49,7 +75,25 @@ export default function MessageHeader({ doc, onEdit }: Props) {
         {`${formatDate(doc.createdAt)} by `}
         <span>{doc.user.displayName}</span>
       </div>
-      <Dropdown onEdit={onEdit} />
+      <Dropdown
+        $css={{ dropdown: css.dropdown, items: css.items }}
+        label={
+          <Button $css={{ button: [css.button, css.buttonExpand] }}>
+            <FontIcon type="more_horiz"></FontIcon>
+          </Button>
+        }
+        direction="left"
+      >
+        <Button $css={{ button: css.button }} onClick={onEdit}>
+          <FontIcon type="edit">edit</FontIcon>
+        </Button>
+        <Button $css={{ button: css.button }} /*onClick={undefined}*/>
+          <FontIcon type="delete">delete</FontIcon>
+        </Button>
+        <Button $css={{ button: css.button }} /*onClick={undefined}*/>
+          <FontIcon type="not_interested">ban</FontIcon>
+        </Button>
+      </Dropdown>
     </div>
   );
 }
