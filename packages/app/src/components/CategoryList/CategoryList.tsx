@@ -1,13 +1,13 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 /**
  * Custom imports.
  */
 import { CategoryType } from "db";
-import { useDB, useCSS } from "../../hooks";
+import { useCSS } from "../../hooks";
 import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
 import ListItem from "../CategoryItem/CategoryItem";
@@ -15,11 +15,18 @@ import ListItem from "../CategoryItem/CategoryItem";
 /**
  * Types.
  */
+interface Props {
+  categories: CategoryType[] | undefined;
+}
 
 /**
  * ListItem functional component.
  */
-export default function CategoryList() {
+export default function CategoryList({ categories }: Props) {
+  if (!categories) {
+    return null;
+  }
+
   const { css } = useCSS(({ spacing, colors }) => ({
     categoryList: {
       display: "flex",
@@ -67,27 +74,7 @@ export default function CategoryList() {
       },
     },
   }));
-  const { db, queries } = useDB();
-  const [categories, setCategories] = useState<CategoryType[]>();
   const [show, setShow] = useState(true);
-
-  const fetch = async () => {
-    const response = await db.select<CategoryType>(
-      "main_categories",
-      queries.category,
-      {}
-    );
-
-    if ("error" in response) {
-      return;
-    }
-
-    setCategories(response);
-  };
-
-  useEffect(() => {
-    fetch();
-  }, []);
 
   return (
     <section css={css.categoryList} data-show={show}>
@@ -104,9 +91,9 @@ export default function CategoryList() {
         </Button>
       </header>
       <ListItem doc={{ id: "popular", label: "popular", subCategories: [] }} />
-      {categories
-        ? categories.map((doc) => <ListItem key={doc.id} doc={doc} />)
-        : null}
+      {categories.map((doc) => (
+        <ListItem key={doc.id} doc={doc} />
+      ))}
     </section>
   );
 }

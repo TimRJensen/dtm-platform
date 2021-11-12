@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 /**
@@ -24,7 +24,9 @@ interface Props {
  * GridBox functional component.
  */
 export default function GridBox({ docs, columns = 3, onLoad }: Props) {
-  if (!docs) return null;
+  if (!docs) {
+    return null;
+  }
 
   const { css, theme } = useCSS(({ spacing }) => ({
     grid: {
@@ -46,38 +48,37 @@ export default function GridBox({ docs, columns = 3, onLoad }: Props) {
     },
   }));
   const [gridItems, setGridItems] = useState<GridItemType[]>([]);
-  const [loaded, setLoaded] = useState(0);
   const [loading, setLoading] = useState(true);
+  const loaded = useRef(0);
 
   useEffect(() => {
     if (docs[0]) {
       setGridItems([...gridItems, ...docs]);
-    } else {
-      setLoading(false);
     }
+
     return () => setLoading(true);
   }, [docs]);
 
-  useEffect(() => {
-    if (loaded === docs.length) {
-      if (onLoad) onLoad();
+  const handleLoad = () => {
+    loaded.current++;
+
+    if (loaded.current === docs.length) {
+      if (onLoad) {
+        onLoad();
+      }
+
       setLoading(false);
-      setLoaded(0);
+      loaded.current = 0;
     }
-  }, [loaded]);
+  };
 
   return (
-    <section css={css.grid}>
+    <section css={css.grid} onLoad={handleLoad}>
       {gridItems.map((doc, i) =>
         i < gridItems.length - docs.length ? (
           <GridItem key={`grid-item-${doc.id}`} doc={doc} />
         ) : (
-          <GridItem
-            key={`grid-item-${doc.id}`}
-            doc={doc}
-            show={!loading}
-            onLoad={() => setLoaded((loaded) => ++loaded)}
-          />
+          <GridItem key={`grid-item-${doc.id}`} doc={doc} show={!loading} />
         )
       )}
       {loading ? (

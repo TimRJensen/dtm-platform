@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRouteMatch, generatePath } from "react-router-dom";
 
 /**
@@ -9,7 +9,6 @@ import { Link, useRouteMatch, generatePath } from "react-router-dom";
  */
 import { CategoryType } from "db";
 import { useCSS } from "../../hooks";
-import { AppStateContext } from "../App/app-state/main";
 import CategoryItemMinor from "../CategoryItemMinor/CategoryItemMinor";
 
 /**
@@ -49,7 +48,6 @@ export default function CategoryItem({ doc }: Props) {
       },
     },
   }));
-  const { dispatch } = useContext(AppStateContext);
   const routeMatch = useRouteMatch<Params>(path);
   const { categoryId, subCategoryIds } = routeMatch?.params ?? {};
   const [lastMatch, setLastMatch] = useState<string>();
@@ -59,15 +57,6 @@ export default function CategoryItem({ doc }: Props) {
       setLastMatch(subCategoryIds);
     }
   }, [subCategoryIds]);
-
-  useEffect(() => {
-    if (categoryId === doc.id) {
-      dispatch({
-        type: "CURRENT_PATH",
-        value: { section: "category", label: doc.label },
-      });
-    }
-  }, [categoryId]);
 
   return (
     <div>

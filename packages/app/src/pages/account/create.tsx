@@ -114,16 +114,14 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       return;
     }
 
-    setTimeout(() => {
-      if (onSubmit) {
-        history.push(
-          generatePath(path, {
-            errorOrSuccess: "success",
-          })
-        );
-        onSubmit(response);
-      }
-    }, 5000);
+    if (onSubmit) {
+      history.push(
+        generatePath(path, {
+          errorOrSuccess: "success",
+        })
+      );
+      onSubmit(response);
+    }
   };
 
   useEffect(() => {

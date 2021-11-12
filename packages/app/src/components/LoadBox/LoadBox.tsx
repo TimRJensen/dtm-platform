@@ -8,6 +8,7 @@ import {
   cloneElement,
   ReactElement,
   Children,
+  useRef,
 } from "react";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
@@ -43,34 +44,31 @@ export default function LoadBox({ data, loadable = false, children }: Props) {
       display: "none",
     },
   }));
-  const [loaded, setLoaded] = useState(0);
   const [loading, setLoading] = useState(true);
+  const loaded = useRef(0);
 
   useEffect(() => {
     if (!loadable && data) {
       setLoading(false);
-    }
-
-    return () => {
-      if (!loading) {
-        setLoading(true);
-      }
-    };
-  }, [data, loading]);
-
-  useEffect(() => {
-    if (!data) {
       return;
     }
 
-    if (loaded === data.length) {
-      setLoading(false);
-      setLoaded(0);
+    if (!data) {
+      setLoading(true);
     }
-  }, [loaded]);
+  }, [data]);
+
+  const handleLoad = () => {
+    loaded.current++;
+
+    if (loaded.current === data.length) {
+      setLoading(false);
+      loaded.current = 0;
+    }
+  };
 
   return (
-    <section onLoad={() => setLoaded((loaded) => ++loaded)}>
+    <section onLoad={loadable ? handleLoad : undefined}>
       <div css={css.loader} data-show={loading}>
         <PacmanLoader color={theme.colors.secondary} />
       </div>
