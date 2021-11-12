@@ -88,7 +88,7 @@ export default function MessageHeader({ doc, onEdit }: Props) {
         label={
           <Button
             $css={{ button: [css.button, css.buttonExpand] }}
-            disabled={!currentUser}
+            //disabled={!currentUser}
           >
             <FontIcon type="more_horiz" />
           </Button>

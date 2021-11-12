@@ -49,17 +49,24 @@ export default function FormSuggestion({
     },
     dropdown: {
       width: "min(304px)",
-      border: "1px solid transparent",
-      borderBottom: `1px solid ${colors.input.defaultBorder}`,
-      cursor: "default",
-      "&:focus-within": {
-        border: `1px solid ${colors.input.defaultBorder}`,
-        borderRadius: borderRadius / 2,
-      },
-      "&[data-toggled=true]": {
+      "&[data-toggled=true] input:first-of-type": {
         borderBottom: "1px solid transparent",
         borderRadius: `${borderRadius / 2}px ${borderRadius / 2}px 0 0`,
       },
+    },
+    input: {
+      height: "1.5rem",
+      width: "min(300px)",
+      outline: "none",
+      border: "1px solid transparent",
+      borderBottom: `1px solid ${colors.input.defaultBorder}`,
+      backgroundColor: "transparent",
+      fontSize: "1rem",
+      "&:focus": {
+        border: `1px solid ${colors.input.defaultBorder}`,
+        borderRadius: borderRadius / 2,
+      },
+      "&[data-toggled=true]:focus": {},
       "&[data-validated=true]": {
         backgroundColor: colors.input.success,
         border: `1px solid ${colors.input.successBorder}`,
@@ -70,14 +77,6 @@ export default function FormSuggestion({
         border: `1px solid ${colors.input.errorBorder}`,
         borderRadius: borderRadius / 2,
       },
-    },
-    input: {
-      height: "1.5rem",
-      width: "inherit",
-      outline: "none",
-      border: "none",
-      backgroundColor: "transparent",
-      fontSize: "1rem",
     },
     items: {
       height: "calc(6 * 1rem)",
@@ -106,7 +105,7 @@ export default function FormSuggestion({
   }));
   const [items, setItems] = useState<string[]>();
   const [value, setValue] = useState("");
-  const [suggestion, setSuggestion] = useState<number>();
+  const [suggestion, setSuggestion] = useState<number>(0);
   const [validated, setValidated] = useState<boolean>();
 
   useEffect(() => {
@@ -140,39 +139,46 @@ export default function FormSuggestion({
       return;
     }
 
-    switch (event.key) {
-      case "ArrowUp": {
-        const i = suggestion !== undefined ? suggestion - 1 : 0;
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+
+      if (event.key === "ArrowUp") {
+        const i = suggestion - 1;
 
         setSuggestion(i > -1 ? i : items.length - 1);
-        break;
-      }
-      case "ArrowDown": {
-        const i = suggestion !== undefined ? suggestion + 1 : 0;
+      } else {
+        const i = suggestion + 1;
 
         setSuggestion(i < items.length ? i : 0);
-        break;
       }
-      case "Escape": {
-        (event.target as HTMLDivElement).blur();
-        break;
-      }
-      case "Enter": {
-        (event.target as HTMLDivElement).blur();
 
-        if (suggestion) {
-          setValue(items[suggestion]);
-        }
-        break;
-      }
+      return;
     }
+
+    if (event.key === "Enter" || event.key === "Escape") {
+      (event.target as HTMLDivElement).blur();
+
+      if (event.key === "Enter") {
+        setValue(items[suggestion]);
+      }
+
+      return;
+    }
+  };
+
+  const handleBlur = () => {
+    if (validate) {
+      setValidated(validate(value));
+    }
+    setItems(undefined);
+    setSuggestion(0);
   };
 
   return (
     <div
       css={css.formCityInput}
       onFocus={() => setValidated(undefined)}
-      onBlur={validate ? () => setValidated(validate(value)) : undefined}
+      onBlur={handleBlur}
       onKeyDown={handleKeyPress}
     >
       <label css={css.label}>{label}</label>
@@ -183,10 +189,9 @@ export default function FormSuggestion({
             css={css.input}
             value={value}
             onChange={(event) => setValue(event.target.value)}
+            data-validated={validated ?? ""}
           />
         }
-        disabled={!items}
-        data-validated={validated ?? ""}
       >
         {items
           ? items.map((item, i) => (

@@ -3,10 +3,11 @@
  */
 import {
   useState,
+  useLayoutEffect,
   useRef,
+  cloneElement,
   ReactNode,
   ReactElement,
-  useLayoutEffect,
 } from "react";
 
 /**
@@ -52,6 +53,7 @@ export default function Dropdown({
       position: "absolute",
       padding: `0 0 ${spacing}px 0`,
       backgroundColor: "#FFF",
+      cursor: "default",
       "&[data-toggled=true]": {
         display: "block",
         visibility: "visible",
@@ -66,6 +68,10 @@ export default function Dropdown({
 
     const element = dropdownElement.current!;
     const items = element.children[1] as HTMLDivElement;
+
+    if (!items) {
+      return;
+    }
 
     switch (direction) {
       case "left": {
@@ -104,15 +110,20 @@ export default function Dropdown({
   return (
     <div
       css={[css.dropdown, $css?.dropdown]}
-      tabIndex={focusable ? 0 : -1}
+      tabIndex={focusable ? 0 : undefined}
       ref={dropdownElement}
-      onClick={handleToggle}
+      onClick={!disabled ? handleToggle : undefined}
       onBlur={() => setToggled(false)}
-      data-toggled={!disabled && toggled}
+      data-toggled={children && toggled}
       {...props}
     >
-      {typeof label === "string" ? <div css={$css?.label}>{label}</div> : label}
-      <div css={[css.items, $css?.items]} data-toggled={!disabled && toggled}>
+      {typeof label === "string" ? (
+        <div css={$css?.label}>{label}</div>
+      ) : (
+        cloneElement(label, { ...label.props, disabled })
+      )}
+
+      <div css={[css.items, $css?.items]} data-toggled={children && toggled}>
         {children}
       </div>
     </div>
