@@ -185,7 +185,7 @@ export default function FormSuggestion({
             onChange={(event) => setValue(event.target.value)}
           />
         }
-        conditional={items !== undefined}
+        disabled={!items}
         data-validated={validated ?? ""}
       >
         {items

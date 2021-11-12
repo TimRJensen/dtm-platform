@@ -1,6 +1,7 @@
 /**
  * Vendor imports.
  */
+import { useContext } from "react";
 
 /**
  * Custom imports.
@@ -8,7 +9,7 @@
 import { PostType, CommentType } from "db";
 import { useCSS } from "../../hooks";
 import { formatDate } from "../../util/main";
-//import { Dropdown } from "./Dropdown/Dropdown";
+import { AppStateContext } from "../App/app-state/main";
 import Dropdown from "../Dropdown/Dropdown";
 import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
@@ -52,6 +53,7 @@ export default function MessageHeader({ doc, onEdit }: Props) {
     },
     items: {
       height: "inherit",
+      width: "fit-content",
       margin: 0,
       padding: 0,
     },
@@ -60,6 +62,9 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       backgroundColor: colors.secondary,
       color: colors.text.secondary,
       borderRadius: 0,
+      "&[data-disabled=true]": {
+        backgroundColor: colors.secondary,
+      },
       "&[data-disabled=false]:hover": {
         backgroundColor: colors.secondaryDarker,
       },
@@ -68,6 +73,9 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       width: 45,
     },
   }));
+  const {
+    state: { currentUser },
+  } = useContext(AppStateContext);
 
   return (
     <div css={css.messageHeader}>
@@ -78,10 +86,14 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       <Dropdown
         $css={{ dropdown: css.dropdown, items: css.items }}
         label={
-          <Button $css={{ button: [css.button, css.buttonExpand] }}>
-            <FontIcon type="more_horiz"></FontIcon>
+          <Button
+            $css={{ button: [css.button, css.buttonExpand] }}
+            disabled={!currentUser}
+          >
+            <FontIcon type="more_horiz" />
           </Button>
         }
+        disabled={!currentUser}
         direction="left"
       >
         <Button $css={{ button: css.button }} onClick={onEdit}>

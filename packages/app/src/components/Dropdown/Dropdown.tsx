@@ -26,7 +26,7 @@ interface Props {
   label: ReactElement | string;
   direction?: "down" | "left" | "right";
   focusable?: boolean;
-  conditional?: boolean;
+  disabled?: boolean;
   children?: ReactNode;
   props?: any;
 }
@@ -38,7 +38,7 @@ export default function Dropdown({
   $css,
   label,
   direction = "down",
-  conditional = true,
+  disabled = false,
   focusable = false,
   children,
   ...props
@@ -106,18 +106,13 @@ export default function Dropdown({
       css={[css.dropdown, $css?.dropdown]}
       tabIndex={focusable ? 0 : -1}
       ref={dropdownElement}
-      onMouseDown={(event) => {
-        if (document.activeElement === dropdownElement.current) {
-          event.preventDefault();
-        }
-        handleToggle();
-      }}
+      onClick={handleToggle}
       onBlur={() => setToggled(false)}
-      data-toggled={conditional && toggled}
+      data-toggled={!disabled && toggled}
       {...props}
     >
       {typeof label === "string" ? <div css={$css?.label}>{label}</div> : label}
-      <div css={[css.items, $css?.items]} data-toggled={conditional && toggled}>
+      <div css={[css.items, $css?.items]} data-toggled={!disabled && toggled}>
         {children}
       </div>
     </div>
