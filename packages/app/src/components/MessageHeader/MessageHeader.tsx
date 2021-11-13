@@ -84,25 +84,22 @@ export default function MessageHeader({ doc, onEdit }: Props) {
         <span>{doc.user.displayName}</span>
       </div>
       <Dropdown
-        $css={{ dropdown: css.dropdown, items: css.items }}
+        css={{ ...css }}
         label={
-          <Button
-            $css={{ button: [css.button, css.buttonExpand] }}
-            //disabled={!currentUser}
-          >
+          <Button $css={{ button: [css.button, css.buttonExpand] }}>
             <FontIcon type="more_horiz" />
           </Button>
         }
         disabled={!currentUser}
         direction="left"
       >
-        <Button $css={{ button: css.button }} onClick={onEdit}>
+        <Button $css={{ ...css }} onClick={onEdit}>
           <FontIcon type="edit">edit</FontIcon>
         </Button>
-        <Button $css={{ button: css.button }} /*onClick={undefined}*/>
+        <Button $css={{ ...css }} /*onClick={undefined}*/>
           <FontIcon type="delete">delete</FontIcon>
         </Button>
-        <Button $css={{ button: css.button }} /*onClick={undefined}*/>
+        <Button $css={{ ...css }} /*onClick={undefined}*/>
           <FontIcon type="not_interested">ban</FontIcon>
         </Button>
       </Dropdown>

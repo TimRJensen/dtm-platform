@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, KeyboardEvent } from "react";
+import { useState, useRef } from "react";
 
 /**
  * Custom imports.
@@ -16,7 +16,7 @@ import FontIcon from "../FontIcon/FontIcon";
 interface Props {
   items: string[];
   label: string;
-  validate: (value: string) => boolean;
+  validate?: (value: string) => boolean;
 }
 
 /**
@@ -34,16 +34,22 @@ export default function FormSelect({ items, label, validate }: Props) {
       margin: `0 ${spacing}px 0 0`,
     },
     dropdown: {
-      width: "min(304px)",
+      width: "min(300px)",
+    },
+    selected: {
+      display: "flex",
+      alignItems: "center",
+      height: "1.5rem",
+      width: "inherit",
       outline: "none",
+      padding: "1px 2px",
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
+      borderRadius: 0,
+      color: colors.text.primary,
       cursor: "default",
-      "&:focus": {
+      "&[data-toggled=true]": {
         border: `1px solid ${colors.input.defaultBorder}`,
-        borderRadius: borderRadius / 2,
-      },
-      "&[data-toggled=true]:focus": {
         borderBottom: "1px solid transparent",
         borderRadius: `${borderRadius / 2}px ${borderRadius / 2}px 0 0`,
       },
@@ -58,84 +64,90 @@ export default function FormSelect({ items, label, validate }: Props) {
         borderRadius: borderRadius / 2,
       },
     },
-    selected: {
-      display: "flex",
-      alignItems: "center",
-      height: "1.5rem",
-      padding: "1px 2px",
-    },
     fontIcon: {
       margin: "0 0 0 auto",
       color: colors.secondary,
     },
     items: {
+      height: "calc(6 * 1rem)",
       border: `1px solid ${colors.input.defaultBorder}`,
       borderTop: "none",
       borderRadius: `0 0 ${borderRadius / 2}px ${borderRadius / 2}px`,
+      padding: `0 0 ${spacing}px 0`,
+      overflowX: "hidden",
+      overflowY: "scroll",
+      "&::-webkit-scrollbar": {
+        width: "0.5rem",
+      },
+      "&::-webkit-scrollbar-track": {
+        backgroundColor: colors.primary,
+      },
+      "&::-webkit-scrollbar-thumb": {
+        backgroundColor: colors.secondary,
+      },
     },
-    item: {
-      padding: `0 0 0 2px`,
-      clear: "both",
-      "&[data-toggled=true]": {
+    /*item: {
+      display: "block",
+      width: "inherit",
+      outline: "none",
+      padding: "1px 2px",
+      textAlign: "left",
+      "&:focus": {
         backgroundColor: colors.secondary,
         color: colors.text.secondary,
       },
-    },
+    },*/
+    item: ({ index }) => ({
+      display: "block",
+      width: "inherit",
+      outline: "none",
+      padding: "1px 2px",
+      textAlign: "left",
+      [`&:nth-of-type(${index + 1})`]: {
+        backgroundColor: colors.secondary,
+        color: colors.text.secondary,
+      },
+    }),
   }));
   const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
+  const selected = useRef("");
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
-      case "ArrowUp": {
-        const i = items.indexOf(value) - 1;
-
-        setValue(i > -1 ? items[i] : items[items.length - 1]);
-        break;
-      }
-      case "ArrowDown": {
-        const i = items.indexOf(value) + 1;
-
-        setValue(i < items.length ? items[i] : items[0]);
-        break;
-      }
-      case "Escape":
-      case "Enter": {
-        (event.target as HTMLDivElement).blur();
-        break;
-      }
+  const handleBlur = () => {
+    if (validate) {
+      setValidated(validate(selected.current));
     }
+
+    setValue(selected.current);
   };
 
   return (
     <div
       css={css.formSelect}
       onFocus={() => setValidated(undefined)}
-      onBlur={() => setValidated(validate(value))}
-      onKeyDown={handleKeyPress}
+      onBlur={handleBlur}
     >
       <div css={css.label}>{label}</div>
       <Dropdown
-        $css={{ dropdown: css.dropdown, items: css.items }}
+        $css={{ ...css }}
         label={
-          <div css={css.selected} data-validated={validated ?? ""}>
+          <button css={css.selected} data-validated={validated ?? ""}>
             {value}
-            <FontIcon $css={{ fontIcon: css.fontIcon }} type="expand_more" />
-          </div>
+            <FontIcon $css={{ ...css }} type="expand_more" />
+          </button>
         }
-        focusable
-        data-validated={validated}
       >
-        {items.map((item) => (
-          <div
-            key={`formSelect-option-${item}`}
+        {items.map((item, i) => (
+          <button
+            key={`formSelect-option-${item}-${i}`}
             css={css.item}
-            data-toggled={value === item}
-            onMouseOver={() => setValue(item)}
-            onMouseDown={() => setValue(item)}
+            tabIndex={undefined}
+            onClick={() => {
+              selected.current = item;
+            }}
           >
             {item}
-          </div>
+          </button>
         ))}
       </Dropdown>
     </div>

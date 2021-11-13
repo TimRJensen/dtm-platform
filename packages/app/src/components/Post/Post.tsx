@@ -76,9 +76,9 @@ export default function Post({ doc }: Props) {
           </div>
         )}
         <TextEditor
-          $css={{ textEditor: css.textEditor, input: css.input }}
+          $css={{ ...css }}
           onSubmit={commentEditor.handleSubmit}
-          show={commentEditor.showEditor()}
+          toggle={commentEditor.showEditor()}
         />
         {arraySort(doc.comments, "createdAt", { reverse: true }).map(
           (comment) => (

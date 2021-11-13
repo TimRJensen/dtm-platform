@@ -88,36 +88,33 @@ export default function login({}: Props) {
               <div css={css.group}>
                 <div css={css.label}>Login with an existing login:</div>
                 <Link
-                  css={css.button}
                   to={generatePath(path, {
                     loginId: "google",
                   })}
                 >
-                  <Button $css={{ button: css.button }}>
+                  <Button $css={{ ...css }}>
                     <GoogleLogo css={css.logo} />
                     Login with Google
                   </Button>
                 </Link>
                 <Link
-                  css={css.button}
                   to={generatePath(path, {
                     loginId: "facebook",
                   })}
                 >
-                  <Button $css={{ button: css.button }}>
+                  <Button $css={{ ...css }}>
                     <FacebookLogo css={css.logo} />
                     Login with Facebook
                   </Button>
                 </Link>
                 <Link
-                  css={css.button}
                   to={generatePath(path, {
                     loginId: "magiclink",
                   })}
                 >
-                  <Button $css={{ button: css.button }}>
+                  <Button $css={{ ...css }}>
                     <FontIcon
-                      $css={{ fontIcon: css.fontIcon, icon: css.magicLink }}
+                      $css={{ ...css, icon: css.magicLink }}
                       type="auto_fix_high"
                       size={38}
                     />
@@ -125,14 +122,13 @@ export default function login({}: Props) {
                   </Button>
                 </Link>
                 <Link
-                  css={css.button}
                   to={generatePath(path, {
                     loginId: "ArtiFACT",
                   })}
                 >
-                  <Button $css={{ button: css.button }}>
+                  <Button $css={{ ...css }}>
                     <FontIcon
-                      $css={{ fontIcon: css.fontIcon, icon: css.artiFACT }}
+                      $css={{ ...css, icon: css.artiFACT }}
                       type="account_circle"
                       size={48}
                     />

@@ -8,9 +8,7 @@ import { useState, useEffect, useRef } from "react";
  */
 import { AccountType, CategoryType, ProfileTable } from "db";
 import { useCSS, useDB } from "../../hooks";
-import FormSuggestion, {
-  InputType,
-} from "../../components/FormSuggestion/FormSuggestion";
+import FormSuggestion from "../../components/FormSuggestion/FormSuggestion";
 import FontIcon from "../../components/FontIcon/FontIcon";
 import Button from "../../components/Button/Button";
 
@@ -53,7 +51,7 @@ export default function success({ doc }: Props) {
         gridColumn: "span 2",
       },
     },
-    buttonModify: {
+    button: {
       gridArea: "add",
       alignSelf: "start",
       height: 24,
@@ -78,7 +76,7 @@ export default function success({ doc }: Props) {
     },
   }));
   const { db, queries } = useDB();
-  const [data, setData] = useState<InputType<CategoryType, "label">>();
+  const [data, setData] = useState<string[]>();
   const [list, setList] = useState<string[]>([]);
   const value = useRef("");
 
@@ -93,7 +91,7 @@ export default function success({ doc }: Props) {
       return;
     }
 
-    setData({ key: "label", data: response });
+    setData(response.map((element) => element.label));
   };
 
   useEffect(() => {
@@ -147,23 +145,18 @@ export default function success({ doc }: Props) {
         <FormSuggestion
           label="Interests"
           suggestions={data}
-          beginIndex={1}
-          onChange={(_value) => {
-            value.current = _value;
+          onChange={(event) => {
+            value.current = event.target.value;
           }}
         />
-        <Button
-          $css={{ button: css.buttonModify }}
-          type="transparent"
-          onClick={handleAdd}
-        >
+        <Button $css={{ ...css }} type="transparent" onClick={handleAdd}>
           <FontIcon type="add" />
         </Button>
         <div css={css.items}>
           {list.map((item, i) => (
             <div key={`interest-${item}-${i}`} css={css.item}>
               <Button
-                $css={{ button: css.buttonModify }}
+                $css={{ ...css }}
                 type="transparent"
                 onClick={handleRemove(i)}
               >
@@ -178,7 +171,7 @@ export default function success({ doc }: Props) {
           type="accept"
           disabled={!list[0]}
           onClick={handleSubmit}
-        >{`Submit`}</Button>
+        >{`submit`}</Button>
       </div>
     </section>
   );

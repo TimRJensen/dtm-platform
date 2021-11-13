@@ -15,14 +15,14 @@ import { useCSS } from "../../hooks";
  */
 interface Props {
   doc: GridItemType;
-  show?: boolean;
+  toggled?: boolean;
   onLoad?: () => void;
 }
 
 /**
  * GridItem functional component.
  */
-export default function GridItem({ doc, show = true, onLoad }: Props) {
+export default function GridItem({ doc, toggled = true, onLoad }: Props) {
   if (!doc) return null;
 
   const { css } = useCSS(({ spacing, colors }) => ({
@@ -33,7 +33,7 @@ export default function GridItem({ doc, show = true, onLoad }: Props) {
       "&:hover :first-of-type:last-child": {
         backgroundColor: colors.secondary,
       },
-      "&[data-show=true]": {
+      "&[data-toggled=true]": {
         display: "initial",
       },
     },
@@ -58,7 +58,7 @@ export default function GridItem({ doc, show = true, onLoad }: Props) {
   const containerElement = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (!show) {
+    if (!toggled) {
       return;
     }
 
@@ -82,10 +82,10 @@ export default function GridItem({ doc, show = true, onLoad }: Props) {
       (child.getBoundingClientRect().height + rowGap) / (rowHeight + rowGap);
 
     element.style.gridRowEnd = `span ${Math.ceil(rowSpan)}`;
-  }, [show]);
+  }, [toggled]);
 
   return (
-    <div css={css.artifactCard} data-show={show} ref={containerElement}>
+    <div css={css.artifactCard} data-toggled={toggled} ref={containerElement}>
       <Link to={`/blogs/${doc.id}`} css={css.content}>
         <img
           css={css.image}

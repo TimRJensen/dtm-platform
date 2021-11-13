@@ -88,9 +88,9 @@ export default function blog({ blog }: Props) {
         <section>
           <Artifact doc={blog.artifact} onComment={handleShowEditor} />
           <TextEditor
-            $css={{ textEditor: css.textEditor, input: css.input }}
+            $css={{ ...css }}
             onSubmit={handleSubmit}
-            show={showEditor()}
+            toggle={showEditor()}
             advanced
           />
           {arraySort(blog.posts, "createdAt", { reverse: true }).map((post) => (

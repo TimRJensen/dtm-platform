@@ -11,63 +11,67 @@ import {
   convertFromHTML,
 } from "draft-js";
 import draftParser from "draftjs-to-html";
+import { SerializedStyles } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
+import Button from "../Button/Button";
 import TextEditorControls from "../TextEditorControls/TextEditorControls";
 
 /**
  * Types.
  */
 interface Props {
-  onSubmit: (content: string | undefined, isEdit?: boolean) => void;
-  show?: boolean;
-  advanced?: boolean;
+  $css?: Partial<{
+    [key in
+      | "textEditor"
+      | "input"
+      | "footer"
+      | "buttonSubmit"
+      | "buttonCancel"]: SerializedStyles | {};
+  }>;
   content?: string;
-  $css?: {
-    textEditor?: ReturnType<typeof useCSS>["css"]["string"];
-    input?: ReturnType<typeof useCSS>["css"]["string"];
-    footer?: ReturnType<typeof useCSS>["css"]["string"];
-    buttonSubmit?: ReturnType<typeof useCSS>["css"]["string"];
-    buttonCancel?: ReturnType<typeof useCSS>["css"]["string"];
-  };
+  toggle?: boolean;
+  advanced?: boolean;
+  onSubmit: (content: string | undefined, isEdit?: boolean) => void;
 }
 
 /**
  * TextEditor functional component - https://draftjs.org/
  */
 export default function TextEditor({
-  $css,
-  show = true,
+  $css = {},
+  toggle = true,
   advanced = false,
   content,
   onSubmit,
 }: Props) {
-  if (!show) return null;
+  if (!toggle) return null;
 
-  const { css } = useCSS(({ spacing, colors, mixins: { button } }) => ({
-    textEditor: {},
-    input: {
-      height: "inherit",
-      marginBottom: spacing,
-      padding: spacing,
-      borderBottom: `1px solid ${colors.primary}`,
-      overflow: "auto",
-    },
+  const { css } = useCSS(({ spacing, colors }) => ({
+    textEditor: [{}, $css.textEditor],
+    input: [
+      {
+        height: "inherit",
+        marginBottom: spacing,
+        padding: spacing,
+        borderBottom: `1px solid ${colors.primary}`,
+        overflow: "auto",
+      },
+      $css.input,
+    ],
     footer: {
       display: "flex",
       justifyContent: "right",
     },
-    buttonCancel: [button, { marginRight: spacing }],
+    buttonCancel: [{}, $css.buttonCancel],
     buttonSubmit: [
-      button,
       {
         marginRight: spacing,
-        backgroundColor: colors.button.accept,
-        "&:hover": { backgroundColor: colors.button.acceptHover },
       },
+      $css.buttonSubmit,
     ],
   }));
   const editorRef = useRef<Editor>(null);
@@ -97,11 +101,8 @@ export default function TextEditor({
   }, []);
 
   return (
-    <section css={[css.textEditor, $css?.textEditor]}>
-      <div
-        css={[css.input, $css?.input]}
-        onClick={() => editorRef.current?.focus()}
-      >
+    <section css={css.textEditor}>
+      <div css={css.input} onClick={() => editorRef.current?.focus()}>
         {advanced ? (
           <TextEditorControls
             editorState={editorState}
@@ -115,9 +116,10 @@ export default function TextEditor({
           ref={editorRef}
         />
       </div>
-      <div css={[css.footer, $css?.footer]}>
-        <button
-          css={[css.buttonSubmit, $css?.buttonSubmit]}
+      <div css={css.footer}>
+        <Button
+          $css={{ button: css.buttonSubmit }}
+          type="accept"
           onClick={() =>
             onSubmit(
               draftParser(convertToRaw(editorState.getCurrentContent())),
@@ -126,13 +128,13 @@ export default function TextEditor({
           }
         >
           submit
-        </button>
-        <button
-          css={[css.buttonCancel, $css?.buttonCancel]}
+        </Button>
+        <Button
+          $css={{ button: css.buttonCancel }}
           onClick={() => onSubmit(undefined)}
         >
           cancel
-        </button>
+        </Button>
       </div>
     </section>
   );

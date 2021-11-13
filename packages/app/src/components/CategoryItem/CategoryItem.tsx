@@ -1,80 +1,79 @@
 /**
  * Vendor imports.
  */
-import { useEffect, useState } from "react";
-import { Link, useRouteMatch, generatePath } from "react-router-dom";
+import { MouseEvent, useState } from "react";
+import { generatePath, Link } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { CategoryType } from "db";
+import { SubCategoryType } from "db";
 import { useCSS } from "../../hooks";
-import CategoryItemMinor from "../CategoryItemMinor/CategoryItemMinor";
 
 /**
  * Types.
  */
 const path = "/categories/:categoryId/:subCategoryIds?";
 
-type Params = {
-  categoryId: string;
-  subCategoryIds?: string;
-};
-
 interface Props {
-  doc: CategoryType;
+  doc: SubCategoryType;
 }
 
 /**
- * CategoryItem functional component.u
+ * ListItemMinor functional component.
  */
-export default function CategoryItem({ doc }: Props) {
+export default function ListItemMinor({ doc }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
-    label: {
+    button: {
       display: "block",
+      height: "auto",
+      width: "inherit",
       padding: `${spacing}px 0 ${spacing}px ${spacing}px`,
-      color: colors.text.secondary,
-      "&:hover, &[data-active=true]": {
-        backgroundColor: colors.secondary,
+      borderRadius: 0,
+      fontSize: "1rem",
+      textAlign: "left",
+      cursor: "default",
+      "&[data-toggled]": {
+        backgroundColor: colors.primaryLighter,
+        color: colors.text.secondary,
       },
-    },
-    subCategories: {
-      maxHeight: 0,
-      overflow: "hidden",
-      transition: "max-height 0.3s ease", //collapse
-      " &[data-show=true]": {
-        maxHeight: 1024,
-        transition: "max-height 1s ease", //show
+      "&[data-toggled=true]": {
+        backgroundColor: colors.primaryLightest,
+        "&::before": {
+          paddingRight: spacing,
+          content: `"+"`,
+        },
+      },
+      "&:hover": {
+        backgroundColor: colors.primaryLightest,
       },
     },
   }));
-  const routeMatch = useRouteMatch<Params>(path);
-  const { categoryId, subCategoryIds } = routeMatch?.params ?? {};
-  const [lastMatch, setLastMatch] = useState<string>();
+  const [toggled, setToggled] = useState(false);
+  const subcategoryIds =
+    window.location.pathname.split("/")[3]?.split("+") ?? [];
 
-  useEffect(() => {
-    if (categoryId === doc.id) {
-      setLastMatch(subCategoryIds);
-    }
-  }, [subCategoryIds]);
+  const handleToggle = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setToggled(!toggled);
+  };
 
   return (
-    <div>
-      <Link
-        css={css.label}
-        to={generatePath(path, {
-          categoryId: doc.id,
-          subCategoryIds: lastMatch,
-        })}
-        data-active={categoryId === doc.id}
-      >
-        {doc.label}
-      </Link>
-      <div css={css.subCategories} data-show={categoryId === doc.id}>
-        {doc.subCategories.map((subCategory) => (
-          <CategoryItemMinor key={subCategory.id} doc={subCategory} />
-        ))}
-      </div>
-    </div>
+    <Link
+      css={css.button}
+      to={generatePath(path, {
+        categoryId: doc.mainCategory.id,
+        subCategoryIds: toggled
+          ? subcategoryIds.concat(doc.id).join("+")
+          : subcategoryIds.length > 1
+          ? subcategoryIds.filter((element) => element !== doc.id).join("+")
+          : undefined,
+      })}
+      data-toggled={toggled}
+      onMouseDown={handleToggle}
+    >
+      {doc.label}
+    </Link>
   );
 }

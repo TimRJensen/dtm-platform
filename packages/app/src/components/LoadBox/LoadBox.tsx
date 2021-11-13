@@ -34,7 +34,7 @@ export default function LoadBox({ data, loadable = false, children }: Props) {
     loader: {
       display: "none",
       minHeight: `calc(100vh - ${appHeader.height}px - ${banner.height}px - 30vh)`,
-      "&[data-show=true]": {
+      "&[data-toggled=true]": {
         display: "flex",
         justifyContent: "center",
         padding: "30vh 0 0 0",
@@ -69,7 +69,7 @@ export default function LoadBox({ data, loadable = false, children }: Props) {
 
   return (
     <section onLoad={loadable ? handleLoad : undefined}>
-      <div css={css.loader} data-show={loading}>
+      <div css={css.loader} data-toggled={loading}>
         <PacmanLoader color={theme.colors.secondary} />
       </div>
       {children

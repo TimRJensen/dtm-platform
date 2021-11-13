@@ -8,10 +8,12 @@ import { ThemeProvider, css, Global } from "@emotion/react";
 /**
  * Custom imports.
  */
-import DB, { DBProvider, UserType, Session, AuthChangeEvent } from "db";
+import DB, { DBProvider, UserType } from "db";
 import theme from "../../themes/dtm";
 import Header from "../AppHeader/AppHeader";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
+
+import Test from "../Test";
 
 const _Index = lazy(() => import("../../pages"));
 const _Blog = lazy(() => import("../../pages/blogs/"));
@@ -26,9 +28,6 @@ const _css = css({
   ":root": {
     fontFamily: `"Roboto", sans-serif`,
     boxSizing: "border-box",
-  },
-  body: {
-    margin: 0,
     "&::-webkit-scrollbar": {
       width: "0.5rem",
     },
@@ -39,8 +38,26 @@ const _css = css({
       backgroundColor: theme.colors.secondary,
     },
   },
+  html: {},
+  "*, *:after, *:before": {
+    boxSizing: "inherit",
+    fontFamily: "inherit",
+  },
+  body: {
+    margin: 0,
+  },
   a: {
+    outline: "none",
+    color: theme.colors.text.link,
     textDecoration: "none",
+  },
+  button: {
+    border: "none",
+    backgroundColor: "#FFF",
+  },
+  input: {
+    outline: "none",
+    border: "none",
   },
 });
 
@@ -59,48 +76,43 @@ export default function App({ db }: Props) {
     showEditor: undefined,
   });
 
-  const handleAuthChange = async (
-    event: AuthChangeEvent,
-    session: Session | null
-  ) => {
-    console.log(event, session);
+  useEffect(() => {
+    db.onAuthChange(async (event, session) => {
+      console.log(event, session);
 
-    if (!session) {
-      return;
-    }
+      if (!session) {
+        return;
+      }
 
-    const { user } = session;
+      const { user } = session;
 
-    switch (event) {
-      case "SIGNED_IN": {
-        const response = await db.selectExact<UserType>(
-          "accounts",
-          `
-            id,
-            role,
-            email,
-            displayName,
-            verified,
-            stats
-        `,
-          {
-            match: { email: user?.email ?? "" },
+      switch (event) {
+        case "SIGNED_IN": {
+          const response = await db.selectExact<UserType>(
+            "accounts",
+            `
+              id,
+              role,
+              email,
+              displayName,
+              verified,
+              stats
+          `,
+            {
+              match: { email: user?.email ?? "" },
+            }
+          );
+
+          console.log("app", response);
+          if ("error" in response) {
+            break;
           }
-        );
 
-        console.log("app", response);
-        if ("error" in response) {
+          dispatch({ type: "CURRENT_USER", value: response });
           break;
         }
-
-        dispatch({ type: "CURRENT_USER", value: response });
-        break;
       }
-    }
-  };
-
-  useEffect(() => {
-    db.onAuthChange(handleAuthChange);
+    });
 
     console.log("dbUser", db.currentUser());
   }, []);
@@ -149,6 +161,7 @@ export default function App({ db }: Props) {
                   </Suspense>
                 )}
               />
+              <Route path="/test" component={Test} />
               <Route
                 path="/"
                 render={() => (

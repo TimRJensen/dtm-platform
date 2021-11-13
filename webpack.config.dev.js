@@ -67,7 +67,7 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
     client: {
-      overlay: { errors: true, warnings: true },
+      overlay: { errors: true, warnings: false },
     },
   },
   stats: "minimal",

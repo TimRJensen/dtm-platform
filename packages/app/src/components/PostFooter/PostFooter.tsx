@@ -48,7 +48,7 @@ export default function PostFooter({ doc, onComment }: Props) {
   return (
     <div css={css.footer}>
       <Button
-        $css={{ button: css.button }}
+        $css={{ ...css }}
         type="transparent"
         disabled={!state.currentUser}
         onClick={onComment}
@@ -58,7 +58,7 @@ export default function PostFooter({ doc, onComment }: Props) {
         </FontIcon>
       </Button>
       <Button
-        $css={{ button: css.button }}
+        $css={{ ...css }}
         type="transparent"
         disabled={!state.currentUser}
         toggled={isUpvoted}

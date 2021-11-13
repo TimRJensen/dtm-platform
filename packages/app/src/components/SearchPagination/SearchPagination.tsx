@@ -2,7 +2,7 @@
  * Vendor imports.
  */
 import { useEffect, useState } from "react";
-import { Link, useParams, generatePath } from "react-router-dom";
+import { useParams, Link, generatePath } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -58,7 +58,7 @@ export default function SearchPagination({
     divider: {
       margin: `0 ${spacing / 2}px 0 0`,
     },
-    arrow: {
+    icon: {
       color: colors.primary,
       ":not(:last-of-type)": {
         margin: `0 ${spacing / 2}px 0 0`,
@@ -106,34 +106,28 @@ export default function SearchPagination({
             query,
             pageId: currentPage - 1,
           })}
-          component={(rest) => (
-            <Button $css={{ button: css.button }} type="transparent" {...rest}>
-              <FontIcon
-                type="keyboard_double_arrow_left"
-                $css={{ icon: css.arrow }}
-              />
-            </Button>
-          )}
-        />
+        >
+          <Button $css={{ ...css }} type="transparent">
+            <FontIcon type="keyboard_double_arrow_left" $css={{ ...css }} />
+          </Button>
+        </Link>
       ) : null}
       {pages.map((value, i) =>
         typeof value === "number" ? (
           <Link
-            key={`search-pagination-${value}`}
             to={generatePath(path, {
               query,
               pageId: value - 1,
             })}
-            component={(rest) => (
-              <Button
-                $css={{ button: css.button }}
-                toggled={value - 1 === currentPage}
-                {...rest}
-              >
-                {value}
-              </Button>
-            )}
-          />
+          >
+            <Button
+              key={`search-pagination-${value}`}
+              $css={{ ...css }}
+              toggled={value - 1 === currentPage}
+            >
+              {value}
+            </Button>
+          </Link>
         ) : (
           <span key={`search-pagination-${value}-${i}`} css={css.divider}>
             {value}
@@ -146,15 +140,11 @@ export default function SearchPagination({
             query,
             pageId: currentPage + 1,
           })}
-          component={(rest) => (
-            <Button $css={{ button: css.button }} type="transparent" {...rest}>
-              <FontIcon
-                type="keyboard_double_arrow_right"
-                $css={{ icon: css.arrow }}
-              />
-            </Button>
-          )}
-        />
+        >
+          <Button $css={{ ...css }} type="transparent">
+            <FontIcon type="keyboard_double_arrow_right" $css={{ ...css }} />
+          </Button>
+        </Link>
       ) : null}
     </div>
   ) : null;

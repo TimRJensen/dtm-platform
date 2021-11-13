@@ -2,7 +2,7 @@
  * Vendor imports.
  */
 import { useState, useEffect, useRef } from "react";
-import { Link, useHistory, generatePath } from "react-router-dom";
+import { useHistory, Link, generatePath } from "react-router-dom";
 import { validate as validateEmail } from "email-validator";
 
 /**
@@ -12,9 +12,7 @@ import { AccountType, ErrorType } from "db";
 import { useCSS, useDB } from "../../hooks";
 import LoadBox from "../../components/LoadBox/LoadBox";
 import FormInput from "../../components/FormInput/FormInput";
-import FormSuggestion, {
-  InputType,
-} from "../../components/FormSuggestion/FormSuggestion";
+import FormSuggestion from "../../components/FormSuggestion/FormSuggestion";
 import FormSelect from "../../components/FormSelect/FormSelect";
 import Button from "../../components/Button/Button";
 
@@ -42,7 +40,7 @@ const regions = [
 ];
 
 interface Props {
-  suggestions: InputType | undefined;
+  suggestions: string[] | undefined;
   onSubmit?: (user: AccountType | undefined) => void;
   onError?: (error: ErrorType) => void;
 }
@@ -60,7 +58,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       margin: `${spacing * 2}px auto 0 auto`,
       whiteSpace: "nowrap",
     },
-    submitButton: {
+    button: {
       margin: `0 ${spacing}px 0 0`,
     },
   }));
@@ -182,15 +180,15 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
         <br />
         <div>
           <Button
-            $css={{ button: css.submitButton }}
+            $css={{ ...css }}
             type="accept"
             disabled={!validated}
             onClick={handleSubmit}
           >
-            {"Submit"}
+            {"submit"}
           </Button>
-          <Link to="/" component={Button}>
-            {"Cancel"}
+          <Link to="/">
+            <Button> {"cancel"}</Button>
           </Link>
         </div>
       </section>

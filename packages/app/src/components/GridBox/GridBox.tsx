@@ -33,6 +33,7 @@ export default function GridBox({ docs, columns = 3, onLoad }: Props) {
       display: "grid",
       gridTemplateColumns: `repeat(${columns}, clamp(200px, 300px, 25vw))`,
       gridAutoRows: 25,
+      gridAutoFlow: "dense",
       alignItems: "start",
       justifyItems: "center",
       columnGap: spacing,
@@ -78,7 +79,7 @@ export default function GridBox({ docs, columns = 3, onLoad }: Props) {
         i < gridItems.length - docs.length ? (
           <GridItem key={`grid-item-${doc.id}`} doc={doc} />
         ) : (
-          <GridItem key={`grid-item-${doc.id}`} doc={doc} show={!loading} />
+          <GridItem key={`grid-item-${doc.id}`} doc={doc} toggled={!loading} />
         )
       )}
       {loading ? (

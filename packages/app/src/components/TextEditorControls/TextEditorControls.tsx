@@ -2,6 +2,7 @@
  * Vendor imports.
  */
 import { EditorState, RichUtils } from "draft-js";
+import { MouseEvent } from "react";
 
 /**
  * Custom imports.
@@ -45,7 +46,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
     button: {
       width: "auto",
       color: colors.secondary,
-      "&[data-disabled=false]:hover": {
+      "&[data-toggled=false]:hover": {
         color: colors.secondaryDarker,
       },
       ":not(:last-of-type)": {
@@ -54,18 +55,26 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
     },
   }));
 
+  const handleStyleToggle = (
+    method: "toggleInlineStyle" | "toggleBlockType",
+    type: string
+  ) => {
+    return (event: MouseEvent<any, any>) => {
+      event.preventDefault();
+      onToggle(RichUtils[method](editorState, type));
+    };
+  };
+
   return (
     <div css={css.textEditorControls}>
       <span css={css.controlGroup}>
         {inlineControls.map((control) => (
           <Button
             key={`text-control-button-${control.type}`}
-            $css={{ button: css.button }}
+            $css={{ ...css }}
             type="transparent"
             toggled={editorState.getCurrentInlineStyle().has(control.type)}
-            onToggle={() =>
-              onToggle(RichUtils.toggleInlineStyle(editorState, control.type))
-            }
+            onToggle={handleStyleToggle("toggleInlineStyle", control.type)}
           >
             <FontIcon
               key={`text-control-button-${control.type}`}
@@ -78,7 +87,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
         {blockControls.map((control) => (
           <Button
             key={`text-control-button-${control.type}`}
-            $css={{ button: css.button }}
+            $css={{ ...css }}
             type="transparent"
             toggled={
               editorState
@@ -86,9 +95,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
                 .getBlockForKey(editorState.getSelection().getStartKey())
                 .getType() === control.type
             }
-            onToggle={() =>
-              onToggle(RichUtils.toggleBlockType(editorState, control.type))
-            }
+            onToggle={handleStyleToggle("toggleInlineStyle", control.type)}
           >
             <FontIcon type={control.fontIcon} />
           </Button>

@@ -42,7 +42,7 @@ export default function AppNavbar() {
     delimeter: {
       margin: `0 ${spacing}px 0 ${spacing}px`,
     },
-    buttonHome: {
+    button: {
       height: "auto",
       width: "auto",
       margin: `0 ${spacing}px 0 0`,
@@ -69,7 +69,7 @@ export default function AppNavbar() {
         </div>
       ) : null}
       <Searchbar />
-      <Button $css={{ button: css.buttonHome }} type="transparent">
+      <Button $css={{ ...css }} type="transparent">
         <FontIcon type="account_circle" size={42} />
       </Button>
     </section>

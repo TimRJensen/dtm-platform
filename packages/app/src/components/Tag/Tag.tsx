@@ -1,7 +1,8 @@
 /**
  * Vendor imports.
  */
-import { Link, generatePath } from "react-router-dom";
+import { generatePath } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -42,13 +43,8 @@ export default function Tag({ children }: Props) {
         query: children.split(" ").join("+"),
         page: 0,
       })}
-      component={(rest) => (
-        <Button $css={{ button: css.button }} {...rest}>
-          {children}
-        </Button>
-      )}
     >
-      {children}
+      <Button $css={{ ...css }}>{children}</Button>
     </Link>
   );
 }

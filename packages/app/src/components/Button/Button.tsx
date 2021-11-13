@@ -1,7 +1,13 @@
 /**
  * Vendor imports.
  */
-import { ReactNode, MouseEvent } from "react";
+import {
+  ReactNode,
+  MouseEvent,
+  RefObject,
+  forwardRef,
+  HTMLAttributes,
+} from "react";
 
 /**
  * Custom imports.
@@ -11,33 +17,30 @@ import { useCSS } from "../../hooks";
 /**
  * Types.
  */
-type StyleType = ReturnType<typeof useCSS>["css"][string];
-
-interface Props {
-  $css?: {
-    button: StyleType | StyleType[];
-  };
+interface Props extends HTMLAttributes<HTMLButtonElement> {
   type?: "default" | "accept" | "transparent";
-  toggled?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
-  onToggle?: () => void;
+  toggled?: boolean;
+  element?: RefObject<HTMLButtonElement>;
+  onToggle?: (event: MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode;
 }
 
 /**
  * Button functional component.
  */
-export default function Button({
-  $css,
-  type = "default",
-  disabled = false,
-  toggled,
-  onClick,
-  onToggle,
-  children,
-  ...rest
-}: Props) {
+export default forwardRef<HTMLButtonElement, Props>(function Button(
+  {
+    type = "default",
+    disabled = false,
+    toggled,
+    onClick,
+    onToggle,
+    children,
+    ...rest
+  }: Props,
+  ref
+) {
   const { css } = useCSS(({ borderRadius, colors }) => ({
     button: {
       height: 25,
@@ -48,13 +51,18 @@ export default function Button({
       backgroundColor: colors.button[type],
       borderRadius: borderRadius / 2,
       color: colors.text.secondary,
-      "&[data-disabled=false]:hover": {
+      cursor: "pointer",
+      "&:hover": {
         backgroundColor: colors.button[`${type}Hover`],
-        cursor: "pointer",
       },
       "&[data-disabled=true]": {
         backgroundColor: colors.button[`${type}Disabled`],
         color: colors.text.disabled,
+        cursor: "default",
+        "&:hover": {
+          backgroundColor: colors.button[`${type}Disabled`],
+          color: colors.text.disabled,
+        },
       },
       "&[data-toggled=false]": {
         backgroundColor: colors.button[`${type}Disabled`],
@@ -63,37 +71,29 @@ export default function Button({
     },
   }));
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    }
-
-    const { navigate, href } = rest as {
-      navigate: (href: string) => void;
-      href: string;
-    };
-
-    if (navigate) {
-      navigate(href ?? "/");
+  const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
+    if (onToggle) {
+      onToggle(event);
     }
   };
 
-  const handleToggle = (event: MouseEvent) => {
-    if (onToggle) {
-      event.preventDefault();
-      onToggle();
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (onClick) {
+      onClick(event);
     }
   };
 
   return (
     <button
-      css={[css.button, $css?.button]}
+      css={css.button}
+      data-disabled={disabled}
+      data-toggled={toggled ?? ""}
+      ref={ref}
       onClick={!disabled ? handleClick : undefined}
       onMouseDown={!disabled ? handleToggle : undefined}
-      data-disabled={disabled}
-      data-toggled={toggled}
+      {...rest}
     >
       {children}
     </button>
   );
-}
+});

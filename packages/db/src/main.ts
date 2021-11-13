@@ -454,4 +454,4 @@ export {
   SupabaseContext as DBContext,
   SupabaseProvider as DBProvider,
 } from "./context";
-export { SupabaBaseWrapper as default, AuthChangeEvent, Session };
+export { SupabaBaseWrapper as default };

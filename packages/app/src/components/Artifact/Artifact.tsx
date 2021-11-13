@@ -90,7 +90,7 @@ export default function Artifact({ doc, onComment }: Props) {
         </InfoPanelItem>
         <div css={css.divider}></div>
         <Button
-          $css={{ button: css.button }}
+          $css={{ ...css }}
           type="transparent"
           onClick={onComment}
           disabled={!state.currentUser}

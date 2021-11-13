@@ -10,12 +10,10 @@ import { Switch, Route } from "react-router-dom";
  */
 import { ErrorType } from "db";
 import { AppStateContext } from "../../components/App/app-state/main";
-import { InputType } from "../../components/FormSuggestion/FormSuggestion";
 
 const Create = lazy(() => import("./create"));
 const Success = lazy(() => import("./success"));
 const Error = lazy(() => import("./error"));
-const Pending = lazy(() => import("./pending"));
 
 /**
  * Types.
@@ -34,16 +32,13 @@ export default function signUp({}: Props) {
   const { dispatch } = useContext(AppStateContext);
   const [user, setUser] = useState<AccountType>();
   const [error, setError] = useState<ErrorType>();
-  const [data, setData] = useState<InputType>();
+  const [data, setData] = useState<string[]>();
 
   const _fetch = async () => {
     const response = await fetch(DAWAURL);
     const data = await response.json();
 
-    setData({
-      key: "primærtnavn",
-      data,
-    });
+    setData(data.map((element: any) => element.primærtnavn));
   };
 
   useEffect(() => {

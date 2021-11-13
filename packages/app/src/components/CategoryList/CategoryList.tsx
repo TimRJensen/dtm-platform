@@ -10,7 +10,7 @@ import { CategoryType } from "db";
 import { useCSS } from "../../hooks";
 import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
-import ListItem from "../CategoryItem/CategoryItem";
+import ListItem from "../CategoryFoldout/CategoryFoldout";
 
 /**
  * Types.
@@ -37,12 +37,12 @@ export default function CategoryList({ categories }: Props) {
       padding: `${spacing}px 0 0 0`,
       backgroundColor: colors.primary,
       color: colors.text.secondary,
-      "&[data-show=false]": {
+      "&[data-toggle=false]": {
         width: 50,
-        "& > :not(header), header [data-type=title]": {
+        "& header > div:first-of-type, & > :not(header)": {
           display: "none",
         },
-        "header :not([data-type=title])": {
+        "& header button > span": {
           margin: `0 auto 0 auto`,
           transform: "rotate(0)",
         },
@@ -51,6 +51,10 @@ export default function CategoryList({ categories }: Props) {
     header: {
       display: "flex",
       alignItems: "center",
+    },
+    label: {
+      padding: spacing,
+      color: colors.text.secondary,
     },
     button: {
       height: 24,
@@ -62,32 +66,21 @@ export default function CategoryList({ categories }: Props) {
       transform: "rotate(180deg)",
       transition: "transform 1s ease",
     },
-    label: {
-      padding: spacing,
-      color: colors.text.secondary,
-      ":not(div):hover, &[data-active=true]": {
-        cursor: "pointer",
-        backgroundColor: colors.secondary,
-      },
-      "&[data-show=false]": {
-        display: "none",
-      },
-    },
   }));
-  const [show, setShow] = useState(true);
+  const [toggle, setToggle] = useState(true);
 
   return (
-    <section css={css.categoryList} data-show={show}>
+    <section css={css.categoryList} data-toggle={toggle}>
       <header css={css.header}>
         <div css={css.label} data-type="title">
           CATEGORIES
         </div>
         <Button
-          $css={{ button: css.button }}
+          $css={{ ...css }}
           type="transparent"
-          onClick={() => setShow(!show)}
+          onClick={() => setToggle(!toggle)}
         >
-          <FontIcon $css={{ fontIcon: css.fontIcon }} type="double_arrow" />
+          <FontIcon $css={{ ...css }} type="double_arrow" />
         </Button>
       </header>
       <ListItem doc={{ id: "popular", label: "popular", subCategories: [] }} />

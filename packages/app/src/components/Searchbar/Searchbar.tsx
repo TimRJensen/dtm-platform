@@ -58,7 +58,7 @@ export default function Searchbar() {
           value={input()}
           ref={domElement}
         />
-        <FontIcon $css={{ fontIcon: css.fontIcon }} type="search" />
+        <FontIcon $css={{ ...css }} type="search" />
       </form>
     </div>
   );
