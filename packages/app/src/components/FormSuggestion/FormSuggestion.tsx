@@ -29,27 +29,23 @@ export default function FormSuggestion({
   onChange,
 }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
-    formCityInput: {
+    formSuggestion: {
       display: "flex",
-      alignItems: "center",
       margin: `0 0 ${spacing}px 0`,
+      lineHeight: "1.5rem",
     },
     label: {
       margin: `0 ${spacing}px 0 0`,
     },
     combobox: {
       width: "min(300px)",
-    },
-    input: {
-      height: "1.5rem",
-      width: "inherit",
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
-      "&:focus": {
+      "&:focus-within": {
         border: `1px solid ${colors.input.defaultBorder}`,
         borderRadius: borderRadius / 2,
       },
-      "&[data-toggled=true]:focus": {
+      "&[data-toggled=true]": {
         borderBottom: "1px solid transparent",
         borderRadius: `${borderRadius / 2}px ${borderRadius / 2}px 0 0`,
       },
@@ -64,30 +60,27 @@ export default function FormSuggestion({
         borderRadius: borderRadius / 2,
       },
     },
-    items: {
+    input: {
+      width: "inherit",
+    },
+    box: {
+      height: "calc(5 * 1.5rem)",
       border: `1px solid ${colors.input.defaultBorder}`,
       borderTop: "none",
       borderRadius: `0 0 ${borderRadius / 2}px ${borderRadius / 2}px`,
-      "&::-webkit-scrollbar": {
-        width: "0.5rem",
-      },
-      "&::-webkit-scrollbar-track": {
-        backgroundColor: colors.primary,
-      },
-      "&::-webkit-scrollbar-thumb": {
-        backgroundColor: colors.secondary,
-      },
+      overflowY: "scroll",
     },
-    item: (index: number) => ({
-      display: "block",
+    item: {
+      height: "1.5rem",
       width: "inherit",
       padding: "1px 2px",
-      textAlign: "left",
-      [`&:nth-of-type(${index + 1})`]: {
+      color: colors.text.primary,
+      fontSize: "0.8rem",
+      "&[data-selected=true]": {
         backgroundColor: colors.secondary,
         color: colors.text.secondary,
       },
-    }),
+    },
   }));
   const [validated, setValidated] = useState<boolean>();
   const selected = useRef("");
@@ -108,7 +101,7 @@ export default function FormSuggestion({
 
   return (
     <div
-      css={css.formCityInput}
+      css={css.formSuggestion}
       onFocus={() => setValidated(undefined)}
       onBlur={handleValidate}
     >
@@ -117,7 +110,7 @@ export default function FormSuggestion({
         $css={{ ...css }}
         suggestions={suggestions ?? []}
         onChange={handleChange}
-        validated={validated}
+        data-validated={validated ?? ""}
       />
     </div>
   );

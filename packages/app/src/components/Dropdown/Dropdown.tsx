@@ -7,31 +7,34 @@ import {
   useRef,
   cloneElement,
   Children,
+  ComponentProps,
   ReactElement,
+  MutableRefObject,
   KeyboardEvent,
   MouseEvent,
   FocusEvent,
-  HTMLAttributes,
+  ChangeEvent,
 } from "react";
 
 /**
  * Custom imports.
  */
 import { useCSS, PropertyValueType } from "../../hooks";
-import Button from "../Button/Button";
+import DropdownBox from "../DropdownBox/DropdownBox";
+import DropdownItem from "../DropdownItem/DropdownItem";
 
 /**
  * Types.
  */
-interface Props extends HTMLAttributes<HTMLDivElement> {
+interface Props extends ComponentProps<"div"> {
   $css?: Partial<{
-    [key in "dropdown" | "label" | "items"]: PropertyValueType;
+    [key in "dropdown" | "label" | "box"]: PropertyValueType;
   }>;
-  label: ReactElement<any, "button"> | string;
+  label: ReactElement & { ref?: MutableRefObject<HTMLElement> };
   direction?: "down" | "left" | "right";
   disabled?: boolean;
-  persists?: boolean;
-  children?: ReactElement<any, "button" | typeof Button>[];
+  children: ReactElement | ReactElement[] | null;
+  //persists?: boolean;
 }
 
 /**
@@ -41,196 +44,202 @@ export default function Dropdown({
   $css = {},
   label,
   direction = "down",
-  disabled = false,
-  persists = false,
+  //persists,
+  disabled,
   children,
   ...rest
 }: Props) {
   const { css } = useCSS(({}) => ({
-    dropdown: [{ cursor: "default" }, $css.dropdown],
-    items: [
-      {
-        display: "none",
-        visibility: "hidden",
-        width: "inherit",
-        overflow: "hidden",
-        position: "absolute",
-        order: -1,
-        backgroundColor: "#FFF",
-        "&[data-toggled=true]": {
-          display: "block",
-          visibility: "visible",
-        },
-      },
-      $css.items ?? {},
-    ],
-    label: [{}, $css.label],
+    dropdown: [{ cursor: "default" }, $css.dropdown ?? {}],
+    label: [$css.label ?? {}],
+    box: [$css.box ?? {}],
   }));
   const [toggled, setToggled] = useState<boolean>();
-  const [focus, setFocus] = useState(-1);
-  const toggleElement = useRef<HTMLButtonElement>(null);
-  const itemsElement = useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = useState(-1);
+  const toggleElement = label.ref ?? useRef<HTMLElement>();
+  const boxElement = useRef<HTMLUListElement>(null);
+  const focusType = useRef<"tab" | "click" | "none">("none");
 
   useLayoutEffect(() => {
-    if (!toggled) {
-      toggleElement.current?.blur();
+    if (!children) {
       return;
     }
 
-    const element = toggleElement.current?.parentElement!;
-    const items = itemsElement.current!;
+    const dropdown = toggleElement.current!.parentElement!;
+    const box = boxElement.current!;
 
     switch (direction) {
       case "left": {
-        const top = window.scrollY + element.getBoundingClientRect().top;
+        const top = window.scrollY + dropdown.getBoundingClientRect().top;
         const right =
-          element.getBoundingClientRect().left -
-          items.getBoundingClientRect().width;
+          dropdown.getBoundingClientRect().left -
+          box.getBoundingClientRect().width;
 
-        items.style.top = top + "px";
-        items.style.left = right + "px";
+        box.style.top = top + "px";
+        box.style.left = right + "px";
         break;
       }
       case "right": {
-        const top = window.scrollY + element.getBoundingClientRect().top;
-        const left = element.getBoundingClientRect().right;
+        const top = window.scrollY + dropdown.getBoundingClientRect().top;
+        const left = dropdown.getBoundingClientRect().right;
 
-        items.style.top = top + "px";
-        items.style.left = left + "px";
+        box.style.top = top + "px";
+        box.style.left = left + "px";
         break;
       }
       default: {
-        items.style.left = element.getBoundingClientRect().left + "px";
+        box.style.left = dropdown.getBoundingClientRect().left + "px";
       }
     }
   }, [toggled]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!children) {
+    if (!toggled) {
       return;
     }
 
-    if (
-      event.key === "ArrowUp" ||
-      event.key === "ArrowDown" ||
-      event.key === "Tab"
-    ) {
-      event.preventDefault();
+    switch (event.key) {
+      case "ArrowUp": {
+        event.preventDefault();
 
-      setFocus((suggestion) => {
-        if (
-          event.key === "ArrowUp" ||
-          (event.key === "Tab" && event.shiftKey)
+        const i = selected > 0 ? selected - 1 : Children.count(children) - 1;
+        const element = boxElement.current!;
+        const item = element.children[i] as HTMLElement;
+
+        if (i === Children.count(children) - 1) {
+          element.scrollTop = element.scrollHeight;
+        } else if (item.offsetTop < element.scrollTop) {
+          element.scrollTop =
+            item.offsetTop + item.offsetHeight - element.offsetHeight;
+        }
+
+        setSelected(i);
+
+        break;
+      }
+
+      case "ArrowDown": {
+        event.preventDefault();
+
+        const i = selected < Children.count(children) - 1 ? selected + 1 : 0;
+        const element = boxElement.current!;
+        const item = element.children[i] as HTMLElement;
+
+        if (i === 0) {
+          element.scrollTop = 0;
+        } else if (
+          item.offsetTop + item.offsetHeight >
+          element.offsetHeight + element.scrollTop
         ) {
-          suggestion = suggestion > 0 ? --suggestion : children.length - 1;
-        } else {
-          suggestion = suggestion < children.length - 1 ? ++suggestion : 0;
+          element.scrollTop = item.offsetTop;
         }
 
-        return suggestion;
-      });
+        setSelected(i);
 
-      return;
-    }
+        break;
+      }
 
-    if (event.key === "Enter" || event.key === "Escape") {
-      if (event.key === "Enter" && focus > -1) {
-        if (children[focus].props.onClick) {
-          children[focus].props.onClick();
+      case "Enter": {
+        event.preventDefault();
+
+        if (selected > -1) {
+          const item = boxElement.current?.children.item(
+            selected
+          ) as HTMLElement;
+
+          item.click();
         }
+
+        break;
       }
 
-      if (!persists) {
-        toggleElement.current?.blur();
+      case "Escape": {
+        toggleOff();
       }
-
-      return;
     }
   };
 
-  const handleToggle = (event: MouseEvent<any>) => {
-    event.preventDefault();
+  const handleClick = (event: MouseEvent<any>) => {
+    if (rest.onClick) {
+      rest.onClick(event);
+    }
 
     if (!toggled) {
-      toggleElement.current?.focus();
+      setToggled(children !== null);
     } else {
-      toggleElement.current?.blur();
-    }
-
-    if (typeof label === "object" && label.props.onMouseDown) {
-      label.props.onMouseDown(event);
+      toggleOff();
     }
   };
 
-  const handleFocus = (event: FocusEvent<any>) => {
-    if (event.type === "focus") {
+  const handleToggle = (event: MouseEvent | FocusEvent) => {
+    event.preventDefault();
+
+    if (focusType.current !== "none") {
+      return;
+    }
+
+    focusType.current = event.type === "mousedown" ? "click" : "tab";
+    toggleElement.current?.focus();
+  };
+
+  const handleFocus = () => {
+    if (focusType.current === "tab") {
       setToggled(true);
-
-      if (typeof label === "object" && label.props.onFocus) {
-        label.props.onFocus(event);
-      }
-    } else {
-      setToggled(undefined);
     }
   };
 
-  const handleChildToggle = (child: ReactElement) => {
-    return (event: MouseEvent<any>) => {
-      event.preventDefault();
+  const toggleOff = (persists = false) => {
+    console.log(persists);
+    if (persists) {
+      return;
+    }
 
-      event.currentTarget.click();
-
-      if (!persists) {
-        toggleElement.current?.blur();
-      }
-
-      if (child.props.onMouseDown) {
-        child.props.onMouseDown(event);
-      }
-    };
+    focusType.current = "none";
+    setToggled(undefined);
   };
 
-  const handleChildHover = (child: ReactElement, index: number) => {
-    return (event: MouseEvent<any>) => {
-      setFocus(index);
-
-      if (child.props.onMouseOver) {
-        child.props.onMouseOver(event);
-      }
-    };
+  const handleChange = (event: ChangeEvent) => {
+    if (label.props.onChange) {
+      label.props.onChange.apply(null, [event, setToggled]);
+    }
   };
 
   return (
-    <div css={css.dropdown} onKeyDownCapture={handleKeyPress} {...rest}>
-      {cloneElement(
-        typeof label === "object" ? label : <button>{label}</button>,
-        {
-          ...(typeof label === "object" ? label.props : null),
-          onFocus: !disabled ? handleFocus : undefined,
-          onBlur: handleFocus,
-          onMouseDown: !disabled ? handleToggle : undefined,
-          ref: toggleElement,
-          "data-disabled": disabled,
-          "data-toggled": toggled,
-        }
-      )}
-      <div css={css.items} ref={itemsElement} data-toggled={toggled}>
-        {Children.map(
-          children,
-          (child, i) =>
-            child &&
-            cloneElement(child, {
-              ...child.props,
-              css:
-                typeof child.props.css === "function"
-                  ? child.props.css({ index: focus })
-                  : child.props.css,
-              "data-toggled": focus === i ? true : undefined,
-              onMouseDown: handleChildToggle(child),
-              onMouseOver: handleChildHover(child, i),
-            })
-        )}
-      </div>
+    <div
+      {...rest}
+      css={css.dropdown}
+      data-toggled={toggled ?? ""}
+      {...(!disabled
+        ? {
+            onMouseDown: handleToggle,
+            onFocusCapture: handleToggle,
+            onClick: handleClick,
+            onFocus: handleFocus,
+            onKeyDown: handleKeyPress,
+            onBlur: toggleOff.bind(null, undefined),
+          }
+        : null)}
+    >
+      {cloneElement(label, {
+        css: css.label,
+        ref: toggleElement,
+        "data-disabled": disabled,
+        "data-toggled": toggled,
+        onChange: handleChange,
+      })}
+      {children ? (
+        <DropdownBox
+          css={$css.box}
+          ref={boxElement}
+          toggled={toggled}
+          selected={selected}
+          onKeyDown={setSelected}
+        >
+          {children}
+        </DropdownBox>
+      ) : null}
     </div>
   );
 }
+
+Dropdown.Item = DropdownItem;

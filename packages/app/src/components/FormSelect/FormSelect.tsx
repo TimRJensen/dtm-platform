@@ -8,6 +8,7 @@ import { useState, useRef } from "react";
  */
 import { useCSS } from "../../hooks";
 import Dropdown from "../Dropdown/Dropdown";
+import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
 
 /**
@@ -26,30 +27,21 @@ export default function FormSelect({ items, label, validate }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formSelect: {
       display: "flex",
-      alignItems: "center",
       margin: `0 0 ${spacing}px 0`,
-      fontSize: "1rem",
+      lineHeight: "1.5rem",
     },
     label: {
       margin: `0 ${spacing}px 0 0`,
     },
     dropdown: {
       width: "min(300px)",
-    },
-    selected: {
-      display: "flex",
-      alignItems: "center",
-      height: "1.5rem",
-      width: "inherit",
-      outline: "none",
-      padding: "1px 2px",
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
-      borderRadius: 0,
-      color: colors.text.primary,
-      cursor: "default",
-      "&[data-toggled=true]": {
+      "&:focus-within": {
         border: `1px solid ${colors.input.defaultBorder}`,
+        borderRadius: borderRadius / 2,
+      },
+      "&[data-toggled=true]": {
         borderBottom: "1px solid transparent",
         borderRadius: `${borderRadius / 2}px ${borderRadius / 2}px 0 0`,
       },
@@ -64,61 +56,52 @@ export default function FormSelect({ items, label, validate }: Props) {
         borderRadius: borderRadius / 2,
       },
     },
+    selected: {
+      display: "flex",
+      alignItems: "center",
+      width: "inherit",
+      outline: "none",
+      padding: "1px 2px",
+      borderRadius: 0,
+      color: colors.text.primary,
+      cursor: "default",
+    },
     fontIcon: {
       margin: "0 0 0 auto",
       color: colors.secondary,
     },
-    items: {
-      height: "calc(6 * 1rem)",
+    box: {
+      height: "calc(5 * 1.5rem)",
       border: `1px solid ${colors.input.defaultBorder}`,
       borderTop: "none",
       borderRadius: `0 0 ${borderRadius / 2}px ${borderRadius / 2}px`,
-      padding: `0 0 ${spacing}px 0`,
-      overflowX: "hidden",
       overflowY: "scroll",
-      "&::-webkit-scrollbar": {
-        width: "0.5rem",
-      },
-      "&::-webkit-scrollbar-track": {
-        backgroundColor: colors.primary,
-      },
-      "&::-webkit-scrollbar-thumb": {
+    },
+    item: {
+      height: "1.5rem",
+      width: "inherit",
+      padding: "1px 2px",
+      color: colors.text.primary,
+      fontSize: "0.8rem",
+      "&[data-selected=true]": {
         backgroundColor: colors.secondary,
+        color: colors.text.secondary,
       },
     },
-    /*item: {
-      display: "block",
-      width: "inherit",
-      outline: "none",
-      padding: "1px 2px",
-      textAlign: "left",
-      "&:focus": {
-        backgroundColor: colors.secondary,
-        color: colors.text.secondary,
-      },
-    },*/
-    item: ({ index }) => ({
-      display: "block",
-      width: "inherit",
-      outline: "none",
-      padding: "1px 2px",
-      textAlign: "left",
-      [`&:nth-of-type(${index + 1})`]: {
-        backgroundColor: colors.secondary,
-        color: colors.text.secondary,
-      },
-    }),
   }));
   const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
-  const selected = useRef("");
+  const input = useRef<HTMLButtonElement>(null);
 
   const handleBlur = () => {
     if (validate) {
-      setValidated(validate(selected.current));
+      setValidated(validate(value));
     }
+  };
 
-    setValue(selected.current);
+  const handleChildClick = (item: string) => {
+    setValue(item);
+    setTimeout(() => input.current?.blur());
   };
 
   return (
@@ -131,23 +114,21 @@ export default function FormSelect({ items, label, validate }: Props) {
       <Dropdown
         $css={{ ...css }}
         label={
-          <button css={css.selected} data-validated={validated ?? ""}>
+          <Button css={css.selected} type="transparent" ref={input}>
             {value}
             <FontIcon $css={{ ...css }} type="expand_more" />
-          </button>
+          </Button>
         }
+        data-validated={validated ?? ""}
       >
         {items.map((item, i) => (
-          <button
+          <Dropdown.Item
             key={`formSelect-option-${item}-${i}`}
             css={css.item}
-            tabIndex={undefined}
-            onClick={() => {
-              selected.current = item;
-            }}
+            onClick={handleChildClick.bind(null, item)}
           >
             {item}
-          </button>
+          </Dropdown.Item>
         ))}
       </Dropdown>
     </div>
