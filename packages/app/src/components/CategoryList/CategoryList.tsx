@@ -1,92 +1,133 @@
 /**
  * Vendor imports.
  */
-import { useState } from "react";
+import { useRef, memo, ComponentProps, MouseEvent, FocusEvent } from "react";
+import { generatePath, Link } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { CategoryType } from "db";
 import { useCSS } from "../../hooks";
-import Button from "../Button/Button";
-import FontIcon from "../FontIcon/FontIcon";
-import ListItem from "../CategoryFoldout/CategoryFoldout";
+import CategoryListItem from "../CategoryListItem/CategoryListItem";
 
 /**
  * Types.
  */
-interface Props {
-  categories: CategoryType[] | undefined;
+const path = "/:categoryId/:subCategoryIds?";
+
+interface Props extends ComponentProps<any> {
+  doc: CategoryType;
+  toggle: (categoryId?: string) => string;
 }
 
 /**
- * ListItem functional component.
+ * CategoryFoldout functional component.u
  */
-export default function CategoryList({ categories }: Props) {
-  if (!categories) {
-    return null;
-  }
-
+export default memo(function ListItem({
+  doc,
+  toggle,
+  toggled: $toggled,
+}: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
-    categoryList: {
-      display: "flex",
-      flexFlow: "column",
-      minHeight: "inherit",
-      width: "clamp(200px, 300px, 15vw)",
-      margin: `0 ${spacing}px 0 0`,
-      padding: `${spacing}px 0 0 0`,
-      backgroundColor: colors.primary,
-      color: colors.text.secondary,
-      "&[data-toggle=false]": {
-        width: 50,
-        "& header > div:first-of-type, & > :not(header)": {
-          display: "none",
-        },
-        "& header button > span": {
-          margin: `0 auto 0 auto`,
-          transform: "rotate(0)",
-        },
-      },
-    },
-    header: {
-      display: "flex",
-      alignItems: "center",
+    mainCategory: {
+      width: "inherit",
+      transition: "all 0.2s ease",
     },
     label: {
-      padding: spacing,
+      display: "block",
+      height: "auto",
+      width: "inherit",
+      borderRadius: 0,
+      padding: `${spacing}px 0 ${spacing}px ${spacing}px`,
       color: colors.text.secondary,
+      cursor: "default",
+      textAlign: "left",
+      fontSize: "1rem",
+      "&:hover, &[data-toggled=true]": {
+        backgroundColor: colors.secondary,
+      },
     },
-    button: {
-      height: 24,
-      width: 24,
-      margin: `0 ${spacing}px 0 auto`,
-      color: colors.secondary,
-    },
-    fontIcon: {
-      transform: "rotate(180deg)",
-      transition: "transform 1s ease",
+    box: {
+      maxHeight: 0,
+      margin: 0,
+      padding: 0,
+      overflow: "hidden",
+      listStyleType: "none",
+      transition: "max-height 0.25s ease", //collapse
+      "&[data-toggled=true]": {
+        maxHeight: 1024,
+        transition: "max-height 1s ease", //show
+      },
     },
   }));
-  const [toggle, setToggle] = useState(true);
+  const toggleElement = useRef<HTMLAnchorElement>(null);
+  const focusType = useRef<"tab" | "click" | "none">("none");
+  const nextPath = useRef(
+    generatePath(path, {
+      categoryId: doc.id,
+    })
+  );
+
+  const handleToggle = (event: MouseEvent | FocusEvent) => {
+    event.preventDefault();
+
+    if (focusType.current !== "none") {
+      return;
+    }
+
+    focusType.current = event.type === "mousedown" ? "click" : "tab";
+    toggleElement.current?.focus();
+  };
+
+  const handleClick = () => {
+    if (toggle() !== doc.id) {
+      toggle(doc.id);
+    }
+  };
+
+  const handleFocus = () => {
+    if (focusType.current === "tab") {
+      toggle(doc.id);
+    }
+  };
+
+  const handleBlur = () => {
+    const subCategoryIds = window.location.pathname.split("/").slice(1)[2];
+
+    nextPath.current = generatePath(path, {
+      categoryId: doc.id,
+      subCategoryIds: subCategoryIds ?? undefined,
+    });
+    focusType.current = "none";
+    console.log(subCategoryIds);
+  };
 
   return (
-    <section css={css.categoryList} data-toggle={toggle}>
-      <header css={css.header}>
-        <div css={css.label} data-type="title">
-          CATEGORIES
-        </div>
-        <Button
-          $css={{ ...css }}
-          type="transparent"
-          onClick={() => setToggle(!toggle)}
-        >
-          <FontIcon $css={{ ...css }} type="double_arrow" />
-        </Button>
-      </header>
-      <ListItem doc={{ id: "popular", label: "popular", subCategories: [] }} />
-      {categories.map((doc) => (
-        <ListItem key={doc.id} doc={doc} />
-      ))}
-    </section>
+    <div
+      css={css.mainCategory}
+      onMouseDown={handleToggle}
+      onFocusCapture={handleToggle}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
+      <Link
+        css={css.label}
+        to={nextPath.current}
+        data-toggled={$toggled ? true : undefined}
+        ref={toggleElement}
+        onClick={handleClick}
+      >
+        {doc.label}
+      </Link>
+      <ul css={css.box} data-toggled={$toggled ? true : undefined}>
+        {doc.subCategories.map((subCategory) => (
+          <CategoryListItem
+            key={`category-list-${subCategory.id}`}
+            doc={subCategory}
+          />
+        ))}
+      </ul>
+    </div>
   );
-}
+});
