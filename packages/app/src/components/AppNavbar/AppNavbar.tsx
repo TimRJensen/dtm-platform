@@ -69,7 +69,7 @@ export default function AppNavbar() {
         </div>
       ) : null}
       <Searchbar />
-      <Button $css={{ ...css }} type="transparent">
+      <Button css={css.button} type="transparent">
         <FontIcon type="account_circle" size={42} />
       </Button>
     </section>

@@ -62,10 +62,10 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       backgroundColor: colors.secondary,
       color: colors.text.secondary,
       borderRadius: 0,
-      "&[data-disabled=true]": {
+      /*"&[data-disabled=true]": {
         backgroundColor: colors.secondary,
-      },
-      "&[data-disabled=false]:hover": {
+      },*/
+      "&:hover": {
         backgroundColor: colors.secondaryDarker,
       },
     },
@@ -86,20 +86,20 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       <Dropdown
         css={{ ...css }}
         label={
-          <Button $css={{ button: [css.button, css.buttonExpand] }}>
+          <Button css={[css.button, css.buttonExpand]}>
             <FontIcon type="more_horiz" />
           </Button>
         }
         disabled={!currentUser}
         direction="left"
       >
-        <Button $css={{ ...css }} onClick={onEdit}>
+        <Button css={css.button} onClick={onEdit}>
           <FontIcon type="edit">edit</FontIcon>
         </Button>
-        <Button $css={{ ...css }} /*onClick={undefined}*/>
+        <Button css={css.button} /*onClick={undefined}*/>
           <FontIcon type="delete">delete</FontIcon>
         </Button>
-        <Button $css={{ ...css }} /*onClick={undefined}*/>
+        <Button css={css.button} /*onClick={undefined}*/>
           <FontIcon type="not_interested">ban</FontIcon>
         </Button>
       </Dropdown>

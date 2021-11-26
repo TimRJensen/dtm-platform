@@ -32,7 +32,7 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
 export default forwardRef<HTMLButtonElement, Props>(function Button(
   {
     type = "default",
-    disabled = false,
+    disabled,
     toggled,
     onClick,
     onToggle,
@@ -59,7 +59,7 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
         backgroundColor: colors.button[`${type}Disabled`],
         color: colors.text.disabled,
         cursor: "default",
-        "&:hover": {
+        "&:hover, &:focus": {
           backgroundColor: colors.button[`${type}Disabled`],
           color: colors.text.disabled,
         },
@@ -85,13 +85,13 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
 
   return (
     <button
+      {...rest}
       css={css.button}
       data-disabled={disabled}
       data-toggled={toggled ?? ""}
       ref={ref}
       onClick={!disabled ? handleClick : undefined}
       onMouseDown={!disabled ? handleToggle : undefined}
-      {...rest}
     >
       {children}
     </button>

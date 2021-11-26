@@ -58,7 +58,7 @@ export default function Artifact({ doc, onComment }: Props) {
     },
     button: {
       color: colors.secondary,
-      "&[data-disabled=false]:hover": {
+      "&:hover": {
         color: colors.secondaryDarker,
       },
     },
@@ -90,7 +90,7 @@ export default function Artifact({ doc, onComment }: Props) {
         </InfoPanelItem>
         <div css={css.divider}></div>
         <Button
-          $css={{ ...css }}
+          css={css.button}
           type="transparent"
           onClick={onComment}
           disabled={!state.currentUser}

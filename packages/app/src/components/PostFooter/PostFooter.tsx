@@ -34,7 +34,7 @@ export default function PostFooter({ doc, onComment }: Props) {
     button: {
       width: "auto",
       color: colors.secondary,
-      "&[data-disabled=false]:hover": {
+      "&:hover": {
         color: colors.secondaryDarker,
       },
       ":first-of-type": {
@@ -48,7 +48,7 @@ export default function PostFooter({ doc, onComment }: Props) {
   return (
     <div css={css.footer}>
       <Button
-        $css={{ ...css }}
+        css={css.button}
         type="transparent"
         disabled={!state.currentUser}
         onClick={onComment}
@@ -58,7 +58,7 @@ export default function PostFooter({ doc, onComment }: Props) {
         </FontIcon>
       </Button>
       <Button
-        $css={{ ...css }}
+        css={css.button}
         type="transparent"
         disabled={!state.currentUser}
         toggled={isUpvoted}

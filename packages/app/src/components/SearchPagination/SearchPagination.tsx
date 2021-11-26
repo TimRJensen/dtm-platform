@@ -107,7 +107,7 @@ export default function SearchPagination({
             pageId: currentPage - 1,
           })}
         >
-          <Button $css={{ ...css }} type="transparent">
+          <Button css={css.button} type="transparent">
             <FontIcon type="keyboard_double_arrow_left" $css={{ ...css }} />
           </Button>
         </Link>
@@ -122,7 +122,7 @@ export default function SearchPagination({
           >
             <Button
               key={`search-pagination-${value}`}
-              $css={{ ...css }}
+              css={css.button}
               toggled={value - 1 === currentPage}
             >
               {value}
@@ -141,7 +141,7 @@ export default function SearchPagination({
             pageId: currentPage + 1,
           })}
         >
-          <Button $css={{ ...css }} type="transparent">
+          <Button css={css.button} type="transparent">
             <FontIcon type="keyboard_double_arrow_right" $css={{ ...css }} />
           </Button>
         </Link>

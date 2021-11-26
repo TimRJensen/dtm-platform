@@ -31,7 +31,7 @@ export default function Tag({ children }: Props) {
       padding: `0 ${spacing}px`,
       backgroundColor: colors.tag.default,
       borderRadius,
-      "&[data-disabled=false]:hover": {
+      "&:hover": {
         backgroundColor: colors.tag.defaultHover,
       },
     },
@@ -44,7 +44,7 @@ export default function Tag({ children }: Props) {
         page: 0,
       })}
     >
-      <Button $css={{ ...css }}>{children}</Button>
+      <Button css={css.button}>{children}</Button>
     </Link>
   );
 }

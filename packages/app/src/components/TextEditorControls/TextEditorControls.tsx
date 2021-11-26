@@ -71,7 +71,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
         {inlineControls.map((control) => (
           <Button
             key={`text-control-button-${control.type}`}
-            $css={{ ...css }}
+            css={css.button}
             type="transparent"
             toggled={editorState.getCurrentInlineStyle().has(control.type)}
             onToggle={handleStyleToggle("toggleInlineStyle", control.type)}
@@ -87,7 +87,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
         {blockControls.map((control) => (
           <Button
             key={`text-control-button-${control.type}`}
-            $css={{ ...css }}
+            css={css.button}
             type="transparent"
             toggled={
               editorState
