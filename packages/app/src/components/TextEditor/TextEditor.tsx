@@ -11,12 +11,11 @@ import {
   convertFromHTML,
 } from "draft-js";
 import draftParser from "draftjs-to-html";
-import { SerializedStyles } from "@emotion/react";
 
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
+import { useCSS, PropertyValueType } from "../../hooks";
 import Button from "../Button/Button";
 import TextEditorControls from "../TextEditorControls/TextEditorControls";
 
@@ -30,7 +29,7 @@ interface Props {
       | "input"
       | "footer"
       | "buttonSubmit"
-      | "buttonCancel"]: SerializedStyles | {};
+      | "buttonCancel"]: PropertyValueType;
   }>;
   content?: string;
   toggle?: boolean;
@@ -118,7 +117,7 @@ export default function TextEditor({
       </div>
       <div css={css.footer}>
         <Button
-          $css={{ button: css.buttonSubmit }}
+          css={css.buttonSubmit}
           type="accept"
           onClick={() =>
             onSubmit(
@@ -129,10 +128,7 @@ export default function TextEditor({
         >
           submit
         </Button>
-        <Button
-          $css={{ button: css.buttonCancel }}
-          onClick={() => onSubmit(undefined)}
-        >
+        <Button css={css.buttonCancel} onClick={() => onSubmit(undefined)}>
           cancel
         </Button>
       </div>

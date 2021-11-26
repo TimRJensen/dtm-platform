@@ -39,3 +39,5 @@ export default function useCSS<T extends ClassType>(
     theme,
   };
 }
+
+//export type { PropertyValueType };

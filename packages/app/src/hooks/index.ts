@@ -5,5 +5,6 @@ export { default as useQuery } from "./useQuery";
 export { default as useSearch } from "./useSearch";
 export { default as useHtmlParser } from "./useHtmlParser";
 export { default as useDecorateNode } from "./useDecorateNode";
-export { default as useCSS, PropertyValueType } from "./useCSS";
+export { default as useCSS } from "./useCSS";
+export type { PropertyValueType } from "./useCSS";
 export { default as useDB } from "./useDB";

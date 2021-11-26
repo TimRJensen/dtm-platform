@@ -1,20 +1,19 @@
 /**
  * Vendor imports.
  */
-import { ReactNode } from "react";
-import { SerializedStyles } from "@emotion/react";
+import { HTMLAttributes, ReactNode } from "react";
 
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
+import { useCSS, PropertyValueType } from "../../hooks";
 
 /**
  * Types.
  */
-interface Props {
+interface Props extends HTMLAttributes<HTMLSpanElement> {
   $css?: Partial<{
-    [key in "fontIcon" | "icon" | "text"]: SerializedStyles | {};
+    [key in "fontIcon" | "icon" | "text"]: PropertyValueType;
   }>;
   type: string;
   size?: number;
@@ -29,6 +28,7 @@ export default function FontIcon({
   type,
   size = 24,
   children,
+  ...rest
 }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     fontIcon: [
@@ -36,15 +36,13 @@ export default function FontIcon({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        "&[data-disabled]": {
-          cursor: "pointer",
-        },
       },
       $css.fontIcon,
     ],
     icon: [
       {
         fontSize: size,
+        zIndex: 0,
       },
       $css.icon,
     ],
@@ -58,7 +56,7 @@ export default function FontIcon({
   }));
 
   return (
-    <span css={css.fontIcon}>
+    <span css={css.fontIcon} {...rest}>
       <span className="material-icons" css={css.icon}>
         {type}
       </span>
