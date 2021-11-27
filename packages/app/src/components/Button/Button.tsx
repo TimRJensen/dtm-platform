@@ -6,7 +6,7 @@ import {
   MouseEvent,
   RefObject,
   forwardRef,
-  HTMLAttributes,
+  ComponentPropsWithRef,
 } from "react";
 
 /**
@@ -17,7 +17,15 @@ import { useCSS } from "../../hooks";
 /**
  * Types.
  */
-interface Props extends HTMLAttributes<HTMLButtonElement> {
+type ComponentPropsWithRefExtended = Omit<
+  ComponentPropsWithRef<"button">,
+  "type"
+> & {
+  "data-toggled"?: boolean;
+  "data-disabled"?: boolean;
+};
+
+interface Props extends ComponentPropsWithRefExtended {
   type?: "default" | "accept" | "transparent";
   disabled?: boolean;
   toggled?: boolean;
@@ -87,9 +95,10 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
     <button
       {...rest}
       css={css.button}
-      data-disabled={disabled}
-      data-toggled={toggled ?? ""}
+      data-disabled={disabled ?? rest?.["data-disabled"] ?? ""}
+      data-toggled={toggled ?? rest?.["data-toggled"] ?? ""}
       ref={ref}
+      tabIndex={!disabled ? 0 : -1}
       onClick={!disabled ? handleClick : undefined}
       onMouseDown={!disabled ? handleToggle : undefined}
     >
