@@ -10,7 +10,7 @@ import { Route } from "react-router-dom";
 import { CategoryType } from "db";
 import { useCSS, useDB } from "../hooks";
 import LoadBox from "../components/LoadBox/LoadBox";
-import CategoryList from "../components/CategoryList/CategoryList";
+import AppPanel from "../components/AppPanel/AppPanel";
 import Categories from "./categories";
 
 /**
@@ -52,7 +52,7 @@ export default function index() {
   return (
     <LoadBox data={categories}>
       <section css={css.index}>
-        <CategoryList categories={categories} />
+        <AppPanel categories={categories} />
         <Route
           path="/categories/:categoryId/:subCategoryIds?"
           component={Categories}
