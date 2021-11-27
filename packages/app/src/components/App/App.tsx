@@ -128,7 +128,8 @@ export default function App({ db }: Props) {
         <ThemeProvider theme={theme}>
           <Router basename="/">
             <Global styles={_css} />
-            <Header />
+            <AppHeader />
+            <AppNavbar />
             <Switch>
               <Route
                 exact

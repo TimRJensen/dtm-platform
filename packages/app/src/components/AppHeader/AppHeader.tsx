@@ -1,13 +1,13 @@
 /**
  * Vendor imports.
  */
+import { useRouteMatch } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 
 /**
  * Custom imports.
  */
 import { useCSS } from "../../hooks";
-import Navbar from "../AppNavbar/AppNavbar";
 import Gear from "../../public/gear.svg";
 import logo from "../../public/logo.png";
 
@@ -26,6 +26,8 @@ const moveX = keyframes({
     transform: "translateX(0)",
   },
 });
+
+const showOn = ["/", "categories", "login", "account"];
 
 /**
  * AppHeader functional component.
@@ -87,21 +89,23 @@ export default function AppHeader() {
       },
     },
   }));
+  const match = useRouteMatch<{ section: string }>("/:section/:any*");
+
+  if (showOn.indexOf(match?.params.section ?? "/") === -1) {
+    return null;
+  }
 
   return (
-    <>
-      <div css={css.banner}>
-        <div css={css.gears}>
-          <Gear css={css.gear} />
-          <Gear css={css.gear} />
-          <Gear css={css.gear} />
-        </div>
-        <div css={css.divider}>|</div>
-        <div css={[css.logo]}>
-          <img src={logo} />
-        </div>
+    <div css={css.banner}>
+      <div css={css.gears}>
+        <Gear css={css.gear} />
+        <Gear css={css.gear} />
+        <Gear css={css.gear} />
       </div>
-      <Navbar />
-    </>
+      <div css={css.divider}>|</div>
+      <div css={css.logo}>
+        <img src={logo} />
+      </div>
+    </div>
   );
 }
