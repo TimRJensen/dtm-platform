@@ -86,7 +86,7 @@ export default function Dropdown({
 
       default: {
         console.log(box.offsetLeft, dropdown.offsetLeft, box.clientLeft);
-        box.style.left = `${-box.clientLeft}px`;
+        //box.style.left = `${-box.clientLeft}px`;
       }
     }
   }, [toggled]);

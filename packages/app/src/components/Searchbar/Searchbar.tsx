@@ -21,7 +21,7 @@ export default function Searchbar() {
       searchBar: {
         height: searchBar.height,
         width: searchBar.width,
-        margin: `0 ${spacing}px 0 auto`,
+        margin: `0 0 0 auto`,
         borderRadius,
         backgroundColor: colors.primary,
       },
