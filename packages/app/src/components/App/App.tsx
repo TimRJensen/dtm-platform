@@ -12,7 +12,8 @@ import DB, { DBProvider, UserType } from "db";
 import theme from "../../themes/dtm";
 import Header from "../AppHeader/AppHeader";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
-
+import AppHeader from "../AppHeader/AppHeader";
+import AppNavbar from "../AppNavbar/AppNavbar";
 import Test from "../Test";
 
 const _Index = lazy(() => import("../../pages"));
