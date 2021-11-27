@@ -50,7 +50,10 @@ export default function Dropdown({
   ...rest
 }: Props) {
   const { css } = useCSS(({}) => ({
-    dropdown: [{ cursor: "default" }, $css.dropdown ?? {}],
+    dropdown: [
+      { cursor: "default", position: "relative" },
+      $css.dropdown ?? {},
+    ],
     label: [$css.label ?? {}],
     box: [$css.box ?? {}],
   }));
@@ -70,25 +73,20 @@ export default function Dropdown({
 
     switch (direction) {
       case "left": {
-        const top = window.scrollY + dropdown.getBoundingClientRect().top;
-        const right =
-          dropdown.getBoundingClientRect().left -
-          box.getBoundingClientRect().width;
-
-        box.style.top = top + "px";
-        box.style.left = right + "px";
+        box.style.top = "0px";
+        box.style.left = `-${box.offsetWidth}px`;
         break;
       }
+
       case "right": {
-        const top = window.scrollY + dropdown.getBoundingClientRect().top;
-        const left = dropdown.getBoundingClientRect().right;
-
-        box.style.top = top + "px";
-        box.style.left = left + "px";
+        box.style.top = "0px";
+        box.style.left = `${dropdown.offsetWidth}px`;
         break;
       }
+
       default: {
-        box.style.left = dropdown.getBoundingClientRect().left + "px";
+        console.log(box.offsetLeft, dropdown.offsetLeft, box.clientLeft);
+        box.style.left = `${-box.clientLeft}px`;
       }
     }
   }, [toggled]);
@@ -159,6 +157,17 @@ export default function Dropdown({
     }
   };
 
+  const handleToggle = (event: MouseEvent | FocusEvent) => {
+    event.preventDefault();
+
+    if (focusType.current !== "none") {
+      return;
+    }
+
+    focusType.current = event.type === "mousedown" ? "click" : "tab";
+    toggleElement.current?.focus();
+  };
+
   const handleClick = (event: MouseEvent<any>) => {
     if (rest.onClick) {
       rest.onClick(event);
@@ -171,37 +180,25 @@ export default function Dropdown({
     }
   };
 
-  const handleToggle = (event: MouseEvent | FocusEvent) => {
-    event.preventDefault();
-
-    if (focusType.current !== "none") {
-      return;
-    }
-
-    focusType.current = event.type === "mousedown" ? "click" : "tab";
-    toggleElement.current?.focus();
-  };
-
   const handleFocus = () => {
     if (focusType.current === "tab") {
-      setToggled(true);
+      setToggled(children !== null);
+    }
+  };
+
+  const handleChange = (event: ChangeEvent) => {
+    if (label.props.onChange) {
+      label.props.onChange(event, setToggled);
     }
   };
 
   const toggleOff = (persists = false) => {
-    console.log(persists);
     if (persists) {
       return;
     }
 
     focusType.current = "none";
     setToggled(undefined);
-  };
-
-  const handleChange = (event: ChangeEvent) => {
-    if (label.props.onChange) {
-      label.props.onChange.apply(null, [event, setToggled]);
-    }
   };
 
   return (
@@ -221,7 +218,7 @@ export default function Dropdown({
         : null)}
     >
       {cloneElement(label, {
-        css: css.label,
+        css: [css.label, label.props.css],
         ref: toggleElement,
         "data-disabled": disabled,
         "data-toggled": toggled,
@@ -229,7 +226,7 @@ export default function Dropdown({
       })}
       {children ? (
         <DropdownBox
-          css={$css.box}
+          css={css.box}
           ref={boxElement}
           toggled={toggled}
           selected={selected}
