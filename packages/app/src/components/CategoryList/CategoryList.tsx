@@ -14,7 +14,7 @@ import CategoryListItem from "../CategoryListItem/CategoryListItem";
 /**
  * Types.
  */
-const path = "/:categoryId/:subCategoryIds?";
+const path = "/categories/:categoryId/:subCategoryIds?";
 
 interface Props extends ComponentProps<any> {
   doc: CategoryType;
@@ -100,7 +100,6 @@ export default memo(function ListItem({
       subCategoryIds: subCategoryIds ?? undefined,
     });
     focusType.current = "none";
-    console.log(subCategoryIds);
   };
 
   return (

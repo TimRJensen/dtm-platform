@@ -66,8 +66,11 @@ export default function ComboBox({
       return;
     }
 
-    if (value.length < beginIndex) {
+    if (value.length === beginIndex) {
       fuse.current.setCollection(suggestions);
+    }
+
+    if (value.length < beginIndex) {
       return;
     }
 
@@ -105,7 +108,12 @@ export default function ComboBox({
       {...rest}
       $css={{ dropdown: css.combobox, box: css.items }}
       label={
-        <input css={css.input} value={value} onChange={handleInputChange} />
+        <input
+          css={css.input}
+          value={value}
+          type="text"
+          onChange={handleInputChange}
+        />
       }
     >
       {items

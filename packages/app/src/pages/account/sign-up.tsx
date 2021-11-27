@@ -59,9 +59,16 @@ export default function signUp({}: Props) {
           <Create suggestions={data} onSubmit={setUser} onError={setError} />
         )}
       />
-      <Route path={path + "/success"} render={() => <Success doc={user} />} />
-      {/* <Route path="/account/new/pending" component={Pending} /> */}
-      <Route path={path + "/error"} render={() => <Error error={error} />} />
+      <Route
+        exact
+        path={path + "/success"}
+        render={() => <Success doc={user} />}
+      />
+      <Route
+        exact
+        path={path + "/error"}
+        render={() => <Error error={error} />}
+      />
     </Switch>
   );
 }

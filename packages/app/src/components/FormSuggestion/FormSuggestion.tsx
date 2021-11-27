@@ -15,6 +15,7 @@ import ComboBox from "../ComboBox/ComboBox";
 interface Props {
   label: string;
   suggestions: string[] | undefined;
+  beginIndex?: number;
   validate?: (value: string) => boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -25,6 +26,7 @@ interface Props {
 export default function FormSuggestion({
   label,
   suggestions,
+  beginIndex,
   validate,
   onChange,
 }: Props) {
@@ -109,6 +111,7 @@ export default function FormSuggestion({
       <ComboBox
         $css={{ ...css }}
         suggestions={suggestions ?? []}
+        beginIndex={beginIndex}
         onChange={handleChange}
         data-validated={validated ?? ""}
       />

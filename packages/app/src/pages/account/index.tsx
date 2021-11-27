@@ -23,7 +23,7 @@ export default function account({}: Props) {
   return (
     <section>
       <Switch>
-        <Route path="/account/(new|success|error)" component={SignUp} />
+        <Route path="/account/new/(error|success)?" component={SignUp} />
         <Route path="/account/verified" component={Verified} />
       </Switch>
     </section>

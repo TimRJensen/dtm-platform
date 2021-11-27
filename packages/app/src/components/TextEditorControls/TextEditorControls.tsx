@@ -46,7 +46,7 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
     button: {
       width: "auto",
       color: colors.secondary,
-      "&[data-toggled=false]:hover": {
+      "&:hover": {
         color: colors.secondaryDarker,
       },
       ":not(:last-of-type)": {
@@ -90,12 +90,18 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
             css={css.button}
             type="transparent"
             toggled={
+              (console.log(
+                editorState
+                  .getCurrentContent()
+                  .getBlockForKey(editorState.getSelection().getStartKey())
+                  .getType() === control.type
+              ),
               editorState
                 .getCurrentContent()
                 .getBlockForKey(editorState.getSelection().getStartKey())
-                .getType() === control.type
+                .getType() === control.type)
             }
-            onToggle={handleStyleToggle("toggleInlineStyle", control.type)}
+            onToggle={handleStyleToggle("toggleBlockType", control.type)}
           >
             <FontIcon type={control.fontIcon} />
           </Button>

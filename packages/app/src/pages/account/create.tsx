@@ -106,6 +106,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
           errorOrSuccess: "error",
         })
       );
+
       if (onError) {
         onError(response.error);
       }
@@ -113,13 +114,16 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     }
 
     if (onSubmit) {
+      onSubmit(response);
+    }
+
+    setTimeout(() => {
       history.push(
         generatePath(path, {
           errorOrSuccess: "success",
         })
       );
-      onSubmit(response);
-    }
+    });
   };
 
   useEffect(() => {
@@ -145,7 +149,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
           onBlur={(value) => {
             password.current = value;
           }}
-          validate={validate(1, (value) => value !== "")}
+          validate={validate(1, (value) => value !== "" && value.length > 5)}
         />
         <FormInput
           type="password"
@@ -187,7 +191,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
           >
             {"submit"}
           </Button>
-          <Link to="/">
+          <Link to="/" tabIndex={-1}>
             <Button> {"cancel"}</Button>
           </Link>
         </div>

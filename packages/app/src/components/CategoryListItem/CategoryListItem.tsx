@@ -75,8 +75,6 @@ export default memo(function CategoryListItem({ doc }: Props) {
     setTimeout(() => setToggled(!toggled));
   };
 
-  console.log("bum bum");
-
   return (
     <li css={css.categoryListItem}>
       <Link

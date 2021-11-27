@@ -115,16 +115,13 @@ export default function SearchPagination({
       {pages.map((value, i) =>
         typeof value === "number" ? (
           <Link
+            key={`search-pagination-${value}`}
             to={generatePath(path, {
               query,
               pageId: value - 1,
             })}
           >
-            <Button
-              key={`search-pagination-${value}`}
-              css={css.button}
-              toggled={value - 1 === currentPage}
-            >
+            <Button css={css.button} toggled={value - 1 === currentPage}>
               {value}
             </Button>
           </Link>

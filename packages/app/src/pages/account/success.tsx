@@ -145,6 +145,7 @@ export default function success({ doc }: Props) {
         <FormSuggestion
           label="Interests"
           suggestions={data}
+          beginIndex={1}
           onChange={(event) => {
             value.current = event.target.value;
           }}
