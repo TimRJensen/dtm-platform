@@ -180,7 +180,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
         <br />
         <div>
           <Button
-            $css={{ ...css }}
+            css={css.button}
             type="accept"
             disabled={!validated}
             onClick={handleSubmit}

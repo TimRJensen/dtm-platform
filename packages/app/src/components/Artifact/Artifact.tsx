@@ -32,7 +32,7 @@ export default function Artifact({ doc, onComment }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     artifact: {
       display: "grid",
-      gridTemplateColumns: `minmax(200px, 1.5fr) minmax(400px, 3fr) minmax(100px, 1fr)`,
+      gridTemplateColumns: `minmax(300px, 1.5fr) minmax(400px, 3fr) minmax(100px, 1fr)`,
       gridTemplateAreas: `
       "title title title" 
       "image content panel"`,
@@ -47,9 +47,11 @@ export default function Artifact({ doc, onComment }: Props) {
       textAlign: "center",
     },
     image: {
+      display: "block",
       gridArea: "image",
       width: "100%",
       borderRadius,
+      objectFit: "cover",
     },
     content: {
       gridArea: "content",

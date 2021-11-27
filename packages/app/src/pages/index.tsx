@@ -24,7 +24,7 @@ export default function index() {
   const { css } = useCSS(({ sizes: { appHeader, banner } }) => ({
     index: {
       display: "grid",
-      gridTemplateColumns: "min-content auto",
+      gridTemplateColumns: "min-content 1fr",
       minHeight: `min(100vh - ${appHeader.height}px - ${banner.height}px)`,
     },
   }));

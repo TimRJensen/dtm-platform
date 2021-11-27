@@ -28,6 +28,7 @@ export default function GridItem({ doc, toggled = true, onLoad }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     artifactCard: {
       display: "none",
+      height: "fit-content",
       borderRadius: spacing,
       overflow: "hidden",
       "&:hover :first-of-type:last-child": {
@@ -38,20 +39,19 @@ export default function GridItem({ doc, toggled = true, onLoad }: Props) {
       },
     },
     content: {
-      display: "inline-flex",
+      display: "flex",
       flexFlow: "column",
     },
     image: {
-      width: "min(300px, 25vw)",
-      backgroundColor: "black",
+      width: "min(300px)",
     },
     info: {
       padding: spacing,
-      height: "calc(3 * 1rem + 2 * 1.4rem)",
+      //height: "calc(3 * 1rem + 2 * 1.4rem)",
       backgroundColor: colors.primary,
       color: colors.text.secondary,
       "& :first-of-type": {
-        fontSize: "1.4rem",
+        fontSize: "1.5rem",
       },
     },
   }));

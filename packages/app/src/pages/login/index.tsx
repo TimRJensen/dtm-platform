@@ -26,16 +26,13 @@ interface Props {}
  */
 export default function login({}: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
-    login: {
-      width: 350,
-      margin: `${spacing * 2}px auto 0 auto`,
-    },
+    login: {},
     group: {
       width: "inherit",
       display: "flex",
       flexFlow: "column",
       alignItems: "center",
-      margin: `0 0 ${spacing * 2}px 0`,
+      margin: `${spacing * 2}px 0 ${spacing * 2}px 0`,
     },
     label: {
       textAlign: "center",

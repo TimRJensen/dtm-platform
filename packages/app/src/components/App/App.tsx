@@ -28,6 +28,9 @@ const _css = css({
   ":root": {
     fontFamily: `"Roboto", sans-serif`,
     boxSizing: "border-box",
+  },
+  "*": {
+    boxSizing: "inherit",
     "&::-webkit-scrollbar": {
       width: "0.5rem",
     },
@@ -37,11 +40,9 @@ const _css = css({
     "&::-webkit-scrollbar-thumb": {
       backgroundColor: theme.colors.secondary,
     },
-  },
-  html: {},
-  "*, *:after, *:before": {
-    boxSizing: "inherit",
-    fontFamily: "inherit",
+    "&::after, &::before": {
+      boxSizing: "inherit",
+    },
   },
   body: {
     margin: 0,
@@ -54,10 +55,14 @@ const _css = css({
   button: {
     border: "none",
     backgroundColor: "#FFF",
+    fontFamily: "inherit",
+    fontSize: "0.8rem",
   },
   input: {
     outline: "none",
     border: "none",
+    fontFamily: "inherit",
+    fontSize: "0.8rem",
   },
 });
 

@@ -25,10 +25,10 @@ interface Props {
 export default function Tag({ children }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     button: {
-      height: "auto",
+      height: "fit-content",
       width: "auto",
       margin: `0 ${0.5 * spacing}px ${0.5 * spacing}px 0`,
-      padding: `0 ${spacing}px`,
+      padding: `${spacing / 3}px ${spacing}px`,
       backgroundColor: colors.tag.default,
       borderRadius,
       "&:hover": {

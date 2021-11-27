@@ -37,7 +37,6 @@ export default function FormInput({ type, label, validate, onBlur }: Props) {
       outline: "none",
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
-      fontSize: "1rem",
       "&:focus": {
         border: `1px solid ${colors.input.defaultBorder}`,
         borderRadius: borderRadius / 2,

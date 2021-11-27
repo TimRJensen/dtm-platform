@@ -52,7 +52,7 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
       borderRadius: borderRadius / 2,
       color: colors.text.secondary,
       cursor: "pointer",
-      "&:hover": {
+      "&:hover, &:focus": {
         backgroundColor: colors.button[`${type}Hover`],
       },
       "&[data-disabled=true]": {

@@ -57,7 +57,7 @@ export default function success({ doc }: Props) {
       height: 24,
       width: 24,
       color: colors.secondary,
-      "&[data-disabled=false]:hover": {
+      "&:hover": {
         color: colors.secondaryDarker,
       },
     },
@@ -149,14 +149,14 @@ export default function success({ doc }: Props) {
             value.current = event.target.value;
           }}
         />
-        <Button $css={{ ...css }} type="transparent" onClick={handleAdd}>
+        <Button css={css.button} type="transparent" onClick={handleAdd}>
           <FontIcon type="add" />
         </Button>
         <div css={css.items}>
           {list.map((item, i) => (
             <div key={`interest-${item}-${i}`} css={css.item}>
               <Button
-                $css={{ ...css }}
+                css={css.button}
                 type="transparent"
                 onClick={handleRemove(i)}
               >
@@ -167,7 +167,7 @@ export default function success({ doc }: Props) {
           ))}
         </div>
         <Button
-          $css={{ button: css.buttonSubmit }}
+          css={css.buttonSubmit}
           type="accept"
           disabled={!list[0]}
           onClick={handleSubmit}

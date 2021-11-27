@@ -32,7 +32,7 @@ export default memo(function ListItem({
   const { css } = useCSS(({ spacing, colors }) => ({
     mainCategory: {
       width: "inherit",
-      transition: "all 0.2s ease",
+      transition: "opacity 0.5s ease",
     },
     label: {
       display: "block",

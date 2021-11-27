@@ -32,6 +32,7 @@ export default function AppNavbar() {
       padding: `0 0 0 ${spacing}px`,
       backgroundColor: colors.secondary,
       boxShadow: "0 2px 5px 0px #000",
+      zIndex: 1,
     },
     artiFACT: {
       fontSize: "1.8rem",

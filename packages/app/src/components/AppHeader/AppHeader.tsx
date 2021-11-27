@@ -73,10 +73,15 @@ export default function AppHeader() {
     },
     logo: {
       overflow: "hidden",
+      width: 430,
+
       "& img": {
-        width: 430,
+        display: "block",
+        width: "100%",
         position: "relative",
         left: -25,
+        aspectRatio: "16 / 9",
+        objectFit: "contain",
         transform: "translateX(-430px)",
         animation: `${moveX} 6s ease 2s forwards`,
       },

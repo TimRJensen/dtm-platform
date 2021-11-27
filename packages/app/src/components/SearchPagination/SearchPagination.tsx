@@ -50,7 +50,7 @@ export default function SearchPagination({
       "&[data-toggled=true]": {
         backgroundColor: colors.secondary,
       },
-      "&[data-toggled=false]": {
+      "&:hover": {
         backgroundColor: colors.primary,
         color: colors.text.secondary,
       },

@@ -31,20 +31,23 @@ export default function GridBox({ docs, columns = 3, onLoad }: Props) {
   const { css, theme } = useCSS(({ spacing }) => ({
     grid: {
       display: "grid",
-      gridTemplateColumns: `repeat(${columns}, clamp(200px, 300px, 25vw))`,
-      gridAutoRows: 25,
+      gridTemplateColumns: `repeat(auto-fill, 300px)`,
+      gridAutoRows: 50,
       gridAutoFlow: "dense",
-      alignItems: "start",
       justifyItems: "center",
+      //justifyContent: "center",
       columnGap: spacing,
       rowGap: spacing,
+      width: `clamp(300px, 80vw, ${columns} * 300px + ${
+        columns - 1
+      } * ${spacing}px)`,
       margin: `${2 * spacing}px auto 100px auto`,
     },
     loader: {
       display: "flex",
       justifyContent: "center",
       alignSelf: "center",
-      gridColumn: "span 3",
+      gridColumn: "1 / -1",
       zIndex: -1,
     },
   }));

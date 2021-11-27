@@ -51,26 +51,30 @@ export default function MessageHeader({ doc, onEdit }: Props) {
       margin: 0,
       padding: 0,
     },
-    items: {
+    box: {
       height: "inherit",
-      width: "fit-content",
+      width: "max-content",
       margin: 0,
       padding: 0,
     },
-    button: {
+    item: {
+      display: "inline-flex",
+      justifyContent: "center",
+      alignItems: "center",
       height: "inherit",
+      width: 90,
       backgroundColor: colors.secondary,
       color: colors.text.secondary,
       borderRadius: 0,
-      /*"&[data-disabled=true]": {
-        backgroundColor: colors.secondary,
-      },*/
-      "&:hover": {
+      "&:hover, &:focus": {
         backgroundColor: colors.secondaryDarker,
       },
     },
     buttonExpand: {
       width: 45,
+      "&[data-disabled=true]": {
+        color: "rgba(255, 255, 255, 0.33)",
+      },
     },
   }));
   const {
@@ -84,24 +88,24 @@ export default function MessageHeader({ doc, onEdit }: Props) {
         <span>{doc.user.displayName}</span>
       </div>
       <Dropdown
-        css={{ ...css }}
+        $css={{ ...css }}
         label={
-          <Button css={[css.button, css.buttonExpand]}>
+          <Button css={[css.item, css.buttonExpand]}>
             <FontIcon type="more_horiz" />
           </Button>
         }
         disabled={!currentUser}
         direction="left"
       >
-        <Button css={css.button} onClick={onEdit}>
+        <Dropdown.Item css={css.item} onClick={onEdit}>
           <FontIcon type="edit">edit</FontIcon>
-        </Button>
-        <Button css={css.button} /*onClick={undefined}*/>
+        </Dropdown.Item>
+        <Dropdown.Item css={css.item} onClick={undefined}>
           <FontIcon type="delete">delete</FontIcon>
-        </Button>
-        <Button css={css.button} /*onClick={undefined}*/>
+        </Dropdown.Item>
+        <Dropdown.Item css={css.item} onClick={undefined}>
           <FontIcon type="not_interested">ban</FontIcon>
-        </Button>
+        </Dropdown.Item>
       </Dropdown>
     </div>
   );

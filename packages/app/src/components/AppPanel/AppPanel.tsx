@@ -31,8 +31,8 @@ export default function AppPanel({ categories }: Props) {
     categoryList: {
       display: "flex",
       flexFlow: "column",
+      width: "clamp(200px, 10vw, 250px)",
       minHeight: "inherit",
-      width: "clamp(200px, 10vw, 300px)",
       margin: `0 ${spacing}px 0 0`,
       padding: `${spacing}px 0 0 0`,
       backgroundColor: colors.primary,
