@@ -6,9 +6,9 @@ import {
   useState,
   useEffect,
   cloneElement,
-  ReactElement,
   Children,
   useRef,
+  ReactElement,
 } from "react";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
@@ -23,17 +23,17 @@ import { useCSS } from "../../hooks";
 interface Props {
   data: any[] | any;
   loadable?: boolean;
-  children: ReactElement[] | ReactElement | null;
+  children: ReactElement | ReactElement[] | null;
 }
 
 /**
  * LoadBox functional component.
  */
 export default function LoadBox({ data, loadable = false, children }: Props) {
-  const { css, theme } = useCSS(({ sizes: { appHeader, banner } }) => ({
+  const { css, theme } = useCSS(({}) => ({
     loader: {
       display: "none",
-      minHeight: `calc(100vh - ${appHeader.height}px - ${banner.height}px - 30vh)`,
+      height: "min(100%)",
       "&[data-toggled=true]": {
         display: "flex",
         justifyContent: "center",
@@ -59,6 +59,10 @@ export default function LoadBox({ data, loadable = false, children }: Props) {
   }, [data]);
 
   const handleLoad = () => {
+    if (!data) {
+      return;
+    }
+
     loaded.current++;
 
     if (loaded.current === data.length) {
@@ -72,14 +76,13 @@ export default function LoadBox({ data, loadable = false, children }: Props) {
       <div css={css.loader} data-toggled={loading}>
         <PacmanLoader color={theme.colors.secondary} />
       </div>
-      {children
-        ? Children.map(children, (child) =>
-            cloneElement(child, {
-              ...child.props,
+      {Children.map(children, (child) =>
+        child
+          ? cloneElement(child, {
               css: loading ? css.child : child.props.css,
             })
-          )
-        : null}
+          : null
+      )}
     </section>
   );
 }

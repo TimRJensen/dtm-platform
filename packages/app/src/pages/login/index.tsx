@@ -2,7 +2,7 @@
  * Vendor imports.
  */
 import { useContext, useEffect } from "react";
-import { Switch, Link, Route, generatePath } from "react-router-dom";
+import { Link, generatePath } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -76,75 +76,65 @@ export default function login({}: Props) {
 
   return (
     <section css={css.login}>
-      <Switch>
-        <Route
-          path="/login"
-          exact
-          render={() => (
-            <section>
-              <div css={css.group}>
-                <div css={css.label}>Login with an existing login:</div>
-                <Link
-                  to={generatePath(path, {
-                    loginId: "google",
-                  })}
-                >
-                  <Button $css={{ ...css }}>
-                    <GoogleLogo css={css.logo} />
-                    Login with Google
-                  </Button>
-                </Link>
-                <Link
-                  to={generatePath(path, {
-                    loginId: "facebook",
-                  })}
-                >
-                  <Button $css={{ ...css }}>
-                    <FacebookLogo css={css.logo} />
-                    Login with Facebook
-                  </Button>
-                </Link>
-                <Link
-                  to={generatePath(path, {
-                    loginId: "magiclink",
-                  })}
-                >
-                  <Button $css={{ ...css }}>
-                    <FontIcon
-                      $css={{ ...css, icon: css.magicLink }}
-                      type="auto_fix_high"
-                      size={38}
-                    />
-                    Login with magiclink
-                  </Button>
-                </Link>
-                <Link
-                  to={generatePath(path, {
-                    loginId: "ArtiFACT",
-                  })}
-                >
-                  <Button $css={{ ...css }}>
-                    <FontIcon
-                      $css={{ ...css, icon: css.artiFACT }}
-                      type="account_circle"
-                      size={48}
-                    />
-                    Login with ArtiFACT
-                  </Button>
-                </Link>
-                <br />
-                <div>
-                  Don't have an account yet? Create one{" "}
-                  <Link css={css.link} to="/account/new">
-                    here
-                  </Link>
-                  .
-                </div>
-              </div>
-            </section>
-          )}
-        />
-      </Switch>
+      <div css={css.group}>
+        <div css={css.label}>Login with an existing login:</div>
+        <Link
+          to={generatePath(path, {
+            loginId: "google",
+          })}
+        >
+          <Button css={css.button}>
+            <GoogleLogo css={css.logo} />
+            Login with Google
+          </Button>
+        </Link>
+        <Link
+          to={generatePath(path, {
+            loginId: "facebook",
+          })}
+        >
+          <Button css={css.button}>
+            <FacebookLogo css={css.logo} />
+            Login with Facebook
+          </Button>
+        </Link>
+        <Link
+          to={generatePath(path, {
+            loginId: "magiclink",
+          })}
+        >
+          <Button css={css.button}>
+            <FontIcon
+              $css={{ ...css, icon: css.magicLink }}
+              type="auto_fix_high"
+              size={38}
+            />
+            Login with magiclink
+          </Button>
+        </Link>
+        <Link
+          to={generatePath(path, {
+            loginId: "ArtiFACT",
+          })}
+        >
+          <Button css={css.button}>
+            <FontIcon
+              $css={{ ...css, icon: css.artiFACT }}
+              type="account_circle"
+              size={48}
+            />
+            Login with ArtiFACT
+          </Button>
+        </Link>
+        <br />
+        <div>
+          Don't have an account yet? Create one{" "}
+          <Link css={css.link} to="/account/new">
+            here
+          </Link>
+          .
+        </div>
+      </div>
     </section>
   );
 }

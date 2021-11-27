@@ -84,20 +84,20 @@ export default function blog({ blog }: Props) {
 
   return (
     <LoadBox data={[blog]} loadable>
-      {blog ? (
-        <section>
-          <Artifact doc={blog.artifact} onComment={handleShowEditor} />
-          <TextEditor
-            $css={{ ...css }}
-            onSubmit={handleSubmit}
-            toggle={showEditor()}
-            advanced
-          />
-          {arraySort(blog.posts, "createdAt", { reverse: true }).map((post) => (
+      <section>
+        <Artifact doc={blog?.artifact} onComment={handleShowEditor} />
+        <TextEditor
+          $css={{ ...css }}
+          onSubmit={handleSubmit}
+          toggle={showEditor()}
+          advanced
+        />
+        {arraySort(blog?.posts ?? [], "createdAt", { reverse: true }).map(
+          (post) => (
             <Post key={post.id} doc={post} />
-          ))}
-        </section>
-      ) : null}
+          )
+        )}
+      </section>
     </LoadBox>
   );
 }
