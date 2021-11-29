@@ -4,7 +4,6 @@
 
 import {
   useState,
-  useEffect,
   useRef,
   ComponentProps,
   ChangeEvent,
@@ -61,42 +60,47 @@ export default function ComboBox({
   const fuse = useRef(new Fuse(suggestions, { threshold: 0.1 }));
   const cache = useRef(new Map<string, FuseResult>());
 
-  useEffect(() => {
-    if (!value.length) {
-      return;
-    }
-
-    if (value.length === beginIndex) {
-      fuse.current.setCollection(suggestions);
-    }
-
-    if (value.length < beginIndex) {
-      return;
-    }
-
-    if (items && items[0]) {
-      fuse.current.setCollection(items.map((element) => element.item));
-    }
-
-    const next = cache.current.get(value) ?? fuse.current.search(value);
-
-    if (next[0]) {
-      cache.current.set(value, next);
-      setItems(next);
-    }
-  }, [value]);
-
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
-    setToggled: Dispatch<SetStateAction<boolean | undefined>> = () => null
+    toggle: Dispatch<SetStateAction<boolean | undefined>> = () => ({})
   ) => {
-    setValue(event.currentTarget.value);
+    const next = event.currentTarget.value;
 
-    if (event.currentTarget.value.length >= beginIndex) {
-      setTimeout(() => setToggled(true));
+    if (next.length >= beginIndex) {
+      let suggestions;
+
+      if (cache.current.has(next)) {
+        suggestions = cache.current.get(next);
+      } else {
+        if (cache.current.has("last")) {
+          fuse.current.setCollection(
+            cache.current.get("last")!.map((item) => item.item)
+          );
+        }
+
+        suggestions = fuse.current.search(next);
+      }
+
+      if (suggestions && suggestions.length) {
+        if (next.length > value.length) {
+          cache.current.set("last", suggestions);
+        }
+        cache.current.set(next, suggestions);
+
+        setItems(suggestions);
+        toggle(true);
+      }
     } else {
-      setToggled(undefined);
+      if (next.length < value.length) {
+        toggle(undefined);
+
+        cache.current.delete("last");
+        fuse.current.setCollection(suggestions);
+        setItems(undefined);
+      }
     }
+
+    setValue(next);
   };
 
   const handleItemClick = (value: string) => {
@@ -104,7 +108,7 @@ export default function ComboBox({
   };
 
   return (
-    <Dropdown
+    <Dropdown<"input">
       {...rest}
       $css={{ dropdown: css.combobox, box: css.items }}
       label={
@@ -116,17 +120,15 @@ export default function ComboBox({
         />
       }
     >
-      {items
-        ? items.map((item, i) => (
-            <Dropdown.Item
-              key={`formSuggestion-option-${item.item}-${i}`}
-              css={css.item}
-              onClick={handleItemClick.bind(null, item.item)}
-            >
-              {item.item}
-            </Dropdown.Item>
-          ))
-        : null}
+      {items?.map((item, i) => (
+        <Dropdown.Item
+          key={`formSuggestion-option-${item.item}-${i}`}
+          css={css.item}
+          onClick={handleItemClick.bind(null, item.item)}
+        >
+          {item.item}
+        </Dropdown.Item>
+      ))}
     </Dropdown>
   );
 }

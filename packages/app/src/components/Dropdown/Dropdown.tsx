@@ -9,11 +9,12 @@ import {
   Children,
   ComponentProps,
   ReactElement,
-  MutableRefObject,
   KeyboardEvent,
   MouseEvent,
   FocusEvent,
   ChangeEvent,
+  ElementType,
+  MutableRefObject,
 } from "react";
 
 /**
@@ -26,21 +27,26 @@ import DropdownItem from "../DropdownItem/DropdownItem";
 /**
  * Types.
  */
-interface Props extends ComponentProps<"div"> {
+type Test<T extends ElementType> = ReactElement<ComponentProps<T>, T> & {
+  ref?: MutableRefObject<HTMLElement>;
+};
+
+interface Props<T extends ElementType> extends ComponentProps<"div"> {
   $css?: Partial<{
     [key in "dropdown" | "label" | "box"]: PropertyValueType;
   }>;
-  label: ReactElement & { ref?: MutableRefObject<HTMLElement> };
+  //label: jsx.JSX.Element;
+  label: Test<T>;
   direction?: "down" | "left" | "right";
   disabled?: boolean;
-  children: ReactElement | ReactElement[] | null;
+  children: ReactElement | ReactElement[] | null | undefined;
   //persists?: boolean;
 }
 
 /**
  * Dropdown functional component.
  */
-export default function Dropdown({
+function Dropdown<T extends ElementType>({
   $css = {},
   label,
   direction = "down",
@@ -48,7 +54,7 @@ export default function Dropdown({
   disabled,
   children,
   ...rest
-}: Props) {
+}: Props<T>) {
   const { css } = useCSS(({}) => ({
     dropdown: [
       { cursor: "default", position: "relative" },
@@ -59,7 +65,8 @@ export default function Dropdown({
   }));
   const [toggled, setToggled] = useState<boolean>();
   const [selected, setSelected] = useState(-1);
-  const toggleElement = label.ref ?? useRef<HTMLElement>();
+
+  const toggleElement = useRef<HTMLElement>();
   const boxElement = useRef<HTMLUListElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
 
@@ -85,8 +92,7 @@ export default function Dropdown({
       }
 
       default: {
-        console.log(box.offsetLeft, dropdown.offsetLeft, box.clientLeft);
-        //box.style.left = `${-box.clientLeft}px`;
+        box.style.left = `${-box.clientLeft}px`;
       }
     }
   }, [toggled]);
@@ -174,7 +180,7 @@ export default function Dropdown({
     }
 
     if (!toggled) {
-      setToggled(children !== null);
+      setToggled(!!children);
     } else {
       toggleOff();
     }
@@ -182,13 +188,16 @@ export default function Dropdown({
 
   const handleFocus = () => {
     if (focusType.current === "tab") {
-      setToggled(children !== null);
+      setToggled(!!children);
     }
   };
 
-  const handleChange = (event: ChangeEvent) => {
-    if (label.props.onChange) {
-      label.props.onChange(event, setToggled);
+  const handleChange = (
+    callBack: (...args: any) => void = () => ({}),
+    event: ChangeEvent
+  ) => {
+    if (callBack) {
+      callBack(event, setToggled);
     }
   };
 
@@ -206,23 +215,27 @@ export default function Dropdown({
       {...rest}
       css={css.dropdown}
       data-toggled={toggled ?? ""}
-      {...(!disabled
-        ? {
-            onMouseDown: handleToggle,
-            onFocusCapture: handleToggle,
-            onClick: handleClick,
-            onFocus: handleFocus,
-            onKeyDown: handleKeyPress,
-            onBlur: toggleOff.bind(null, undefined),
-          }
-        : null)}
+      {...(!disabled && {
+        onMouseDown: handleToggle,
+        onFocusCapture: handleToggle,
+        onClick: handleClick,
+        onFocus: handleFocus,
+        onKeyDown: handleKeyPress,
+        onBlur: toggleOff.bind(null, undefined),
+      })}
     >
-      {cloneElement(label, {
+      {cloneElement<any>(label, {
         css: [css.label, label.props.css],
-        ref: toggleElement,
+        ref: (element: HTMLElement) => {
+          if (label.ref) {
+            label.ref.current = element;
+          }
+
+          toggleElement.current = element;
+        },
         "data-disabled": disabled,
         "data-toggled": toggled,
-        onChange: handleChange,
+        onChange: handleChange.bind(null, label.props.onChange),
       })}
       {children ? (
         <DropdownBox
@@ -230,7 +243,7 @@ export default function Dropdown({
           ref={boxElement}
           toggled={toggled}
           selected={selected}
-          onKeyDown={setSelected}
+          select={setSelected}
         >
           {children}
         </DropdownBox>
@@ -240,3 +253,4 @@ export default function Dropdown({
 }
 
 Dropdown.Item = DropdownItem;
+export default Dropdown;

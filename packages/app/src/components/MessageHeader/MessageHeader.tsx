@@ -72,9 +72,10 @@ export default function MessageHeader({ doc, onEdit }: Props) {
     },
     buttonExpand: {
       width: 45,
-      "&[data-disabled=true]": {
-        color: "rgba(255, 255, 255, 0.33)",
-      },
+      "&[data-disabled=true], &[data-disabled=true]:hover, &[data-disabled=true]:focus":
+        {
+          color: "rgba(255, 255, 255, 0.33)",
+        },
     },
   }));
   const {

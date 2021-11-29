@@ -9,6 +9,7 @@ import {
   SetStateAction,
   MouseEvent,
   ReactElement,
+  ComponentProps,
 } from "react";
 
 /**
@@ -19,10 +20,10 @@ import { useCSS } from "../../hooks";
 /**
  * Types.
  */
-interface Props {
+interface Props extends ComponentProps<"ul"> {
   toggled: boolean | undefined;
   selected: number;
-  onKeyDown: Dispatch<SetStateAction<number>>;
+  select: Dispatch<SetStateAction<number>>;
   children: ReactElement | ReactElement[];
 }
 
@@ -30,7 +31,7 @@ interface Props {
  * DropdownBox functional component.
  */
 export default forwardRef<HTMLUListElement, Props>(function DropdownBox(
-  { toggled, selected, children, onKeyDown, ...rest }: Props,
+  { toggled, selected, children, select, ...rest }: Props,
   ref
 ) {
   const { css } = useCSS(({}) => ({
@@ -56,7 +57,7 @@ export default forwardRef<HTMLUListElement, Props>(function DropdownBox(
   const handleMouseOver = (event: MouseEvent) => {
     if (!ref || typeof ref === "function") return;
 
-    onKeyDown(
+    select(
       Array.from(ref.current?.children!).indexOf(event.target as HTMLElement)
     );
   };

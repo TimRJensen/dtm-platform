@@ -19,6 +19,7 @@ type CSSType = {
 export type PropertyValueType =
   | CSSType
   | CSSType[]
+  | { [key: string]: CSSType }
   | ((...value: any) => CSSType)
   | {};
 

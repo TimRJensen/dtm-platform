@@ -63,6 +63,10 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
       "&:hover, &:focus": {
         backgroundColor: colors.button[`${type}Hover`],
       },
+      "&[data-toggled=false]": {
+        backgroundColor: colors.button[`${type}Disabled`],
+        color: colors.text.disabled,
+      },
       "&[data-disabled=true]": {
         backgroundColor: colors.button[`${type}Disabled`],
         color: colors.text.disabled,
@@ -71,10 +75,6 @@ export default forwardRef<HTMLButtonElement, Props>(function Button(
           backgroundColor: colors.button[`${type}Disabled`],
           color: colors.text.disabled,
         },
-      },
-      "&[data-toggled=false]": {
-        backgroundColor: colors.button[`${type}Disabled`],
-        color: colors.text.disabled,
       },
     },
   }));

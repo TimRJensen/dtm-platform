@@ -46,13 +46,8 @@ export default function SearchPagination({
       width: 25,
       borderRadius: borderRadius * 0.5,
       margin: `0 ${spacing / 2}px 0 0`,
-
       "&[data-toggled=true]": {
         backgroundColor: colors.secondary,
-      },
-      "&:hover": {
-        backgroundColor: colors.primary,
-        color: colors.text.secondary,
       },
     },
     divider: {
@@ -62,9 +57,6 @@ export default function SearchPagination({
       color: colors.primary,
       ":not(:last-of-type)": {
         margin: `0 ${spacing / 2}px 0 0`,
-      },
-      "&:hover": {
-        color: colors.secondary,
       },
     },
   }));
@@ -121,7 +113,10 @@ export default function SearchPagination({
               pageId: value - 1,
             })}
           >
-            <Button css={css.button} toggled={value - 1 === currentPage}>
+            <Button
+              css={css.button}
+              toggled={value - 1 === currentPage ? true : undefined}
+            >
               {value}
             </Button>
           </Link>
