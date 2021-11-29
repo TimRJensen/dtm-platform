@@ -32,11 +32,23 @@ const labels = [
 ];
 
 const regions = [
-  "Region Hovedstaden",
-  "Region Sjælland",
-  "Region Nordjylland",
-  "Region Midtjylland",
-  "Region Syddanmark",
+  "København og omegn",
+  "Aarhus",
+  "Odense",
+  "Aalborg",
+  "Sjælland",
+  "Jylland",
+  "Fyn",
+  "Bornholm",
+  "Nordsjælland",
+  "Vestsjælland",
+  "Sydsjælland og Lolland-Falster",
+  "Nordjylland",
+  "Østjylland",
+  "Midt og Vestjylland",
+  "Syd og Sønderjylland",
+  "Færøerne",
+  "Grønland",
 ];
 
 interface Props {
