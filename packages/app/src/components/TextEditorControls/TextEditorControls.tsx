@@ -90,16 +90,10 @@ export default function TextEditorControls({ editorState, onToggle }: Props) {
             css={css.button}
             type="transparent"
             toggled={
-              (console.log(
-                editorState
-                  .getCurrentContent()
-                  .getBlockForKey(editorState.getSelection().getStartKey())
-                  .getType() === control.type
-              ),
               editorState
                 .getCurrentContent()
                 .getBlockForKey(editorState.getSelection().getStartKey())
-                .getType() === control.type)
+                .getType() === control.type
             }
             onToggle={handleStyleToggle("toggleBlockType", control.type)}
           >
