@@ -2,6 +2,7 @@
  * Vendor imports.
  */
 import { useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
 
 /**
  * Custom imports.
@@ -34,8 +35,10 @@ export default function verified({}: Props) {
     },
   }));
   const { dispatch } = useContext(AppStateContext);
+  const loc = useLocation();
 
   useEffect(() => {
+    console.log(loc);
     dispatch({
       type: "CURRENT_PATH",
       value: { section: "account", label: "new" },
