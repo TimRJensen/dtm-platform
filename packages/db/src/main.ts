@@ -50,7 +50,7 @@ export interface AccountTable extends BaseTable {
 }
 export type AccountType = AccountTable;
 export type UserType = Omit<
-  AccountTable,
+  AccountTable & { profile: ProfileTable },
   "createdAt" | "updatedAt" | "profileId"
 >;
 
@@ -437,6 +437,29 @@ class SupabaBaseWrapper {
     }
 
     return accountInsert.data[0];
+  }
+
+  async signIn(email: string, password: string) {
+    const { user, error } = await this.supabase.auth.signIn({
+      email,
+      password,
+    });
+
+    if (error || user === null) {
+      return { error };
+    }
+
+    /*const response = await this.selectExact<UserType>(
+      "accounts",
+      `id, email, stats, profile:profileId(*) `,
+      { match: { email: user.email! } }
+    );
+
+    if ("error" in response) {
+      return response;
+    }*/
+
+    return user;
   }
 
   onAuthChange(
