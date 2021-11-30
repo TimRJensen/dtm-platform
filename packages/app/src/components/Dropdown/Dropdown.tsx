@@ -39,7 +39,7 @@ interface Props<T extends ElementType> extends ComponentProps<"div"> {
   label: Test<T>;
   direction?: "down" | "left" | "right";
   disabled?: boolean;
-  children: ReactElement | ReactElement[] | null;
+  children: ReactElement | ReactElement[] | null | undefined;
   //persists?: boolean;
 }
 
