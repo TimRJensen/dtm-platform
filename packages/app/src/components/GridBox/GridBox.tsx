@@ -23,7 +23,7 @@ interface Props {
 /**
  * GridBox functional component.
  */
-export default function GridBox({ docs, columns = 3, onLoad }: Props) {
+export default function GridBox({ docs, onLoad }: Props) {
   if (!docs) {
     return null;
   }
@@ -35,12 +35,9 @@ export default function GridBox({ docs, columns = 3, onLoad }: Props) {
       gridAutoRows: 50,
       gridAutoFlow: "dense",
       justifyItems: "center",
-      //justifyContent: "center",
+      justifyContent: "center",
       columnGap: spacing,
       rowGap: spacing,
-      width: `clamp(300px, 80vw, ${columns} * 300px + ${
-        columns - 1
-      } * ${spacing}px)`,
       margin: `${2 * spacing}px auto 100px auto`,
     },
     loader: {
