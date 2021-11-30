@@ -33,7 +33,8 @@ export default function AppNavbar() {
       padding: `0 0 0 ${spacing}px`,
       backgroundColor: colors.secondary,
       boxShadow: "0 2px 5px 0px #000",
-      zIndex: 10,
+      zIndex: 1,
+      overflow: "hidden",
     },
     artiFACT: {
       fontSize: "1.8rem",
@@ -45,35 +46,41 @@ export default function AppNavbar() {
       margin: `0 ${spacing}px 0 ${spacing}px`,
     },
     signIn: {
-      margin: `0 ${spacing}px 0 0`,
-      fontSize: "1.25rem",
+      padding: `0 ${spacing}px 0 ${spacing}px`,
       color: colors.primary,
     },
     button: {
-      height: "auto",
+      height: appHeader.height,
       width: "auto",
+      borderRadius: 0,
+      padding: `0 ${spacing}px 0 ${spacing}px`,
+      backgroundColor: colors.secondary,
       color: colors.primary,
-      margin: `0 ${spacing}px 0 ${spacing}px`,
+      zIndex: 2,
+      "&:hover, &:focus": {
+        backgroundColor: colors.secondary,
+      },
     },
     dropdown: {
       display: "flex",
-      alignItems: "center",
       height: "inherit",
     },
     box: {
       display: "block",
+      visibility: "visible",
       height: "inherit",
       width: 325,
       backgroundColor: colors.primary,
       color: colors.text.secondary,
       textAlign: "right",
+      overflow: "hidden",
       clipPath: "polygon(7% 0%, 101% 0, 101% 101%, 0% 101%)",
       opacity: 0,
-      transform: "scaleX(0%) translateX(325px)",
+      transform: "translateX(325px) scaleX(0)",
+      transition: "all 0.33s ease",
       "&[data-toggled=true]": {
         opacity: 1,
-        transform: "scaleX(100%) translateX(0)",
-        transition: "all 0.1s ease",
+        transform: "translateX(0px) scaleX(1)",
       },
     },
     item: {
@@ -106,7 +113,7 @@ export default function AppNavbar() {
         </div>
       ) : null}
       <Searchbar />
-      {!state.currentUser ? (
+      {state.currentUser ? (
         <Dropdown
           $css={{ ...css }}
           label={
@@ -127,15 +134,3 @@ export default function AppNavbar() {
     </section>
   );
 }
-
-// @ts-ignore
-window.showDropdown = () => {
-  setTimeout(() => {
-    const element = document.querySelector(
-      "div[data-toggled] > ul"
-    ) as HTMLElement;
-
-    element.dataset["toggled"] = "true";
-  }, 500);
-};
-// @ts-ignore
