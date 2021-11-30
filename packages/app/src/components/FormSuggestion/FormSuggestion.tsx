@@ -1,7 +1,13 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef, ChangeEvent } from "react";
+import {
+  useState,
+  useRef,
+  ChangeEvent,
+  FocusEvent,
+  ComponentProps,
+} from "react";
 
 /**
  * Custom imports.
@@ -12,7 +18,7 @@ import ComboBox from "../ComboBox/ComboBox";
 /**
  * Types.
  */
-interface Props {
+interface Props extends ComponentProps<"div"> {
   label: string;
   suggestions: string[] | undefined;
   beginIndex?: number;
@@ -28,7 +34,7 @@ export default function FormSuggestion({
   suggestions,
   beginIndex,
   validate,
-  onChange,
+  ...rest
 }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formSuggestion: {
@@ -40,7 +46,7 @@ export default function FormSuggestion({
       margin: `0 ${spacing}px 0 0`,
     },
     combobox: {
-      width: "min(300px)",
+      width: 300,
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
       "&:focus-within": {
@@ -74,7 +80,6 @@ export default function FormSuggestion({
     },
     item: {
       height: "1.5rem",
-      width: "inherit",
       padding: "1px 2px",
       color: colors.text.primary,
       fontSize: "0.8rem",
@@ -87,26 +92,34 @@ export default function FormSuggestion({
   const [validated, setValidated] = useState<boolean>();
   const selected = useRef("");
 
-  const handleValidate = () => {
-    if (validate) {
-      setValidated(validate(selected.current));
+  const handleFocus = (event: FocusEvent<any>) => {
+    if (event.type === "focus") {
+      if (rest.onFocus) {
+        rest.onFocus(event);
+      }
+
+      setValidated(undefined);
+    } else {
+      if (rest.onBlur) {
+        rest.onBlur(event);
+      }
+
+      if (validate) {
+        setValidated(validate(selected.current));
+      }
     }
   };
 
   const handleChange = (event: ChangeEvent<any>) => {
-    if (onChange) {
-      onChange(event);
+    if (rest.onChange) {
+      rest.onChange(event);
     }
 
     selected.current = event.target.value;
   };
 
   return (
-    <div
-      css={css.formSuggestion}
-      onFocus={() => setValidated(undefined)}
-      onBlur={handleValidate}
-    >
+    <div css={css.formSuggestion} onFocus={handleFocus} onBlur={handleFocus}>
       <label css={css.label}>{label}</label>
       <ComboBox
         $css={{ ...css }}

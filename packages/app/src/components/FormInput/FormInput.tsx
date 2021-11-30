@@ -1,7 +1,14 @@
 /**
  * Vendor imports.
  */
-import { useState, HTMLInputTypeAttribute } from "react";
+import {
+  useState,
+  useEffect,
+  HTMLInputTypeAttribute,
+  ComponentProps,
+  FocusEvent,
+  ChangeEvent,
+} from "react";
 
 /**
  * Custom imports.
@@ -11,17 +18,25 @@ import { useCSS } from "../../hooks";
 /**
  * Types.
  */
-interface Props {
+interface Props extends Omit<ComponentProps<"div">, "onChange"> {
   type: HTMLInputTypeAttribute;
   label: string;
+  dependencies?: any[];
   validate?: (value: string) => boolean;
-  onBlur?: (value: string) => void;
+  onChange?: (value: string) => void;
 }
 
 /**
  * FormInput functional component.
  */
-export default function FormInput({ type, label, validate, onBlur }: Props) {
+export default function FormInput({
+  type,
+  label,
+  dependencies,
+  validate,
+  onChange,
+  ...rest
+}: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formInput: {
       display: "flex",
@@ -56,16 +71,48 @@ export default function FormInput({ type, label, validate, onBlur }: Props) {
   const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
 
-  const handleFocus = () => {
-    if (validate) setValidated(validate(value));
-    if (onBlur) onBlur(value);
+  useEffect(() => {
+    if (validated === undefined) {
+      return;
+    }
+
+    if (validate) {
+      setValidated(validate(value));
+    }
+  }, [dependencies]);
+
+  const handleFocus = (event: FocusEvent<any>) => {
+    if (event.type === "focus") {
+      if (rest.onFocus) {
+        rest.onFocus(event);
+      }
+
+      setValidated(undefined);
+    } else {
+      if (rest.onBlur) {
+        rest.onBlur(event);
+      }
+
+      if (validate) {
+        setValidated(validate(value));
+      }
+    }
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(event.target.value);
+    }
+
+    setValue(event.target.value);
   };
 
   return (
     <div
+      {...rest}
       css={css.formInput}
-      onFocus={() => setValidated(undefined)}
-      onBlur={validate || onBlur ? handleFocus : undefined}
+      onFocus={handleFocus}
+      onBlur={handleFocus}
     >
       <label css={css.label}>{label}</label>
       <input
@@ -73,7 +120,7 @@ export default function FormInput({ type, label, validate, onBlur }: Props) {
         type={type}
         value={value}
         data-validated={validated ?? ""}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={handleChange}
       />
     </div>
   );

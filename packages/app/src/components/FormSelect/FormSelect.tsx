@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef } from "react";
+import { useState, ComponentProps, FocusEvent } from "react";
 
 /**
  * Custom imports.
@@ -14,7 +14,7 @@ import FontIcon from "../FontIcon/FontIcon";
 /**
  * Types.
  */
-interface Props {
+interface Props extends ComponentProps<"div"> {
   items: string[];
   label: string;
   validate?: (value: string) => boolean;
@@ -23,7 +23,7 @@ interface Props {
 /**
  * FormSelect functional component.
  */
-export default function FormSelect({ items, label, validate }: Props) {
+export default function FormSelect({ items, label, validate, ...rest }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formSelect: {
       display: "flex",
@@ -34,7 +34,7 @@ export default function FormSelect({ items, label, validate }: Props) {
       margin: `0 ${spacing}px 0 0`,
     },
     dropdown: {
-      width: "min(300px)",
+      width: 300,
       border: "1px solid transparent",
       borderBottom: `1px solid ${colors.input.defaultBorder}`,
       "&:focus-within": {
@@ -79,7 +79,6 @@ export default function FormSelect({ items, label, validate }: Props) {
     },
     item: {
       height: "1.5rem",
-      width: "inherit",
       padding: "1px 2px",
       color: colors.text.primary,
       fontSize: "0.8rem",
@@ -91,30 +90,36 @@ export default function FormSelect({ items, label, validate }: Props) {
   }));
   const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
-  const input = useRef<HTMLButtonElement>(null);
 
-  const handleBlur = () => {
-    if (validate) {
-      setValidated(validate(value));
+  const handleFocus = (event: FocusEvent<any>) => {
+    if (event.type === "focus") {
+      if (rest.onFocus) {
+        rest.onFocus(event);
+      }
+
+      setValidated(undefined);
+    } else {
+      if (rest.onBlur) {
+        rest.onBlur(event);
+      }
+
+      if (validate) {
+        setValidated(validate(value));
+      }
     }
   };
 
-  const handleChildClick = (item: string) => {
+  const handleSelect = (item: string) => {
     setValue(item);
-    setTimeout(() => input.current?.blur());
   };
 
   return (
-    <div
-      css={css.formSelect}
-      onFocus={() => setValidated(undefined)}
-      onBlur={handleBlur}
-    >
+    <div css={css.formSelect} onFocus={handleFocus} onBlur={handleFocus}>
       <div css={css.label}>{label}</div>
       <Dropdown
         $css={{ ...css }}
         label={
-          <Button css={css.selected} type="transparent" ref={input}>
+          <Button css={css.selected} type="transparent">
             {value}
             <FontIcon $css={{ ...css }} type="expand_more" />
           </Button>
@@ -125,7 +130,8 @@ export default function FormSelect({ items, label, validate }: Props) {
           <Dropdown.Item
             key={`formSelect-option-${item}-${i}`}
             css={css.item}
-            onClick={handleChildClick.bind(null, item)}
+            onClick={handleSelect.bind(null, item)}
+            onKeyDown={handleSelect.bind(null, item)}
           >
             {item}
           </Dropdown.Item>

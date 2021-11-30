@@ -67,6 +67,8 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       flexFlow: "column",
       alignItems: "flex-end",
       width: "fit-content",
+      position: "relative",
+      left: `calc(-1em * ${labels[2].length} * 0.33)`,
       margin: `${spacing * 2}px auto 0 auto`,
       whiteSpace: "nowrap",
     },
@@ -77,17 +79,17 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   const { db } = useDB();
   const history = useHistory();
   const [forceLoad, setForceLoad] = useState(false);
+  const [password, setPassword] = useState("");
   const [validated, setValidated] = useState(false);
-  const password = useRef("");
-  const validating = useRef<string[]>([]);
+  const inputs = useRef<string[]>([]);
 
   const validate = (index: number, validator: (value: string) => boolean) => {
     return (value: string) => {
       const flag = validator(value);
 
-      validating.current[index] = value;
+      inputs.current[index] = value;
 
-      if (validating.current.every((value) => value !== "")) {
+      if (flag && inputs.current.every((value) => value !== "")) {
         setValidated(true);
       } else {
         setValidated(false);
@@ -99,7 +101,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
 
   const handleSubmit = async () => {
     const [email, password, , firstName, lastName, city, region] =
-      validating.current;
+      inputs.current;
 
     setForceLoad(true);
 
@@ -142,7 +144,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     let i = -1;
 
     while (++i < labels.length) {
-      validating.current[i] = "";
+      inputs.current[i] = "";
     }
   }, []);
 
@@ -158,18 +160,16 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
         <FormInput
           type="password"
           label={labels[1]}
-          onBlur={(value) => {
-            password.current = value;
+          onChange={(value) => {
+            setPassword(value);
           }}
           validate={validate(1, (value) => value !== "" && value.length > 5)}
         />
         <FormInput
           type="password"
           label={labels[2]}
-          validate={validate(
-            2,
-            (value) => value !== "" && password.current === value
-          )}
+          dependencies={[password]}
+          validate={validate(2, (value) => value !== "" && password === value)}
         />
         <br />
         <FormInput

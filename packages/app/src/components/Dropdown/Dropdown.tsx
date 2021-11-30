@@ -39,7 +39,7 @@ interface Props<T extends ElementType> extends ComponentProps<"div"> {
   label: Test<T>;
   direction?: "down" | "left" | "right";
   disabled?: boolean;
-  children: ReactElement | ReactElement[] | null | undefined;
+  children: ReactElement | ReactElement[] | null;
   //persists?: boolean;
 }
 
@@ -95,15 +95,25 @@ function Dropdown<T extends ElementType>({
         box.style.left = `${-box.clientLeft}px`;
       }
     }
+
+    if (selected > -1) {
+      const item = box.children.item(selected) as HTMLElement;
+
+      box.scrollTop = item.offsetTop;
+    }
   }, [toggled]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!toggled) {
+    if (!children) {
       return;
     }
 
     switch (event.key) {
       case "ArrowUp": {
+        if (label.props.onChange && !toggled) {
+          return;
+        }
+
         event.preventDefault();
 
         const i = selected > 0 ? selected - 1 : Children.count(children) - 1;
@@ -117,12 +127,22 @@ function Dropdown<T extends ElementType>({
             item.offsetTop + item.offsetHeight - element.offsetHeight;
         }
 
+        const child = Children.toArray(children)[i] as ReactElement;
+
+        if (child.props.onKeyDown) {
+          child.props.onKeyDown(event);
+        }
+
         setSelected(i);
 
         break;
       }
 
       case "ArrowDown": {
+        if (label.props.onChange && !toggled) {
+          return;
+        }
+
         event.preventDefault();
 
         const i = selected < Children.count(children) - 1 ? selected + 1 : 0;
@@ -138,6 +158,12 @@ function Dropdown<T extends ElementType>({
           element.scrollTop = item.offsetTop;
         }
 
+        const child = Children.toArray(children)[i] as ReactElement;
+
+        if (child.props.onKeyDown) {
+          child.props.onKeyDown(event);
+        }
+
         setSelected(i);
 
         break;
@@ -147,9 +173,8 @@ function Dropdown<T extends ElementType>({
         event.preventDefault();
 
         if (selected > -1) {
-          const item = boxElement.current?.children.item(
-            selected
-          ) as HTMLElement;
+          const element = boxElement.current!;
+          const item = element.children.item(selected) as HTMLElement;
 
           item.click();
         }
@@ -164,14 +189,12 @@ function Dropdown<T extends ElementType>({
   };
 
   const handleToggle = (event: MouseEvent | FocusEvent) => {
-    event.preventDefault();
-
     if (focusType.current !== "none") {
+      event.preventDefault();
       return;
     }
 
     focusType.current = event.type === "mousedown" ? "click" : "tab";
-    toggleElement.current?.focus();
   };
 
   const handleClick = (event: MouseEvent<any>) => {
@@ -192,12 +215,9 @@ function Dropdown<T extends ElementType>({
     }
   };
 
-  const handleChange = (
-    callBack: (...args: any) => void = () => ({}),
-    event: ChangeEvent
-  ) => {
-    if (callBack) {
-      callBack(event, setToggled);
+  const handleChange = (event: ChangeEvent) => {
+    if (label.props.onChange) {
+      label.props.onChange(event, setToggled);
     }
   };
 
@@ -235,7 +255,7 @@ function Dropdown<T extends ElementType>({
         },
         "data-disabled": disabled,
         "data-toggled": toggled,
-        onChange: handleChange.bind(null, label.props.onChange),
+        onChange: handleChange,
       })}
       {children ? (
         <DropdownBox
