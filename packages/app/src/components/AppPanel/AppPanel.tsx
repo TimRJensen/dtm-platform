@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef } from "react";
+import { useState, Dispatch, SetStateAction, useRef } from "react";
 
 /**
  * Custom imports.
@@ -74,14 +74,7 @@ export default function AppPanel({ categories }: Props) {
     },
   }));
   const [panelToggle, setPanelToggle] = useState(true);
-  const [categoryToggle, setCategoryToggle] = useState("");
-  const meh = useRef((categoryId?: string) => {
-    if (categoryId !== undefined) {
-      setCategoryToggle(categoryId);
-    }
-
-    return categoryId ?? "";
-  });
+  const meh = useRef<Dispatch<SetStateAction<boolean | "">>>();
 
   return (
     <section css={css.categoryList} data-toggle={panelToggle}>
@@ -99,16 +92,10 @@ export default function AppPanel({ categories }: Props) {
       </header>
       <CategoryList
         doc={{ id: "popular", label: "popular", subCategories: [] }}
-        toggled={"popular" === categoryToggle}
-        toggle={meh.current}
+        toggle={meh}
       />
       {categories.map((doc) => (
-        <CategoryList
-          key={doc.id}
-          doc={doc}
-          toggled={doc.id === categoryToggle}
-          toggle={meh.current}
-        />
+        <CategoryList key={doc.id} doc={doc} toggle={meh} />
       ))}
     </section>
   );

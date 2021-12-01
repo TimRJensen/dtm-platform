@@ -1,7 +1,17 @@
 /**
  * Vendor imports.
  */
-import { useRef, memo, ComponentProps, MouseEvent, FocusEvent } from "react";
+import {
+  useRef,
+  memo,
+  ComponentProps,
+  MouseEvent,
+  FocusEvent,
+  useState,
+  MutableRefObject,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { generatePath, Link } from "react-router-dom";
 
 /**
@@ -18,17 +28,13 @@ const path = "/categories/:categoryId/:subCategoryIds?";
 
 interface Props extends ComponentProps<any> {
   doc: CategoryType;
-  toggle: (categoryId?: string) => string;
+  toggle: MutableRefObject<Dispatch<SetStateAction<boolean | "">> | undefined>;
 }
 
 /**
  * CategoryFoldout functional component.u
  */
-export default memo(function ListItem({
-  doc,
-  toggle,
-  toggled: $toggled,
-}: Props) {
+export default memo(function ListItem({ doc, toggle }: Props) {
   const { css } = useCSS(({ spacing, colors }) => ({
     mainCategory: {
       width: "inherit",
@@ -61,6 +67,7 @@ export default memo(function ListItem({
       },
     },
   }));
+  const [toggled, setToggled] = useState<boolean | "">(false);
   const toggleElement = useRef<HTMLAnchorElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
   const nextPath = useRef(
@@ -81,14 +88,12 @@ export default memo(function ListItem({
   };
 
   const handleClick = () => {
-    if (toggle() !== doc.id) {
-      toggle(doc.id);
-    }
+    toggleOn();
   };
 
   const handleFocus = () => {
     if (focusType.current === "tab") {
-      toggle(doc.id);
+      toggleOn();
     }
   };
 
@@ -102,6 +107,16 @@ export default memo(function ListItem({
     focusType.current = "none";
   };
 
+  const toggleOn = () => {
+    if (toggle.current) {
+      toggle.current(false);
+    }
+    toggle.current = setToggled;
+    setToggled(true);
+  };
+
+  console.log("A");
+
   return (
     <div
       css={css.mainCategory}
@@ -113,13 +128,13 @@ export default memo(function ListItem({
       <Link
         css={css.label}
         to={nextPath.current}
-        data-toggled={$toggled ? true : undefined}
+        data-toggled={toggled ? true : undefined}
         ref={toggleElement}
         onClick={handleClick}
       >
         {doc.label}
       </Link>
-      <ul css={css.box} data-toggled={$toggled ? true : undefined}>
+      <ul css={css.box} data-toggled={toggled ? true : undefined}>
         {doc.subCategories.map((subCategory) => (
           <CategoryListItem
             key={`category-list-${subCategory.id}`}
