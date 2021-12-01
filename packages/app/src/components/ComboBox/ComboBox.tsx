@@ -29,6 +29,7 @@ interface Props extends ComponentProps<"div"> {
   }>;
   suggestions: string[];
   beginIndex?: number;
+  reset?: boolean;
   disabled?: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function ComboBox({
   $css = {},
   suggestions,
   beginIndex = 2,
+  reset = false,
   disabled,
   ...rest
 }: Props) {
@@ -103,6 +105,12 @@ export default function ComboBox({
     setValue(next);
   };
 
+  const handleInputBlur = () => {
+    if (reset) {
+      setValue("");
+    }
+  };
+
   const handleItemClick = (value: string) => {
     setValue(value);
   };
@@ -117,6 +125,7 @@ export default function ComboBox({
           value={value}
           type="text"
           onChange={handleInputChange}
+          onBlur={handleInputBlur}
         />
       }
     >

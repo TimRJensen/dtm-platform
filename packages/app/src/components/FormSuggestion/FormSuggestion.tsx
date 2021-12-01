@@ -22,6 +22,7 @@ interface Props extends ComponentProps<"div"> {
   label: string;
   suggestions: string[] | undefined;
   beginIndex?: number;
+  reset?: boolean;
   validate?: (value: string) => boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -34,6 +35,7 @@ export default function FormSuggestion({
   suggestions,
   beginIndex,
   validate,
+  reset,
   ...rest
 }: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
@@ -125,8 +127,9 @@ export default function FormSuggestion({
         $css={{ ...css }}
         suggestions={suggestions ?? []}
         beginIndex={beginIndex}
-        onChange={handleChange}
+        reset={reset}
         data-validated={validated ?? ""}
+        onChange={handleChange}
       />
     </div>
   );

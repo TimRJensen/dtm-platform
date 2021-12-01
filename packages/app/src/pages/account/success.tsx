@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FormEvent, MouseEvent } from "react";
 
 /**
  * Custom imports.
@@ -23,6 +23,10 @@ interface Props {
  * success functional component.
  */
 export default function success({ doc }: Props) {
+  if (!doc) {
+    return null;
+  }
+
   const { css } = useCSS(({ spacing, colors }) => ({
     success: {
       display: "flex",
@@ -98,10 +102,8 @@ export default function success({ doc }: Props) {
     fetch();
   }, []);
 
-  const handleSubmit = async () => {
-    if (!doc) {
-      return;
-    }
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
 
     const response = await db.update<ProfileTable>("profiles", {
       id: doc.profileId,
@@ -112,17 +114,21 @@ export default function success({ doc }: Props) {
       return;
     }
 
+    value.current = "";
     setList([]);
   };
 
-  const handleAdd = () => {
+  const handleAdd = (event: MouseEvent) => {
+    event.preventDefault();
+
     if (value.current !== "") {
       setList([...list, value.current]);
     }
   };
 
   const handleRemove = (index: number) => {
-    return () => {
+    return (event: MouseEvent) => {
+      event.preventDefault();
       setList([...list.slice(0, index), ...list.slice(index + 1)]);
     };
   };
@@ -141,11 +147,12 @@ export default function success({ doc }: Props) {
           some of your interests below:
         `}
       </div>
-      <div css={css.interestsGroup}>
+      <form css={css.interestsGroup} onSubmit={handleSubmit}>
         <FormSuggestion
           label="Interests"
           suggestions={data}
           beginIndex={1}
+          reset
           onChange={(event) => {
             value.current = event.target.value;
           }}
@@ -171,9 +178,8 @@ export default function success({ doc }: Props) {
           css={css.buttonSubmit}
           type="accept"
           disabled={!list[0]}
-          onClick={handleSubmit}
         >{`submit`}</Button>
-      </div>
+      </form>
     </section>
   );
 }
