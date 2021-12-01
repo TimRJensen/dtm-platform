@@ -5,9 +5,7 @@ import {
   forwardRef,
   cloneElement,
   Children,
-  Dispatch,
-  SetStateAction,
-  MouseEvent,
+  MutableRefObject,
   ReactElement,
   ComponentProps,
 } from "react";
@@ -22,8 +20,7 @@ import { useCSS } from "../../hooks";
  */
 interface Props extends ComponentProps<"ul"> {
   toggled: boolean | undefined;
-  selected: number;
-  select: Dispatch<SetStateAction<number>>;
+  select: MutableRefObject<Map<string | Element, unknown>>;
   children: ReactElement | ReactElement[];
 }
 
@@ -31,7 +28,7 @@ interface Props extends ComponentProps<"ul"> {
  * DropdownBox functional component.
  */
 export default forwardRef<HTMLUListElement, Props>(function DropdownBox(
-  { toggled, selected, children, select, ...rest }: Props,
+  { toggled, children, select, ...rest }: Props,
   ref
 ) {
   const { css } = useCSS(({}) => ({
@@ -54,25 +51,9 @@ export default forwardRef<HTMLUListElement, Props>(function DropdownBox(
     },
   }));
 
-  const handleMouseOver = (event: MouseEvent) => {
-    if (!ref || typeof ref === "function") return;
-
-    select(
-      Array.from(ref.current?.children!).indexOf(event.target as HTMLElement)
-    );
-  };
-
   return (
-    <ul
-      {...rest}
-      css={css.box}
-      ref={ref}
-      data-toggled={toggled}
-      onMouseOver={handleMouseOver}
-    >
-      {Children.map(children, (item, i) =>
-        cloneElement(item, { "data-selected": selected === i ? true : "" })
-      )}
+    <ul {...rest} css={css.box} ref={ref} data-toggled={toggled}>
+      {Children.map(children, (item) => cloneElement(item, { select }))}
     </ul>
   );
 });

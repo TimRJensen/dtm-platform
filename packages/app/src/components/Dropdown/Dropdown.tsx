@@ -35,12 +35,11 @@ interface Props<T extends ElementType> extends ComponentProps<"div"> {
   $css?: Partial<{
     [key in "dropdown" | "label" | "box"]: PropertyValueType;
   }>;
-  //label: jsx.JSX.Element;
   label: Test<T>;
   direction?: "down" | "left" | "right";
+  //persists?: boolean;
   disabled?: boolean;
   children: ReactElement | ReactElement[] | null | undefined;
-  //persists?: boolean;
 }
 
 /**
@@ -64,11 +63,11 @@ function Dropdown<T extends ElementType>({
     box: [$css.box ?? {}],
   }));
   const [toggled, setToggled] = useState<boolean>();
-  const [selected, setSelected] = useState(-1);
 
   const toggleElement = useRef<HTMLElement>();
   const boxElement = useRef<HTMLUListElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
+  const selected = useRef(new Map<HTMLLIElement | "selected", unknown>());
 
   useLayoutEffect(() => {
     if (!children) {
@@ -96,10 +95,10 @@ function Dropdown<T extends ElementType>({
       }
     }
 
-    if (selected > -1) {
-      const item = box.children.item(selected) as HTMLElement;
-
-      box.scrollTop = item.offsetTop;
+    if (selected.current.has("selected")) {
+      box.scrollTop = (
+        selected.current.get("selected") as HTMLElement
+      ).offsetTop;
     }
   }, [toggled]);
 
@@ -116,16 +115,12 @@ function Dropdown<T extends ElementType>({
 
         event.preventDefault();
 
-        const i = selected > 0 ? selected - 1 : Children.count(children) - 1;
-        const element = boxElement.current!;
-        const item = element.children[i] as HTMLElement;
-
-        if (i === Children.count(children) - 1) {
-          element.scrollTop = element.scrollHeight;
-        } else if (item.offsetTop < element.scrollTop) {
-          element.scrollTop =
-            item.offsetTop + item.offsetHeight - element.offsetHeight;
-        }
+        const box = boxElement.current!;
+        const items = Array.from(box.children);
+        const selectedItem = selected.current.get("selected") as HTMLLIElement;
+        const nextItem = (selectedItem.previousElementSibling ??
+          box.lastElementChild) as HTMLLIElement;
+        const i = items.indexOf(nextItem);
 
         const child = Children.toArray(children)[i] as ReactElement;
 
@@ -133,7 +128,16 @@ function Dropdown<T extends ElementType>({
           child.props.onKeyDown(event);
         }
 
-        setSelected(i);
+        if (i === items.length - 1) {
+          box.scrollTop = box.scrollHeight;
+        } else if (nextItem.offsetTop < box.scrollTop) {
+          box.scrollTop =
+            nextItem.offsetTop + nextItem.offsetHeight - box.offsetHeight;
+        }
+
+        selected.current.set("selected", nextItem);
+        (selected.current.get(selectedItem) as Function)?.(false);
+        (selected.current.get(nextItem) as Function)(true);
 
         break;
       }
@@ -145,18 +149,12 @@ function Dropdown<T extends ElementType>({
 
         event.preventDefault();
 
-        const i = selected < Children.count(children) - 1 ? selected + 1 : 0;
-        const element = boxElement.current!;
-        const item = element.children[i] as HTMLElement;
-
-        if (i === 0) {
-          element.scrollTop = 0;
-        } else if (
-          item.offsetTop + item.offsetHeight >
-          element.offsetHeight + element.scrollTop
-        ) {
-          element.scrollTop = item.offsetTop;
-        }
+        const box = boxElement.current!;
+        const items = Array.from(box.children);
+        const selectedItem = selected.current.get("selected") as HTMLLIElement;
+        const nextItem = (selectedItem?.nextElementSibling ??
+          box.firstElementChild!) as HTMLLIElement;
+        const i = items.indexOf(nextItem);
 
         const child = Children.toArray(children)[i] as ReactElement;
 
@@ -164,19 +162,27 @@ function Dropdown<T extends ElementType>({
           child.props.onKeyDown(event);
         }
 
-        setSelected(i);
+        if (i === 0) {
+          box.scrollTop = 0;
+        } else if (
+          nextItem.offsetTop + nextItem.offsetHeight >
+          box.offsetHeight + box.scrollTop
+        ) {
+          box.scrollTop = nextItem.offsetTop;
+        }
+
+        selected.current.set("selected", nextItem);
+
+        (selected.current.get(selectedItem) as Function)?.(false);
+        (selected.current.get(nextItem) as Function)(true);
 
         break;
       }
 
       case "Enter": {
-        event.preventDefault();
-
-        if (selected > -1) {
-          const element = boxElement.current!;
-          const item = element.children.item(selected) as HTMLElement;
-
-          item.click();
+        if (selected.current.has("selected") && toggled) {
+          event.preventDefault();
+          (selected.current.get("selected") as HTMLElement).click();
         }
 
         break;
@@ -262,8 +268,7 @@ function Dropdown<T extends ElementType>({
           css={css.box}
           ref={boxElement}
           toggled={toggled}
-          selected={selected}
-          select={setSelected}
+          select={selected}
         >
           {children}
         </DropdownBox>
