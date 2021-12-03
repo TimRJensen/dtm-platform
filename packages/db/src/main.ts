@@ -397,6 +397,8 @@ class SupabaBaseWrapper {
       return { error, user };
     }
 
+    console.log("auth signed up user", user);
+
     const profileInsert = await this.insert<ProfileTable>("profiles", [
       {
         firstName,

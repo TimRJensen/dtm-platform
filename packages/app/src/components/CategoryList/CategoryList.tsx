@@ -115,8 +115,6 @@ export default memo(function ListItem({ doc, toggle }: Props) {
     setToggled(true);
   };
 
-  console.log("A");
-
   return (
     <div
       css={css.mainCategory}
