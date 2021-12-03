@@ -11,6 +11,7 @@ import { useDB, useCSS } from "../../hooks";
 import Button from "../../components/Button/Button";
 import FormInput from "../../components/FormInput/FormInput";
 import { AppStateContext } from "../../components/App/app-state/main";
+import { UserType } from "db";
 
 /**
  * Types.
@@ -36,7 +37,7 @@ export default function ArtiFACT({}: Props) {
       margin: `0 ${spacing}px 0 0`,
     },
   }));
-  const { db } = useDB();
+  const { db, queries } = useDB();
   const { dispatch } = useContext(AppStateContext);
   const [validated, setValidated] = useState(false);
   const email = useRef("");
@@ -50,7 +51,16 @@ export default function ArtiFACT({}: Props) {
       return;
     }
 
-    //dispatch({ type: "CURRENT_USER", value: response });
+    const user = await db.selectExact<UserType>("accounts", queries.user, {
+      match: { id: response.id },
+    });
+
+    if ("error" in user) {
+      console.log(user.error); //N.B. remove this eventually.
+      return;
+    }
+
+    dispatch({ type: "CURRENT_USER", value: user });
   };
 
   return (

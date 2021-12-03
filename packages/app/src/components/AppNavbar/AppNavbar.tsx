@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
+import { useCSS, useDB } from "../../hooks";
 import { AppStateContext } from "../App/app-state/main";
 import Dropdown from "../Dropdown/Dropdown";
 import Searchbar from "../Searchbar/Searchbar";
@@ -45,6 +45,10 @@ export default function AppNavbar() {
     delimeter: {
       margin: `0 ${spacing}px 0 ${spacing}px`,
     },
+    dropdown: {
+      display: "flex",
+      height: "inherit",
+    },
     signIn: {
       padding: `0 ${spacing}px 0 ${spacing}px`,
       color: colors.primary,
@@ -61,17 +65,13 @@ export default function AppNavbar() {
         backgroundColor: colors.secondary,
       },
     },
-    dropdown: {
-      display: "flex",
-      height: "inherit",
-    },
     box: {
       display: "block",
       visibility: "visible",
       height: "inherit",
       width: 325,
       backgroundColor: colors.primary,
-      color: colors.text.secondary,
+      //color: colors.text.secondary,
       textAlign: "right",
       overflow: "hidden",
       clipPath: "polygon(7% 0%, 101% 0, 101% 101%, 0% 101%)",
@@ -92,8 +92,16 @@ export default function AppNavbar() {
         backgroundColor: colors.secondary,
       },
     },
+    link: {
+      color: colors.text.secondary,
+    },
   }));
+  const { db } = useDB();
   const { state } = useContext(AppStateContext);
+
+  const handleSignOut = () => {
+    db.signOut();
+  };
 
   return (
     <section css={css.navbar}>
@@ -124,7 +132,13 @@ export default function AppNavbar() {
           direction="left"
         >
           <Dropdown.Item css={css.item}>{"dashboard"}</Dropdown.Item>
-          <Dropdown.Item css={css.item}>{"sign out"}</Dropdown.Item>
+          <Dropdown.Item css={css.item}>
+            {
+              <Link to="/" css={css.link} onClick={handleSignOut}>
+                {"sign out"}
+              </Link>
+            }
+          </Dropdown.Item>
         </Dropdown>
       ) : (
         <Link to="/login" css={css.signIn}>

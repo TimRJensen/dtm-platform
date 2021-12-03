@@ -87,6 +87,13 @@ const queries = {
       )
     )
   `,
+  user: `
+    id,
+    role,
+    email,
+    displayName,
+    stats
+  `,
 };
 /**
  * useDB hook.

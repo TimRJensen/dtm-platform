@@ -10,7 +10,6 @@ import { ThemeProvider, css, Global } from "@emotion/react";
  */
 import DB, { DBProvider, UserType } from "db";
 import theme from "../../themes/dtm";
-import Header from "../AppHeader/AppHeader";
 import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 import AppHeader from "../AppHeader/AppHeader";
 import AppNavbar from "../AppNavbar/AppNavbar";
@@ -82,45 +81,52 @@ export default function App({ db }: Props) {
     showEditor: undefined,
   });
 
-  useEffect(() => {
-    db.onAuthChange(async (event, session) => {
-      console.log(event, session);
-
-      if (!session) {
-        return;
+  const fetch = async (user: any) => {
+    const response = await db.selectExact<UserType>(
+      "accounts",
+      `
+        id,
+        role,
+        email,
+        displayName,
+        stats
+    `,
+      {
+        match: { email: user?.email ?? "" },
       }
+    );
 
-      const { user } = session;
+    if ("error" in response) {
+      return;
+    }
+    console.log("account fetched", user, response);
+
+    dispatch({ type: "CURRENT_USER", value: response });
+  };
+
+  useEffect(() => {
+    db.onAuthChange((event, session) => {
+      console.log("user state change", event, session);
 
       switch (event) {
         case "SIGNED_IN": {
-          const response = await db.selectExact<UserType>(
-            "accounts",
-            `
-              id,
-              role,
-              email,
-              displayName,
-              verified,
-              stats
-          `,
-            {
-              match: { email: user?.email ?? "" },
-            }
-          );
+          fetch(session!.user);
 
-          console.log("app", response);
-          if ("error" in response) {
-            break;
-          }
+          break;
+        }
 
-          dispatch({ type: "CURRENT_USER", value: response });
+        case "SIGNED_OUT": {
+          dispatch({ type: "CURRENT_USER", value: undefined });
+
           break;
         }
       }
     });
 
-    console.log("dbUser", db.currentUser());
+    const user = db.currentUser();
+    if (user) {
+      fetch(user);
+    }
   }, []);
 
   return (
@@ -168,7 +174,7 @@ export default function App({ db }: Props) {
                   </Suspense>
                 )}
               />
-              <Route path="/test" component={Test} />
+              <Route path="/test" render={() => <Test />} />
               <Route
                 path="/"
                 render={() => (

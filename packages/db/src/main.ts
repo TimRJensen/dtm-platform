@@ -462,6 +462,14 @@ class SupabaBaseWrapper {
     return user;
   }
 
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+
+    if (error) {
+      return { error };
+    }
+  }
+
   onAuthChange(
     callback: (event: AuthChangeEvent, session: Session | null) => void
   ) {
