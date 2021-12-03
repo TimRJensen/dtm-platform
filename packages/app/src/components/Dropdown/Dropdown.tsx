@@ -67,7 +67,8 @@ function Dropdown<T extends ElementType>({
   const toggleElement = useRef<HTMLElement>();
   const boxElement = useRef<HTMLUListElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
-  const selected = useRef(new Map<HTMLLIElement | "selected", unknown>());
+  //const selected = useRef(new Map<HTMLLIElement | "selected", unknown>());
+  const _selected = useRef<HTMLLIElement>();
 
   useLayoutEffect(() => {
     if (!children) {
@@ -95,10 +96,8 @@ function Dropdown<T extends ElementType>({
       }
     }
 
-    if (selected.current.has("selected")) {
-      box.scrollTop = (
-        selected.current.get("selected") as HTMLElement
-      ).offsetTop;
+    if (_selected.current) {
+      box.scrollTop = _selected.current.offsetTop;
     }
   }, [toggled]);
 
@@ -117,27 +116,23 @@ function Dropdown<T extends ElementType>({
 
         const box = boxElement.current!;
         const items = Array.from(box.children);
-        const selectedItem = selected.current.get("selected") as HTMLLIElement;
-        const nextItem = (selectedItem.previousElementSibling ??
+        const nextItem = (_selected.current?.previousElementSibling ??
           box.lastElementChild) as HTMLLIElement;
-        const i = items.indexOf(nextItem);
 
-        const child = Children.toArray(children)[i] as ReactElement;
+        const child = Children.toArray(children)[
+          items.indexOf(nextItem!)
+        ] as ReactElement;
 
         if (child.props.onKeyDown) {
           child.props.onKeyDown(event);
         }
 
-        if (i === items.length - 1) {
-          box.scrollTop = box.scrollHeight;
-        } else if (nextItem.offsetTop < box.scrollTop) {
-          box.scrollTop =
-            nextItem.offsetTop + nextItem.offsetHeight - box.offsetHeight;
+        if (_selected.current) {
+          _selected.current.dataset.selected = "false";
         }
 
-        selected.current.set("selected", nextItem);
-        (selected.current.get(selectedItem) as Function)?.(false);
-        (selected.current.get(nextItem) as Function)(true);
+        _selected.current = nextItem;
+        nextItem.dataset.selected = "true";
 
         break;
       }
@@ -151,38 +146,31 @@ function Dropdown<T extends ElementType>({
 
         const box = boxElement.current!;
         const items = Array.from(box.children);
-        const selectedItem = selected.current.get("selected") as HTMLLIElement;
-        const nextItem = (selectedItem?.nextElementSibling ??
-          box.firstElementChild!) as HTMLLIElement;
-        const i = items.indexOf(nextItem);
+        const nextItem = (_selected.current?.nextElementSibling ??
+          box.firstElementChild) as HTMLLIElement;
 
-        const child = Children.toArray(children)[i] as ReactElement;
+        const child = Children.toArray(children)[
+          items.indexOf(nextItem!)
+        ] as ReactElement;
 
         if (child.props.onKeyDown) {
           child.props.onKeyDown(event);
         }
 
-        if (i === 0) {
-          box.scrollTop = 0;
-        } else if (
-          nextItem.offsetTop + nextItem.offsetHeight >
-          box.offsetHeight + box.scrollTop
-        ) {
-          box.scrollTop = nextItem.offsetTop;
+        if (_selected.current) {
+          _selected.current.dataset.selected = "false";
         }
 
-        selected.current.set("selected", nextItem);
-
-        (selected.current.get(selectedItem) as Function)?.(false);
-        (selected.current.get(nextItem) as Function)(true);
+        _selected.current = nextItem;
+        nextItem.dataset.selected = "true";
 
         break;
       }
 
       case "Enter": {
-        if (selected.current.has("selected") && toggled) {
+        if (_selected.current && toggled) {
           event.preventDefault();
-          (selected.current.get("selected") as HTMLElement).click();
+          _selected.current.click();
         }
 
         break;
@@ -268,7 +256,7 @@ function Dropdown<T extends ElementType>({
           css={css.box}
           ref={boxElement}
           toggled={toggled}
-          select={selected}
+          select={_selected}
         >
           {children}
         </DropdownBox>

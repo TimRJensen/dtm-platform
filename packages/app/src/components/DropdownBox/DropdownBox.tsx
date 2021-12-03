@@ -20,7 +20,7 @@ import { useCSS } from "../../hooks";
  */
 interface Props extends ComponentProps<"ul"> {
   toggled: boolean | undefined;
-  select: MutableRefObject<Map<string | Element, unknown>>;
+  select: MutableRefObject<HTMLLIElement | undefined>;
   children: ReactElement | ReactElement[];
 }
 

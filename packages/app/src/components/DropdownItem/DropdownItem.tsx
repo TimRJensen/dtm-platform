@@ -2,13 +2,7 @@
  * Vendor imports.
  */
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  ComponentProps,
-  MutableRefObject,
-} from "react";
+import { useRef, ComponentProps, MutableRefObject } from "react";
 
 /**
  * Custom imports.
@@ -18,48 +12,38 @@ import {
  * Types.
  */
 interface Props extends ComponentProps<"li"> {
-  select?: MutableRefObject<Map<string | Element, unknown>>;
+  select?: MutableRefObject<HTMLLIElement | null>;
 }
 
 /**
  * DropdownItem functional component.
  */
 export default function DropdownItem({ select, children, ...rest }: Props) {
-  const [selected, setSelected] = useState(false);
   const element = useRef<HTMLLIElement>(null);
 
   const handleMouseOver = () => {
-    if (select?.current.has("selected")) {
-      (
-        select.current.get(
-          select.current.get("selected") as Element
-        ) as Function
-      )(false);
+    if (select) {
+      if (select.current) {
+        select.current.dataset.selected = "false";
+      }
+
+      select.current = element.current;
     }
 
-    select?.current.set("selected", element.current);
-    setSelected(true);
+    element.current!.dataset.selected = "true";
   };
 
-  useEffect(() => {
-    if (!element.current) {
-      return;
-    }
-
-    element.current.setAttribute("data-selected", selected ? "true" : "false");
-  }, [selected]);
-
-  useEffect(() => {
-    if (!element.current) {
-      return;
-    }
-
-    console.log(select?.current);
-    select?.current.set(element.current, setSelected);
-  }, []);
+  const handleMouseOut = () => {
+    //element.current!.dataset.selected = "false";
+  };
 
   return (
-    <li {...rest} ref={element} onMouseOver={handleMouseOver}>
+    <li
+      {...rest}
+      ref={element}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+    >
       {children}
     </li>
   );
