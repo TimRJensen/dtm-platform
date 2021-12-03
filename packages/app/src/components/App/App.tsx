@@ -10,10 +10,10 @@ import { ThemeProvider, css, Global } from "@emotion/react";
  */
 import DB, { DBProvider, UserType } from "db";
 import theme from "../../themes/dtm";
-import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 import AppHeader from "../AppHeader/AppHeader";
 import AppNavbar from "../AppNavbar/AppNavbar";
 import Test from "../Test";
+import { Actions, AppState, AppStateProvider, reducer } from "./app-state/main";
 
 const _Index = lazy(() => import("../../pages"));
 const _Blog = lazy(() => import("../../pages/blogs/"));
@@ -83,7 +83,7 @@ export default function App({ db }: Props) {
 
   const fetch = async (user: any) => {
     const response = await db.selectExact<UserType>(
-      "accounts",
+      "app_users",
       `
         id,
         role,

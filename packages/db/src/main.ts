@@ -6,7 +6,6 @@ import {
   SupabaseClient,
   AuthChangeEvent,
   Session,
-  PostgrestError,
 } from "@supabase/supabase-js";
 
 import { v4 as uuidv4 } from "uuid";
@@ -14,7 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 /**
  * Types.
  */
-export type ErrorType = PostgrestError | { message: string; status: number };
+export type ErrorType = { message: string; code: number };
 
 /* BaseTable. */
 interface BaseTable {
@@ -385,7 +384,7 @@ class SupabaBaseWrapper {
       country: string;
     }
   ) {
-    const { user, error } = await this.supabase.auth.signUp(
+    const { user: authResponse, error } = await this.supabase.auth.signUp(
       { email, password },
       {
         redirectTo: redirectURL,
@@ -393,13 +392,19 @@ class SupabaBaseWrapper {
     );
 
     if (error) {
-      console.log("api error");
-      return { error, user };
+      return { error: { message: "unknown", code: 500 } };
     }
 
-    console.log("auth signed up user", user);
+    const existingUserResponse = await this.supabase
+      .from<AccountTable>("app_users")
+      .select("email", { count: "exact", head: true })
+      .match({ email });
 
-    const profileInsert = await this.insert<ProfileTable>("profiles", [
+    if (existingUserResponse.count) {
+      return { error: { message: "unknown", code: 409 } };
+    }
+
+    const profileResponse = await this.insert<ProfileTable>("profiles", [
       {
         firstName,
         lastName,
@@ -410,21 +415,20 @@ class SupabaBaseWrapper {
       },
     ]);
 
-    if ("error" in profileInsert) {
-      console.log("profile insert error");
-      return profileInsert;
+    if ("error" in profileResponse) {
+      return { error: { message: "unknown", code: 500 } };
     }
 
-    const [profile] = profileInsert;
-    const accountInsert = await this.supabase
+    const [profile] = profileResponse;
+    const userResponse = await this.supabase
       .from<AccountTable>("app_users")
       .insert([
         {
-          id: user?.id,
+          id: authResponse?.id,
           createdAt: profile.createdAt,
           updatedAt: profile.updatedAt,
           profileId: profile.id,
-          role: user?.role as AccountTable["role"],
+          role: authResponse?.role as AccountTable["role"],
           email,
           displayName: `${profile.firstName} ${profile.lastName}`,
           stats: {
@@ -437,12 +441,12 @@ class SupabaBaseWrapper {
         },
       ]);
 
-    if (accountInsert.error) {
-      console.log("account insert error");
-      return accountInsert;
+    if (userResponse.error) {
+      console.log(userResponse);
+      return { error: { message: "unknown", code: 500 } };
     }
 
-    return accountInsert.data[0];
+    return userResponse.data[0];
   }
 
   async signIn(email: string, password: string) {
@@ -454,16 +458,6 @@ class SupabaBaseWrapper {
     if (error || user === null) {
       return { error };
     }
-
-    /*const response = await this.selectExact<UserType>(
-      "accounts",
-      `id, email, stats, profile:profileId(*) `,
-      { match: { email: user.email! } }
-    );
-
-    if ("error" in response) {
-      return response;
-    }*/
 
     return user;
   }
