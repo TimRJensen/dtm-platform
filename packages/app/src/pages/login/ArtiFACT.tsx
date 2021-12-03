@@ -47,15 +47,17 @@ export default function ArtiFACT({}: Props) {
     const response = await db.signIn(email.current, password.current);
 
     if ("error" in response) {
+      console.log("sign in error");
       console.log(response.error); //N.B. remove this eventually.
       return;
     }
 
-    const user = await db.selectExact<UserType>("accounts", queries.user, {
+    const user = await db.selectExact<UserType>("app_users", queries.user, {
       match: { id: response.id },
     });
 
     if ("error" in user) {
+      console.log("fetch user error");
       console.log(user.error); //N.B. remove this eventually.
       return;
     }

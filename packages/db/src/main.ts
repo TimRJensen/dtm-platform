@@ -166,7 +166,8 @@ export type AllTables =
 /* AllTableNames. */
 export type AllTableNames =
   | "profiles"
-  | "accounts"
+  //| "accounts"
+  | "app_users"
   | "main_categories"
   | "sub_categories"
   | "artifacts"
