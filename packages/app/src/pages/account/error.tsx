@@ -19,6 +19,10 @@ interface Props {
  * error functional component.
  */
 export default function error({ error }: Props) {
+  if (!error) {
+    return null;
+  }
+
   const { css } = useCSS(({ spacing }) => ({
     error: {
       display: "flex",
@@ -39,7 +43,7 @@ export default function error({ error }: Props) {
     <section css={css.error}>
       <div css={css.label}>{`(✖﹏✖)`}</div>
       <div css={css.text}>
-        {error && "code" in error && error.code === "23505"
+        {error.code === 409
           ? `The provided email is already registered.`
           : `Something unexpected occurred.`}
       </div>

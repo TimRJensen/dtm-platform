@@ -131,8 +131,6 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       onSubmit(response);
     }
 
-    console.log("auth success", response);
-
     setTimeout(() => {
       history.push(
         generatePath(path, {
