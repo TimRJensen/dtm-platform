@@ -392,7 +392,8 @@ class SupabaBaseWrapper {
     );
 
     if (error) {
-      return { error };
+      console.log("api error");
+      return { error, user };
     }
 
     const profileInsert = await this.insert<ProfileTable>("profiles", [
@@ -407,12 +408,13 @@ class SupabaBaseWrapper {
     ]);
 
     if ("error" in profileInsert) {
+      console.log("profile insert error");
       return profileInsert;
     }
 
     const [profile] = profileInsert;
     const accountInsert = await this.supabase
-      .from<AccountTable>("accounts")
+      .from<AccountTable>("app_users")
       .insert([
         {
           id: user?.id,
@@ -433,6 +435,7 @@ class SupabaBaseWrapper {
       ]);
 
     if (accountInsert.error) {
+      console.log("account insert error");
       return accountInsert;
     }
 

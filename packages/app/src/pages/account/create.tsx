@@ -114,7 +114,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     });
 
     if ("error" in response) {
-      console.log(response.error); //N.B. remove this eventually.
+      console.log(response); //N.B. remove this eventually.
       history.push(
         generatePath(path, {
           errorOrSuccess: "error",
