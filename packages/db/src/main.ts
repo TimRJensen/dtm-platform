@@ -384,6 +384,18 @@ class SupabaBaseWrapper {
       country: string;
     }
   ) {
+    let response = await this.selectExact<UserType>("app_users", "*", {
+      match: { email },
+    });
+
+    if ("error" in response) {
+      return { error: { message: "unknown", code: 500 } };
+    }
+
+    if (response) {
+      return { error: { message: "duplicate user", code: 409 } };
+    }
+
     const { user: authResponse, error } = await this.supabase.auth.signUp(
       { email, password },
       {
@@ -393,15 +405,6 @@ class SupabaBaseWrapper {
 
     if (error) {
       return { error: { message: "unknown", code: 500 } };
-    }
-
-    const existingUserResponse = await this.supabase
-      .from<AccountTable>("app_users")
-      .select("email", { count: "exact", head: true })
-      .match({ email });
-
-    if (existingUserResponse.count) {
-      return { error: { message: "unknown", code: 409 } };
     }
 
     const profileResponse = await this.insert<ProfileTable>("profiles", [
@@ -442,7 +445,6 @@ class SupabaBaseWrapper {
       ]);
 
     if (userResponse.error) {
-      console.log(userResponse);
       return { error: { message: "unknown", code: 500 } };
     }
 
