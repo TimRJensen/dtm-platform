@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useReducer } from "react";
 import { useHistory, Link, generatePath } from "react-router-dom";
 import { validate as validateEmail } from "email-validator";
 
@@ -78,18 +78,27 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   }));
   const { db } = useDB();
   const history = useHistory();
+  const [formState, dispatch] = useReducer(reducer, {
+    email: "",
+    password: "",
+    confirmedPassword: "",
+    firstName: "",
+    lastName: "",
+    city: "",
+    region: "",
+    country: "Danmark",
+  });
   const [forceLoad, setForceLoad] = useState(false);
-  const [password, setPassword] = useState("");
   const [validated, setValidated] = useState(false);
-  const inputs = useRef<string[]>([]);
 
-  const validate = (index: number, validator: (value: string) => boolean) => {
+  const validate = (
+    key: keyof FormState,
+    validator: (value: string) => boolean
+  ) => {
     return (value: string) => {
       const flag = validator(value);
 
-      inputs.current[index] = value;
-
-      if (flag && inputs.current.every((value) => value !== "")) {
+      if (flag && Object.values(formState).every((value) => value !== "")) {
         setValidated(true);
       } else {
         setValidated(false);
@@ -100,8 +109,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   };
 
   const handleSubmit = async () => {
-    const [email, password, , firstName, lastName, city, region] =
-      inputs.current;
+    const { email, password, firstName, lastName, city, region } = formState;
 
     setForceLoad(true);
 
@@ -140,58 +148,87 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     });
   };
 
-  useEffect(() => {
-    let i = -1;
-
-    while (++i < labels.length) {
-      inputs.current[i] = "";
-    }
-  }, []);
-
   return (
     <LoadBox data={forceLoad ? undefined : suggestions}>
       <section css={css.form}>
         <FormInput
           type="email"
           label={labels[0]}
-          validate={validate(0, validateEmail)}
+          value={formState.email}
+          validate={validate("email", validateEmail)}
+          onChange={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "email", value } });
+          }}
         />
         <br />
         <FormInput
           type="password"
           label={labels[1]}
+          value={formState.password}
+          validate={validate(
+            "password",
+            (value) => value !== "" && value.length > 5
+          )}
           onChange={(value) => {
-            setPassword(value);
+            dispatch({ type: "SET_VALUE", value: { key: "password", value } });
           }}
-          validate={validate(1, (value) => value !== "" && value.length > 5)}
         />
         <FormInput
           type="password"
           label={labels[2]}
-          dependencies={[password]}
-          validate={validate(2, (value) => value !== "" && password === value)}
+          value={formState.confirmedPassword}
+          dependencies={[formState.password]}
+          validate={validate(
+            "confirmedPassword",
+            (value) => value !== "" && formState.password === value
+          )}
+          onChange={(value) => {
+            dispatch({
+              type: "SET_VALUE",
+              value: { key: "confirmedPassword", value },
+            });
+          }}
         />
         <br />
         <FormInput
           type="text"
           label={labels[3]}
-          validate={validate(3, (value) => value !== "")}
+          value={formState.firstName}
+          validate={validate("firstName", (value) => value !== "")}
+          onChange={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "firstName", value } });
+          }}
         />
         <FormInput
           type="text"
           label={labels[4]}
-          validate={validate(4, (value) => value !== "")}
+          value={formState.lastName}
+          validate={validate("lastName", (value) => value !== "")}
+          onChange={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "lastName", value } });
+          }}
         />
         <br />
         <FormSuggestion
           label={labels[5]}
+          value={formState.city}
           suggestions={suggestions}
-          validate={validate(5, (value) => value !== "")}
+          validate={validate("city", (value) => value !== "")}
+          onChange={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "city", value } });
+          }}
+          onSelect={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "city", value } });
+          }}
         />
         <FormSelect
           label={labels[6]}
+          value={formState.region}
           items={regions}
-          validate={validate(6, (value) => value !== "")}
+          validate={validate("region", (value) => value !== "")}
+          onSelect={(value) => {
+            dispatch({ type: "SET_VALUE", value: { key: "region", value } });
+          }}
         />
         <br />
         <div>
@@ -211,3 +248,30 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     </LoadBox>
   );
 }
+
+interface FormState {
+  email: string;
+  password: string;
+  confirmedPassword: string;
+  firstName: string;
+  lastName: string;
+  city: string;
+  region: string;
+  country: string;
+}
+
+type Actions = {
+  type: "SET_VALUE";
+  value: { key: keyof FormState; value: string };
+};
+
+const reducer = function reducer(state: FormState, action: Actions) {
+  switch (action.type) {
+    case "SET_VALUE": {
+      return { ...state, [action.value.key]: action.value.value };
+    }
+    default: {
+      throw new Error();
+    }
+  }
+};

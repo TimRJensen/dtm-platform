@@ -1,13 +1,7 @@
 /**
  * Vendor imports.
  */
-import {
-  useState,
-  useRef,
-  ChangeEvent,
-  FocusEvent,
-  ComponentProps,
-} from "react";
+import { useState, FocusEvent, ComponentProps } from "react";
 
 /**
  * Custom imports.
@@ -18,13 +12,15 @@ import ComboBox from "../ComboBox/ComboBox";
 /**
  * Types.
  */
-interface Props extends ComponentProps<"div"> {
+interface Props extends Omit<ComponentProps<"div">, "onChange" | "onSelect"> {
   label: string;
+  value: string;
   suggestions: string[] | undefined;
   beginIndex?: number;
   reset?: boolean;
   validate?: (value: string) => boolean;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (value: string) => void;
+  onSelect?: (value: string) => void;
 }
 
 /**
@@ -32,9 +28,13 @@ interface Props extends ComponentProps<"div"> {
  */
 export default function FormSuggestion({
   label,
+  value,
   suggestions,
+  defaultValue,
   beginIndex,
   validate,
+  onChange,
+  onSelect,
   reset,
   ...rest
 }: Props) {
@@ -92,7 +92,6 @@ export default function FormSuggestion({
     },
   }));
   const [validated, setValidated] = useState<boolean>();
-  const selected = useRef("");
 
   const handleFocus = (event: FocusEvent<any>) => {
     if (event.type === "focus") {
@@ -107,17 +106,21 @@ export default function FormSuggestion({
       }
 
       if (validate) {
-        setValidated(validate(selected.current));
+        setValidated(validate(value));
       }
     }
   };
 
-  const handleChange = (event: ChangeEvent<any>) => {
-    if (rest.onChange) {
-      rest.onChange(event);
+  const handleChange = (value: string) => {
+    if (onChange) {
+      onChange(value);
     }
+  };
 
-    selected.current = event.target.value;
+  const handleSelect = (value: string) => {
+    if (onChange) {
+      onChange(value);
+    }
   };
 
   return (
@@ -125,11 +128,13 @@ export default function FormSuggestion({
       <label css={css.label}>{label}</label>
       <ComboBox
         $css={{ ...css }}
+        value={value}
         suggestions={suggestions ?? []}
         beginIndex={beginIndex}
         reset={reset}
         data-validated={validated ?? ""}
         onChange={handleChange}
+        onSelect={handleSelect}
       />
     </div>
   );

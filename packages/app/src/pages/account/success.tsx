@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, useRef, FormEvent, MouseEvent } from "react";
+import { useState, useEffect, FormEvent, MouseEvent } from "react";
 
 /**
  * Custom imports.
@@ -80,9 +80,9 @@ export default function success({ doc }: Props) {
     },
   }));
   const { db, queries } = useDB();
-  const [data, setData] = useState<string[]>();
+  const [value, setValue] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>();
   const [list, setList] = useState<string[]>([]);
-  const value = useRef("");
 
   const fetch = async () => {
     const response = await db.select<CategoryType>(
@@ -95,7 +95,7 @@ export default function success({ doc }: Props) {
       return;
     }
 
-    setData(response.map((element) => element.label));
+    setSuggestions(response.map((element) => element.label));
   };
 
   useEffect(() => {
@@ -114,15 +114,15 @@ export default function success({ doc }: Props) {
       return;
     }
 
-    value.current = "";
     setList([]);
+    setValue("");
   };
 
   const handleAdd = (event: MouseEvent) => {
     event.preventDefault();
 
-    if (value.current !== "") {
-      setList([...list, value.current]);
+    if (value !== "") {
+      setList([...list, value]);
     }
   };
 
@@ -150,11 +150,11 @@ export default function success({ doc }: Props) {
       <form css={css.interestsGroup} onSubmit={handleSubmit}>
         <FormSuggestion
           label="Interests"
-          suggestions={data}
+          value={value}
+          suggestions={suggestions}
           beginIndex={1}
-          reset
-          onChange={(event) => {
-            value.current = event.target.value;
+          onChange={(value) => {
+            setValue(value);
           }}
         />
         <Button css={css.button} type="transparent" onClick={handleAdd}>

@@ -21,6 +21,7 @@ import { useCSS } from "../../hooks";
 interface Props extends Omit<ComponentProps<"div">, "onChange"> {
   type: HTMLInputTypeAttribute;
   label: string;
+  value: string;
   dependencies?: any[];
   validate?: (value: string) => boolean;
   onChange?: (value: string) => void;
@@ -32,6 +33,8 @@ interface Props extends Omit<ComponentProps<"div">, "onChange"> {
 export default function FormInput({
   type,
   label,
+  value,
+  defaultValue = "",
   dependencies,
   validate,
   onChange,
@@ -68,7 +71,6 @@ export default function FormInput({
       },
     },
   }));
-  const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
 
   useEffect(() => {
@@ -103,8 +105,6 @@ export default function FormInput({
     if (onChange) {
       onChange(event.target.value);
     }
-
-    setValue(event.target.value);
   };
 
   return (

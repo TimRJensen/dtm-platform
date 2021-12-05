@@ -392,7 +392,7 @@ class SupabaBaseWrapper {
     );
 
     if (error) {
-      return { error: { message: "unknown", code: 500 } };
+      return { error: { message: "Unknown", code: 500 } };
     }
 
     const existingUserResponse = await this.supabase
@@ -401,7 +401,7 @@ class SupabaBaseWrapper {
       .match({ email });
 
     if (existingUserResponse.count) {
-      return { error: { message: "unknown", code: 409 } };
+      return { error: { message: "Duplicate email registration", code: 409 } };
     }
 
     const profileResponse = await this.insert<ProfileTable>("profiles", [
@@ -416,7 +416,7 @@ class SupabaBaseWrapper {
     ]);
 
     if ("error" in profileResponse) {
-      return { error: { message: "unknown", code: 500 } };
+      return { error: { message: "Unknown", code: 500 } };
     }
 
     const [profile] = profileResponse;
@@ -442,7 +442,7 @@ class SupabaBaseWrapper {
       ]);
 
     if (userResponse.error) {
-      return { error: { message: "unknown", code: 500 } };
+      return { error: { message: "Unknown", code: 500 } };
     }
 
     return userResponse.data[0];
@@ -459,6 +459,26 @@ class SupabaBaseWrapper {
     }
 
     return user;
+  }
+
+  async signInUpdate(email: string, password: string) {
+    if (email) {
+      const { error } = await this.supabase.auth.update({ email });
+
+      if (error) {
+        return { error: { message: "Unknown", code: 500 } };
+      }
+    }
+
+    if (password) {
+      const { error } = await this.supabase.auth.update({ password });
+
+      if (error) {
+        return { error: { message: "Unknown", code: 500 } };
+      }
+    }
+
+    return { error: null };
   }
 
   async signOut() {

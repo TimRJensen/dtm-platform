@@ -14,16 +14,25 @@ import FontIcon from "../FontIcon/FontIcon";
 /**
  * Types.
  */
-interface Props extends ComponentProps<"div"> {
-  items: string[];
+interface Props extends Omit<ComponentProps<"div">, "onSelect"> {
   label: string;
+  value: string;
+  items: string[];
   validate?: (value: string) => boolean;
+  onSelect?: (value: string) => void;
 }
 
 /**
  * FormSelect functional component.
  */
-export default function FormSelect({ items, label, validate, ...rest }: Props) {
+export default function FormSelect({
+  label,
+  value,
+  items,
+  validate,
+  onSelect,
+  ...rest
+}: Props) {
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     formSelect: {
       display: "flex",
@@ -88,7 +97,6 @@ export default function FormSelect({ items, label, validate, ...rest }: Props) {
       },
     },
   }));
-  const [value, setValue] = useState("");
   const [validated, setValidated] = useState<boolean>();
 
   const handleFocus = (event: FocusEvent<any>) => {
@@ -110,7 +118,9 @@ export default function FormSelect({ items, label, validate, ...rest }: Props) {
   };
 
   const handleSelect = (item: string) => {
-    setValue(item);
+    if (onSelect) {
+      onSelect(item);
+    }
   };
 
   return (

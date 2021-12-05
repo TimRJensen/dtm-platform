@@ -23,14 +23,18 @@ import Dropdown from "../Dropdown/Dropdown";
  */
 type FuseResult = Fuse.FuseResult<string>[];
 
-interface Props extends ComponentProps<"div"> {
+interface Props extends Omit<ComponentProps<"div">, "onChange" | "onSelect"> {
   $css?: Partial<{
     [key in "combobox" | "input" | "box" | "item"]: PropertyValueType;
   }>;
+  value: string;
   suggestions: string[];
+  defaultValue?: string;
   beginIndex?: number;
   reset?: boolean;
   disabled?: boolean;
+  onChange?: (value: string) => void;
+  onSelect?: (value: string) => void;
 }
 
 /**
@@ -38,10 +42,13 @@ interface Props extends ComponentProps<"div"> {
  */
 export default function ComboBox({
   $css = {},
+  value,
   suggestions,
   beginIndex = 2,
   reset = false,
   disabled,
+  onChange,
+  onSelect,
   ...rest
 }: Props) {
   const { css } = useCSS(({}) => ({
@@ -57,7 +64,6 @@ export default function ComboBox({
     items: [$css.box ?? {}],
     item: [$css.item ?? {}],
   }));
-  const [value, setValue] = useState("");
   const [items, setItems] = useState<FuseResult>();
   const fuse = useRef(new Fuse(suggestions, { threshold: 0.1 }));
   const cache = useRef(new Map<string, FuseResult>());
@@ -90,29 +96,32 @@ export default function ComboBox({
         cache.current.set(next, suggestions);
 
         setItems(suggestions);
-        toggle(true);
+        setTimeout(() => toggle(true));
       }
     } else {
       if (next.length < value.length) {
-        toggle(undefined);
-
         cache.current.delete("last");
         fuse.current.setCollection(suggestions);
         setItems(undefined);
+        toggle(undefined);
       }
     }
 
-    setValue(next);
+    if (onChange) {
+      onChange(next);
+    }
   };
 
   const handleInputBlur = () => {
-    if (reset) {
-      setValue("");
+    if (reset && onChange) {
+      onChange("");
     }
   };
 
   const handleItemClick = (value: string) => {
-    setValue(value);
+    if (onSelect) {
+      onSelect(value);
+    }
   };
 
   return (
