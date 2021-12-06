@@ -14,6 +14,7 @@ export interface AppState {
   currentUser: UserType | undefined;
   currentBlog: BlogType | undefined;
   currentPath: { section: string; label?: string } | undefined;
+  error: { message: string; code: number } | undefined;
   showEditor: ((flag: boolean) => void) | undefined;
 }
 
@@ -35,6 +36,10 @@ export type Actions =
       value: ((flag: boolean) => void) | undefined;
     }
   | {
+      type: "SET_ERROR";
+      value: { message: string; code: number } | undefined;
+    }
+  | {
       type: "ANY";
       value: Partial<AppState>;
     };
@@ -53,6 +58,8 @@ export const reducer = function reducer(state: AppState, action: Actions) {
         ...state,
         currentPath: { ...state.currentPath, ...action.value },
       };
+    case "SET_ERROR":
+      return { ...state, error: action.value };
     case "SHOW_EDITOR":
       return { ...state, showEditor: action.value };
     case "ANY":

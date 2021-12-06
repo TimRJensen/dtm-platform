@@ -50,8 +50,17 @@ interface Props {
  * profile functional component.
  */
 export default function profile({ user, suggestions }: Props) {
+  const { state, dispatch } = useContext(AppStateContext);
+  const history = useHistory();
+
   if (!user) {
-    return null; // 404
+    dispatch({
+      type: "SET_ERROR",
+      value: { message: "No results.", code: 404 },
+    });
+    setTimeout(() => history.push("/error"));
+
+    return null;
   }
 
   const { css } = useCSS(({ spacing }) => ({
@@ -79,8 +88,7 @@ export default function profile({ user, suggestions }: Props) {
   }));
   const { locale } = useLocale("dk/DK");
   const { db } = useDB();
-  const history = useHistory();
-  const { state, dispatch } = useContext(AppStateContext);
+
   const [formState, setFormState] = useReducer(reducer, {
     email: user.email,
     password: "",
@@ -139,7 +147,13 @@ export default function profile({ user, suggestions }: Props) {
 
     if (response.error) {
       console.log(response); //N.B. remove this eventually.
-      history.push("/error");
+
+      dispatch({
+        type: "SET_ERROR",
+        value: response.error,
+      });
+      setTimeout(() => history.push("/error"));
+
       return;
     }
 
@@ -162,7 +176,13 @@ export default function profile({ user, suggestions }: Props) {
 
     if ("error" in response) {
       console.log(response); //N.B. remove this eventually.
-      history.push("/error");
+
+      dispatch({
+        type: "SET_ERROR",
+        value: { message: response.error.message, code: 500 },
+      });
+      setTimeout(() => history.push("/error"));
+
       return;
     }
 

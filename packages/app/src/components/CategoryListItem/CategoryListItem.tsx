@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { generatePath, Link } from "react-router-dom";
 
 /**
@@ -74,6 +74,14 @@ export default memo(function CategoryListItem({ doc }: Props) {
 
     setTimeout(() => setToggled(!toggled));
   };
+
+  useEffect(() => {
+    const id = window.location.pathname.split("/").slice(1)[2];
+
+    if (id === doc.id) {
+      setToggled(true);
+    }
+  }, []);
 
   return (
     <li css={css.categoryListItem}>

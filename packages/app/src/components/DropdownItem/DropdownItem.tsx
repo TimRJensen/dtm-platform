@@ -33,17 +33,8 @@ export default function DropdownItem({ select, children, ...rest }: Props) {
     element.current!.dataset.selected = "true";
   };
 
-  const handleMouseOut = () => {
-    //element.current!.dataset.selected = "false";
-  };
-
   return (
-    <li
-      {...rest}
-      ref={element}
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
-    >
+    <li {...rest} ref={element} onMouseOver={handleMouseOver}>
       {children}
     </li>
   );

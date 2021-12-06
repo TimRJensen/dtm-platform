@@ -6,6 +6,7 @@ import {
   SupabaseClient,
   AuthChangeEvent,
   Session,
+  PostgrestResponse,
 } from "@supabase/supabase-js";
 
 import { v4 as uuidv4 } from "uuid";
@@ -221,7 +222,9 @@ class SupabaBaseWrapper {
       .range(range.from, range.to - 1);
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.data;
@@ -240,7 +243,9 @@ class SupabaBaseWrapper {
       .single();
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.data;
@@ -267,7 +272,9 @@ class SupabaBaseWrapper {
       .range(range.from, range.to);
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.data;
@@ -301,9 +308,10 @@ class SupabaBaseWrapper {
       )
       .range(range?.from, range?.to - 1);
 
-    if (!response.error) {
-      // @ts-ignore
-      delete response.error;
+    if (response.error) {
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response;
@@ -320,7 +328,9 @@ class SupabaBaseWrapper {
       .match(match);
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.count! > 0;
@@ -344,7 +354,9 @@ class SupabaBaseWrapper {
       );
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.data;
@@ -361,7 +373,9 @@ class SupabaBaseWrapper {
       .match(match ?? { id: value.id });
 
     if (response.error) {
-      return response;
+      return {
+        error: { message: response.error.message, code: response.status },
+      };
     }
 
     return response.data;
@@ -392,15 +406,10 @@ class SupabaBaseWrapper {
     );
 
     if (error) {
-      return { error: { message: "Unknown", code: 500 } };
+      return { error: { message: error.message, code: error.status } };
     }
 
-    const existingUserResponse = await this.supabase
-      .from<AccountTable>("app_users")
-      .select("email", { count: "exact", head: true })
-      .match({ email });
-
-    if (existingUserResponse.count) {
+    if (await this.has<AccountTable>("app_users", "email", { email })) {
       return { error: { message: "Duplicate email registration", code: 409 } };
     }
 
@@ -416,7 +425,7 @@ class SupabaBaseWrapper {
     ]);
 
     if ("error" in profileResponse) {
-      return { error: { message: "Unknown", code: 500 } };
+      return { error: profileResponse.error };
     }
 
     const [profile] = profileResponse;
@@ -442,7 +451,12 @@ class SupabaBaseWrapper {
       ]);
 
     if (userResponse.error) {
-      return { error: { message: "Unknown", code: 500 } };
+      return {
+        error: {
+          message: userResponse.error.message,
+          code: userResponse.status,
+        },
+      };
     }
 
     return userResponse.data[0];
@@ -454,8 +468,8 @@ class SupabaBaseWrapper {
       password,
     });
 
-    if (error || user === null) {
-      return { error };
+    if (error) {
+      return { error: { message: error.message, code: error.status } };
     }
 
     return user;
@@ -466,7 +480,7 @@ class SupabaBaseWrapper {
       const { error } = await this.supabase.auth.update({ email });
 
       if (error) {
-        return { error: { message: "Unknown", code: 500 } };
+        return { error: { message: error.message, code: error.status } };
       }
     }
 
@@ -474,7 +488,7 @@ class SupabaBaseWrapper {
       const { error } = await this.supabase.auth.update({ password });
 
       if (error) {
-        return { error: { message: "Unknown", code: 500 } };
+        return { error: { message: error.message, code: error.status } };
       }
     }
 
@@ -485,7 +499,7 @@ class SupabaBaseWrapper {
     const { error } = await this.supabase.auth.signOut();
 
     if (error) {
-      return { error };
+      return { error: { message: error.message, code: error.status } };
     }
   }
 
@@ -504,4 +518,4 @@ export {
   SupabaseContext as DBContext,
   SupabaseProvider as DBProvider,
 } from "./context";
-export { SupabaBaseWrapper as default };
+export { SupabaBaseWrapper as default, PostgrestResponse };

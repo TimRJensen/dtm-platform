@@ -8,7 +8,7 @@ import { validate as validateEmail } from "email-validator";
 /**
  * Custom imports.
  */
-import { AccountType, ErrorType } from "db";
+import { AccountType } from "db";
 import { useCSS, useDB, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
 import LoadBox from "../../components/LoadBox/LoadBox";
@@ -46,13 +46,12 @@ const regions = [
 interface Props {
   suggestions: string[] | undefined;
   onSubmit?: (user: AccountType | undefined) => void;
-  onError?: (error: ErrorType) => void;
 }
 
 /**
  * create functional component.
  */
-export default function create({ suggestions, onSubmit, onError }: Props) {
+export default function create({ suggestions, onSubmit }: Props) {
   const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing }) => ({
     form: {
@@ -113,16 +112,9 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     });
 
     if ("error" in response) {
-      console.log(response); //N.B. remove this eventually.
-      history.push(
-        generatePath(path, {
-          errorOrSuccess: "error",
-        })
-      );
+      dispatch({ type: "SET_ERROR", value: response.error });
+      setTimeout(() => history.push("/error"));
 
-      if (onError) {
-        onError(response.error);
-      }
       return;
     }
 

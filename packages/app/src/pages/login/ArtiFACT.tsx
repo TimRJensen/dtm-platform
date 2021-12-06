@@ -1,13 +1,14 @@
 /**
  * Vendor imports.
  */
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useContext } from "react";
 import { Link, useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { useDB, useCSS, useLocale } from "../../hooks";
+import { AppStateContext } from "../../components/App/app-state/main";
 import Button from "../../components/Button/Button";
 import FormInput from "../../components/FormInput/FormInput";
 
@@ -37,6 +38,7 @@ export default function ArtiFACT({}: Props) {
     },
   }));
   const { db } = useDB();
+  const { dispatch } = useContext(AppStateContext);
   const history = useHistory();
   const [validated, setValidated] = useState(false);
   const [email, setEmail] = useState("");
@@ -47,9 +49,10 @@ export default function ArtiFACT({}: Props) {
 
     const response = await db.signIn(email, password);
 
-    if ("error" in response) {
-      console.log("sign in error");
-      console.log(response.error); //N.B. remove this eventually.
+    if (response && "error" in response) {
+      dispatch({ type: "SET_ERROR", value: response.error });
+      setTimeout(() => history.push("/error"));
+
       return;
     }
 

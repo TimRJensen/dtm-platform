@@ -61,11 +61,6 @@ export default {
           city: "City",
           region: "Region",
         },
-        error: {
-          emoji: "(✖﹏✖)",
-          409: "The provided email is already registered.",
-          default: "Something unexpected occurred.",
-        },
         success: {
           emoji: "(>‿◠)✌",
           success:
@@ -98,6 +93,20 @@ export default {
       },
       categories: {
         section: "category",
+      },
+      error: {
+        [409]: {
+          emoji: "(✖﹏✖)",
+          message: "The provided email is already registered.",
+        },
+        [404]: {
+          emoji: "¯\\_(ツ)_/¯",
+          message: "Nothing here.",
+        },
+        [500]: {
+          emoji: "(✖﹏✖)",
+          message: "Something unexpected happened.",
+        },
       },
       landing: {},
     },
@@ -164,11 +173,6 @@ export default {
           city: "By",
           region: "Lokalitet",
         },
-        error: {
-          emoji: "(✖﹏✖)",
-          409: "Den indtastede email er allerede registeret.",
-          default: "Der opstod noget uventet.",
-        },
         success: {
           emoji: "(>‿◠)✌",
           success:
@@ -201,6 +205,20 @@ export default {
       },
       categories: {
         section: "kategori",
+      },
+      error: {
+        [409]: {
+          emoji: "(✖﹏✖)",
+          message: "Den indtastede email er allerde registreret",
+        },
+        [404]: {
+          emoji: "¯\\_(ツ)_/¯",
+          message: "Intet her.",
+        },
+        [500]: {
+          emoji: "(✖﹏✖)",
+          message: "Der skete noget uventet.",
+        },
       },
       landing: {},
     },

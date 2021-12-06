@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, useContext } from "react";
 import { Route } from "react-router-dom";
 
 /**
@@ -9,9 +9,12 @@ import { Route } from "react-router-dom";
  */
 import { CategoryType } from "db";
 import { useCSS, useDB } from "../hooks";
+import { AppStateContext } from "../components/App/app-state/main";
 import LoadBox from "../components/LoadBox/LoadBox";
 import AppPanel from "../components/AppPanel/AppPanel";
-import Categories from "./categories";
+
+const Categories = lazy(() => import("./categories"));
+const Error = lazy(() => import("./error"));
 
 /**
  * Types.
@@ -29,6 +32,7 @@ export default function index() {
     },
   }));
   const { db, queries } = useDB();
+  const { state } = useContext(AppStateContext);
   const [categories, setCategories] = useState<CategoryType[]>();
 
   const fetch = async () => {
@@ -56,7 +60,12 @@ export default function index() {
         <Route
           exact
           path="/categories/:categoryId/:subCategoryIds?"
-          component={Categories}
+          render={() => <Categories />}
+        />
+        <Route
+          exact
+          path="/error"
+          render={() => <Error error={state.error} />}
         />
         <Route exact path="/" component={Categories} />
       </section>

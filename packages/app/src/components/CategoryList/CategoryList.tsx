@@ -2,12 +2,13 @@
  * Vendor imports.
  */
 import {
+  useState,
+  useEffect,
   useRef,
   memo,
   ComponentProps,
   MouseEvent,
   FocusEvent,
-  useState,
   MutableRefObject,
   Dispatch,
   SetStateAction,
@@ -28,7 +29,7 @@ const path = "/categories/:categoryId/:subCategoryIds?";
 
 interface Props extends ComponentProps<any> {
   doc: CategoryType;
-  toggle: MutableRefObject<Dispatch<SetStateAction<boolean | "">> | undefined>;
+  toggle: MutableRefObject<Dispatch<SetStateAction<boolean>> | undefined>;
 }
 
 /**
@@ -67,7 +68,7 @@ export default memo(function ListItem({ doc, toggle }: Props) {
       },
     },
   }));
-  const [toggled, setToggled] = useState<boolean | "">(false);
+  const [toggled, setToggled] = useState<boolean>(false);
   const toggleElement = useRef<HTMLAnchorElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
   const nextPath = useRef(
@@ -114,6 +115,14 @@ export default memo(function ListItem({ doc, toggle }: Props) {
     toggle.current = setToggled;
     setToggled(true);
   };
+
+  useEffect(() => {
+    const id = window.location.pathname.split("/").slice(1)[1];
+
+    if (id === doc.id) {
+      toggleOn();
+    }
+  }, []);
 
   return (
     <div

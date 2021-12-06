@@ -78,6 +78,7 @@ export default function App({ db }: Props) {
     currentUser: undefined,
     currentBlog: undefined,
     currentPath: undefined,
+    error: undefined,
     showEditor: undefined,
   });
 

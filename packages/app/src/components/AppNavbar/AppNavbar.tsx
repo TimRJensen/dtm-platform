@@ -55,7 +55,6 @@ export default function AppNavbar() {
       color: colors.primary,
     },
     button: {
-      //height: appHeader.height,
       height: "inherit",
       width: "auto",
       borderRadius: 0,

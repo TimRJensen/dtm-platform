@@ -28,54 +28,56 @@ export default function AppPanel({ categories }: Props) {
   }
 
   const { locale } = useLocale("dk/DK");
-  const { css } = useCSS(({ spacing, colors }) => ({
-    categoryList: {
-      display: "flex",
-      flexFlow: "column",
-      width: "clamp(200px, 10vw, 250px)",
-      minHeight: "inherit",
-      margin: `0 ${spacing}px 0 0`,
-      padding: `${spacing}px 0 0 0`,
-      backgroundColor: colors.primary,
-      color: colors.text.secondary,
-      transition: "all 0.2s ease",
-      "&[data-toggle=false]": {
-        width: 48,
-        "& > header": {
-          "& > div:first-of-type, & ~ *": {
-            width: 0,
-            padding: 0,
-            opacity: 0,
-            overflow: "hidden",
-          },
-          "& > button > span": {
-            transform: ["rotate(0)", "translateX(-10%)"],
+  const { css } = useCSS(
+    ({ spacing, colors, sizes: { appHeader, banner } }) => ({
+      categoryList: {
+        display: "flex",
+        flexFlow: "column",
+        width: "clamp(200px, 10vw, 250px)",
+        minHeight: `calc(100vh - ${appHeader}px - ${banner}px)`,
+        margin: `0 ${spacing}px 0 0`,
+        padding: `${spacing}px 0 0 0`,
+        backgroundColor: colors.primary,
+        color: colors.text.secondary,
+        transition: "all 0.2s ease",
+        "&[data-toggle=false]": {
+          width: 48,
+          "& > header": {
+            "& > div:first-of-type, & ~ *": {
+              width: 0,
+              padding: 0,
+              opacity: 0,
+              overflow: "hidden",
+            },
+            "& > button > span": {
+              transform: ["rotate(0)", "translateX(-10%)"],
+            },
           },
         },
       },
-    },
-    header: {
-      display: "flex",
-      alignItems: "center",
-    },
-    label: {
-      padding: spacing,
-      color: colors.text.secondary,
-      overflow: "hidden",
-    },
-    button: {
-      height: 24,
-      width: 24,
-      margin: `0 ${spacing}px 0 auto`,
-      color: colors.secondary,
-    },
-    fontIcon: {
-      transform: "rotate(180deg)",
-      transition: "transform 1s ease",
-    },
-  }));
+      header: {
+        display: "flex",
+        alignItems: "center",
+      },
+      label: {
+        padding: spacing,
+        color: colors.text.secondary,
+        overflow: "hidden",
+      },
+      button: {
+        height: 24,
+        width: 24,
+        margin: `0 ${spacing}px 0 auto`,
+        color: colors.secondary,
+      },
+      fontIcon: {
+        transform: "rotate(180deg)",
+        transition: "transform 1s ease",
+      },
+    })
+  );
   const [panelToggle, setPanelToggle] = useState(true);
-  const meh = useRef<Dispatch<SetStateAction<boolean | "">>>();
+  const categoryToggle = useRef<Dispatch<SetStateAction<boolean>>>();
 
   return (
     <section css={css.categoryList} data-toggle={panelToggle}>
@@ -97,10 +99,10 @@ export default function AppPanel({ categories }: Props) {
           label: locale.components.AppPanel.popular,
           subCategories: [],
         }}
-        toggle={meh}
+        toggle={categoryToggle}
       />
       {categories.map((doc) => (
-        <CategoryList key={doc.id} doc={doc} toggle={meh} />
+        <CategoryList key={doc.id} doc={doc} toggle={categoryToggle} />
       ))}
     </section>
   );

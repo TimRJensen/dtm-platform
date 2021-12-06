@@ -1,13 +1,15 @@
 /**
  * Vendor imports.
  */
-import { useState, useEffect, FormEvent, MouseEvent } from "react";
+import { useState, useEffect, FormEvent, MouseEvent, useContext } from "react";
+import { useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
  */
 import { AccountType, CategoryType, ProfileTable } from "db";
 import { useCSS, useDB, useLocale } from "../../hooks";
+import { AppStateContext } from "../../components/App/app-state/main";
 import FormSuggestion from "../../components/FormSuggestion/FormSuggestion";
 import FontIcon from "../../components/FontIcon/FontIcon";
 import Button from "../../components/Button/Button";
@@ -23,7 +25,16 @@ interface Props {
  * success functional component.
  */
 export default function success({ doc }: Props) {
+  const { dispatch } = useContext(AppStateContext);
+  const history = useHistory();
+
   if (!doc) {
+    dispatch({
+      type: "SET_ERROR",
+      value: { message: "No results.", code: 404 },
+    });
+    setTimeout(() => history.push("/error"));
+
     return null;
   }
 

@@ -2,12 +2,12 @@
  * Vendor imports.
  */
 import { useContext, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { ArtifactType } from "db";
+import { ArtifactType, PostgrestResponse } from "db";
 import { useDB, useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
 import LoadBox from "../../components/LoadBox/LoadBox";
@@ -20,10 +20,6 @@ import SearchResult from "../../components/SearchResult/SearchResult";
 const resultsPerPage = 10;
 
 type Params = { query: string; pageId: string };
-type ResponseType = {
-  count: number;
-  data: ArtifactType[];
-};
 
 /**
  * search functional component.
@@ -42,8 +38,9 @@ export default function search() {
 
   const { db, queries } = useDB();
   const { query, pageId } = useParams<Params>();
-  const [result, setResult] = useState<ResponseType>();
-  const cache = useRef(new Map<string, ResponseType>());
+  const history = useHistory();
+  const [result, setResult] = useState<PostgrestResponse<ArtifactType>>();
+  const cache = useRef(new Map<string, PostgrestResponse<ArtifactType>>());
 
   const fetch = async () => {
     const currentRange = Number.parseInt(pageId) * resultsPerPage;
@@ -62,8 +59,15 @@ export default function search() {
           },
         }));
 
-      if ("error" in response) {
-        return; // 404
+      console.log(response);
+      if (response.error) {
+        dispatch({
+          type: "SET_ERROR",
+          value: { message: "No results.", code: 404 },
+        });
+        setTimeout(() => history.push("/error"));
+
+        return;
       }
 
       cache.current.set(query + pageId, response);
@@ -93,7 +97,7 @@ export default function search() {
   return (
     <LoadBox data={result?.data} loadable>
       <section css={css.body}>
-        {result?.data.map((result) => (
+        {result?.data!.map((result: ArtifactType) => (
           <SearchResult
             key={`search-result-${result.id}`}
             query={query}

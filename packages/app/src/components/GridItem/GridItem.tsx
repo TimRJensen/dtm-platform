@@ -47,7 +47,6 @@ export default function GridItem({ doc, toggled = true, onLoad }: Props) {
     },
     info: {
       padding: spacing,
-      //height: "calc(3 * 1rem + 2 * 1.4rem)",
       backgroundColor: colors.primary,
       color: colors.text.secondary,
       "& :first-of-type": {

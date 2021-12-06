@@ -27,7 +27,7 @@ const moveX = keyframes({
   },
 });
 
-const showOn = ["/", "categories", "login", "account"];
+const showOn = ["/", "error", "categories", "login", "account"];
 
 /**
  * AppHeader functional component.

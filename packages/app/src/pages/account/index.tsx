@@ -8,7 +8,7 @@ import { Switch, Route } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { AccountType, ErrorType } from "db";
+import { AccountType } from "db";
 import { useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
 
@@ -33,7 +33,6 @@ export default function account({}: Props) {
   const { state, dispatch } = useContext(AppStateContext);
   const [data, setData] = useState<string[]>();
   const [user, setUser] = useState<AccountType>();
-  const [error, setError] = useState<ErrorType>();
 
   const _fetch = async () => {
     const response = await fetch(DAWAURL);
@@ -57,9 +56,7 @@ export default function account({}: Props) {
         <Route
           exact
           path="/account/new"
-          render={() => (
-            <Create suggestions={data} onSubmit={setUser} onError={setError} />
-          )}
+          render={() => <Create suggestions={data} onSubmit={setUser} />}
         />
         <Route
           exact

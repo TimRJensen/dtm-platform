@@ -67,8 +67,7 @@ function Dropdown<T extends ElementType>({
   const toggleElement = useRef<HTMLElement>();
   const boxElement = useRef<HTMLUListElement>(null);
   const focusType = useRef<"tab" | "click" | "none">("none");
-  //const selected = useRef(new Map<HTMLLIElement | "selected", unknown>());
-  const _selected = useRef<HTMLLIElement>();
+  const selected = useRef<HTMLLIElement>();
 
   useLayoutEffect(() => {
     if (!children) {
@@ -96,8 +95,8 @@ function Dropdown<T extends ElementType>({
       }
     }
 
-    if (_selected.current) {
-      box.scrollTop = _selected.current.offsetTop;
+    if (selected.current) {
+      box.scrollTop = selected.current.offsetTop;
     }
   }, [toggled]);
 
@@ -116,7 +115,7 @@ function Dropdown<T extends ElementType>({
 
         const box = boxElement.current!;
         const items = Array.from(box.children);
-        const nextItem = (_selected.current?.previousElementSibling ??
+        const nextItem = (selected.current?.previousElementSibling ??
           box.lastElementChild) as HTMLLIElement;
 
         const child = Children.toArray(children)[
@@ -127,11 +126,11 @@ function Dropdown<T extends ElementType>({
           child.props.onKeyDown(event);
         }
 
-        if (_selected.current) {
-          _selected.current.dataset.selected = "false";
+        if (selected.current) {
+          selected.current.dataset.selected = "false";
         }
 
-        _selected.current = nextItem;
+        selected.current = nextItem;
         nextItem.dataset.selected = "true";
 
         break;
@@ -146,7 +145,7 @@ function Dropdown<T extends ElementType>({
 
         const box = boxElement.current!;
         const items = Array.from(box.children);
-        const nextItem = (_selected.current?.nextElementSibling ??
+        const nextItem = (selected.current?.nextElementSibling ??
           box.firstElementChild) as HTMLLIElement;
 
         const child = Children.toArray(children)[
@@ -157,20 +156,20 @@ function Dropdown<T extends ElementType>({
           child.props.onKeyDown(event);
         }
 
-        if (_selected.current) {
-          _selected.current.dataset.selected = "false";
+        if (selected.current) {
+          selected.current.dataset.selected = "false";
         }
 
-        _selected.current = nextItem;
+        selected.current = nextItem;
         nextItem.dataset.selected = "true";
 
         break;
       }
 
       case "Enter": {
-        if (_selected.current && toggled) {
+        if (selected.current && toggled) {
           event.preventDefault();
-          _selected.current.click();
+          selected.current.click();
         }
 
         break;
@@ -256,7 +255,7 @@ function Dropdown<T extends ElementType>({
           css={css.box}
           ref={boxElement}
           toggled={toggled}
-          select={_selected}
+          select={selected}
         >
           {children}
         </DropdownBox>

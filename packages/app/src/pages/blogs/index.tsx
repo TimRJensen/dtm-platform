@@ -2,7 +2,7 @@
  * Vendor imports.
  */
 import { useContext, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import arraySort from "array-sort";
 
 /**
@@ -39,8 +39,9 @@ export default function blog({ blog }: Props) {
       borderRadius,
     },
   }));
-  const { blogId } = useParams<{ blogId: string }>();
   const { db, queries } = useDB();
+  const { blogId } = useParams<{ blogId: string }>();
+  const history = useHistory();
   const { dispatch } = useContext(AppStateContext);
   const { showEditor, handleShowEditor, handleSubmit } = useEditor(blog);
 
@@ -49,8 +50,15 @@ export default function blog({ blog }: Props) {
       match: { id: blogId },
     });
 
+    console.log(response);
     if ("error" in response) {
-      return; //return 404
+      dispatch({
+        type: "SET_ERROR",
+        value: { message: "No results.", code: 404 },
+      });
+      setTimeout(() => history.push("/error"));
+
+      return;
     }
 
     dispatch({

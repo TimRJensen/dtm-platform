@@ -2,16 +2,16 @@
  * Vendor imports.
  */
 import { useState, useEffect, useRef, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import arraySort from "array-sort";
 
 /**
  * Custom imports.
  */
 import { GridItemFromCategory, GridItemType } from "db";
-import { useDB, useCSS, useLocale } from "../hooks";
-import { AppStateContext } from "../components/App/app-state/main";
-import GridBox from "../components/GridBox/GridBox";
+import { useDB, useCSS, useLocale } from "../../hooks";
+import { AppStateContext } from "../../components/App/app-state/main";
+import GridBox from "../../components/GridBox/GridBox";
 
 /**
  * Types.
@@ -37,8 +37,9 @@ export default function name({}: Props) {
       visibility: "hidden",
     },
   }));
-  const { categoryId, subCategoryIds } = useParams<Params>();
   const { db, queries } = useDB();
+  const { categoryId, subCategoryIds } = useParams<Params>();
+  const history = useHistory();
   const { dispatch } = useContext(AppStateContext);
   const [pageId, setPageId] = useState(0);
   const [docs, setDocs] = useState<GridItemType[]>();
@@ -64,6 +65,12 @@ export default function name({}: Props) {
       );
 
       if ("error" in response) {
+        dispatch({
+          type: "SET_ERROR",
+          value: { message: "No results.", code: 404 },
+        });
+        setTimeout(() => history.push("/error"));
+
         return;
       }
 
@@ -93,7 +100,13 @@ export default function name({}: Props) {
       );
 
       if ("error" in response) {
-        return; //return 404
+        dispatch({
+          type: "SET_ERROR",
+          value: { message: "No results.", code: 404 },
+        });
+        setTimeout(() => history.push("/error"));
+
+        return;
       }
 
       if (!response[0]) {

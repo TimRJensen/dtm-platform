@@ -6,8 +6,7 @@ import { useContext, useState } from "react";
 /**
  * Custom imports.
  */
-// @ts-ignore
-import { DBContext, PostTable, BlogType, PostType } from "db";
+import { PostTable, PostType } from "db";
 import { AppStateContext } from "../components/App/app-state/context";
 import { useDB } from ".";
 
