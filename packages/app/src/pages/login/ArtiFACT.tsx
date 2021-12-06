@@ -79,7 +79,7 @@ export default function ArtiFACT({}: Props) {
           {locale.components.Button.submit}
         </Button>
         <Link to="/" tabIndex={-1}>
-          <Button>{locale.components.Button.submit}</Button>
+          <Button>{locale.components.Button.cancel}</Button>
         </Link>
       </div>
     </form>

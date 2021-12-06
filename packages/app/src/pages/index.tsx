@@ -54,9 +54,11 @@ export default function index() {
       <section css={css.index}>
         <AppPanel categories={categories} />
         <Route
+          exact
           path="/categories/:categoryId/:subCategoryIds?"
           component={Categories}
         />
+        <Route exact path="/" component={Categories} />
       </section>
     </LoadBox>
   );
