@@ -92,6 +92,7 @@ const queries = {
     role,
     email,
     displayName,
+    profile:profileId(*),
     stats
   `,
 };

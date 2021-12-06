@@ -89,6 +89,7 @@ export default function App({ db }: Props) {
         role,
         email,
         displayName,
+        profile:profileId(*),
         stats
     `,
       {

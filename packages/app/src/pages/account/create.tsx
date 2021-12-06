@@ -1,7 +1,7 @@
 /**
  * Vendor imports.
  */
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect, useContext } from "react";
 import { useHistory, Link, generatePath } from "react-router-dom";
 import { validate as validateEmail } from "email-validator";
 
@@ -9,27 +9,19 @@ import { validate as validateEmail } from "email-validator";
  * Custom imports.
  */
 import { AccountType, ErrorType } from "db";
-import { useCSS, useDB } from "../../hooks";
+import { useCSS, useDB, useLocale } from "../../hooks";
+import { AppStateContext } from "../../components/App/app-state/main";
 import LoadBox from "../../components/LoadBox/LoadBox";
 import FormInput from "../../components/FormInput/FormInput";
 import FormSuggestion from "../../components/FormSuggestion/FormSuggestion";
 import FormSelect from "../../components/FormSelect/FormSelect";
 import Button from "../../components/Button/Button";
+import { reducer } from "./form-state";
 
 /**
  * Types.
  */
 const path = "/account/new/:errorOrSuccess";
-
-const labels = [
-  "Email",
-  "Password",
-  "Confirm password",
-  "Firstname",
-  "Lastname",
-  "City",
-  "Region",
-];
 
 const regions = [
   "København og omegn",
@@ -61,6 +53,7 @@ interface Props {
  * create functional component.
  */
 export default function create({ suggestions, onSubmit, onError }: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing }) => ({
     form: {
       display: "flex",
@@ -68,7 +61,7 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
       alignItems: "flex-end",
       width: "fit-content",
       position: "relative",
-      left: `calc(-1em * ${labels[2].length} * 0.33)`,
+      left: `calc(-1em * ${locale.pages.account.create.confirmPassword.length} * 0.33)`,
       margin: `${spacing * 2}px auto 0 auto`,
       whiteSpace: "nowrap",
     },
@@ -78,7 +71,8 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   }));
   const { db } = useDB();
   const history = useHistory();
-  const [formState, dispatch] = useReducer(reducer, {
+  const { state, dispatch } = useContext(AppStateContext);
+  const [formState, setFormState] = useReducer(reducer, {
     email: "",
     password: "",
     confirmedPassword: "",
@@ -91,12 +85,9 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   const [forceLoad, setForceLoad] = useState(false);
   const [validated, setValidated] = useState(false);
 
-  const validate = (
-    key: keyof FormState,
-    validator: (value: string) => boolean
-  ) => {
-    return (value: string) => {
-      const flag = validator(value);
+  const validate = (validator: () => boolean) => {
+    return () => {
+      const flag = validator();
 
       if (flag && Object.values(formState).every((value) => value !== "")) {
         setValidated(true);
@@ -109,9 +100,9 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
   };
 
   const handleSubmit = async () => {
-    const { email, password, firstName, lastName, city, region } = formState;
-
     setForceLoad(true);
+
+    const { email, password, firstName, lastName, city, region } = formState;
 
     const response = await db.signUp(email, password, {
       firstName,
@@ -148,42 +139,55 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
     });
   };
 
+  useEffect(() => {
+    dispatch({
+      type: "CURRENT_PATH",
+      value: {
+        section: state.currentPath!.section,
+        label: locale.pages.account.create.label,
+      },
+    });
+  }, []);
+
   return (
     <LoadBox data={forceLoad ? undefined : suggestions}>
       <section css={css.form}>
         <FormInput
           type="email"
-          label={labels[0]}
+          label={locale.pages.account.create.email}
           value={formState.email}
-          validate={validate("email", validateEmail)}
+          validate={validate(() => validateEmail(formState.email))}
           onChange={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "email", value } });
+            setFormState({ type: "SET_VALUE", value: { key: "email", value } });
           }}
         />
         <br />
         <FormInput
           type="password"
-          label={labels[1]}
+          label={locale.pages.account.create.password}
           value={formState.password}
           validate={validate(
-            "password",
-            (value) => value !== "" && value.length > 5
+            () => formState.password !== "" && formState.password.length > 5
           )}
           onChange={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "password", value } });
+            setFormState({
+              type: "SET_VALUE",
+              value: { key: "password", value },
+            });
           }}
         />
         <FormInput
           type="password"
-          label={labels[2]}
+          label={locale.pages.account.create.confirmPassword}
           value={formState.confirmedPassword}
           dependencies={[formState.password]}
           validate={validate(
-            "confirmedPassword",
-            (value) => value !== "" && formState.password === value
+            () =>
+              formState.confirmedPassword !== "" &&
+              formState.confirmedPassword === formState.password
           )}
           onChange={(value) => {
-            dispatch({
+            setFormState({
               type: "SET_VALUE",
               value: { key: "confirmedPassword", value },
             });
@@ -192,42 +196,51 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
         <br />
         <FormInput
           type="text"
-          label={labels[3]}
+          label={locale.pages.account.create.firstName}
           value={formState.firstName}
-          validate={validate("firstName", (value) => value !== "")}
+          validate={validate(() => formState.firstName !== "")}
           onChange={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "firstName", value } });
+            setFormState({
+              type: "SET_VALUE",
+              value: { key: "firstName", value },
+            });
           }}
         />
         <FormInput
           type="text"
-          label={labels[4]}
+          label={locale.pages.account.create.lastName}
           value={formState.lastName}
-          validate={validate("lastName", (value) => value !== "")}
+          validate={validate(() => formState.lastName !== "")}
           onChange={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "lastName", value } });
+            setFormState({
+              type: "SET_VALUE",
+              value: { key: "lastName", value },
+            });
           }}
         />
         <br />
         <FormSuggestion
-          label={labels[5]}
+          label={locale.pages.account.create.city}
           value={formState.city}
           suggestions={suggestions}
-          validate={validate("city", (value) => value !== "")}
+          validate={validate(() => formState.city !== "")}
           onChange={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "city", value } });
+            setFormState({ type: "SET_VALUE", value: { key: "city", value } });
           }}
           onSelect={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "city", value } });
+            setFormState({ type: "SET_VALUE", value: { key: "city", value } });
           }}
         />
         <FormSelect
-          label={labels[6]}
+          label={locale.pages.account.create.region}
           value={formState.region}
           items={regions}
-          validate={validate("region", (value) => value !== "")}
+          validate={validate(() => formState.region !== "")}
           onSelect={(value) => {
-            dispatch({ type: "SET_VALUE", value: { key: "region", value } });
+            setFormState({
+              type: "SET_VALUE",
+              value: { key: "region", value },
+            });
           }}
         />
         <br />
@@ -238,40 +251,13 @@ export default function create({ suggestions, onSubmit, onError }: Props) {
             disabled={!validated}
             onClick={handleSubmit}
           >
-            {"submit"}
+            {locale.components.Button.submit}
           </Button>
           <Link to="/" tabIndex={-1}>
-            <Button> {"cancel"}</Button>
+            <Button>{locale.components.Button.cancel}</Button>
           </Link>
         </div>
       </section>
     </LoadBox>
   );
 }
-
-interface FormState {
-  email: string;
-  password: string;
-  confirmedPassword: string;
-  firstName: string;
-  lastName: string;
-  city: string;
-  region: string;
-  country: string;
-}
-
-type Actions = {
-  type: "SET_VALUE";
-  value: { key: keyof FormState; value: string };
-};
-
-const reducer = function reducer(state: FormState, action: Actions) {
-  switch (action.type) {
-    case "SET_VALUE": {
-      return { ...state, [action.value.key]: action.value.value };
-    }
-    default: {
-      throw new Error();
-    }
-  }
-};

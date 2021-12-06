@@ -129,7 +129,11 @@ export default function FormSelect({
       <Dropdown
         $css={{ ...css }}
         label={
-          <Button css={css.selected} type="transparent">
+          <Button
+            css={css.selected}
+            type="transparent"
+            onClick={(event) => event.preventDefault()}
+          >
             {value}
             <FontIcon $css={{ ...css }} type="expand_more" />
           </Button>

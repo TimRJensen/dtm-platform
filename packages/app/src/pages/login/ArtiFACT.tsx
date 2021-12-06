@@ -1,17 +1,15 @@
 /**
  * Vendor imports.
  */
-import { useContext, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, FormEvent } from "react";
+import { Link, useHistory } from "react-router-dom";
 
 /**
  * Custom imports.
  */
-import { useDB, useCSS } from "../../hooks";
+import { useDB, useCSS, useLocale } from "../../hooks";
 import Button from "../../components/Button/Button";
 import FormInput from "../../components/FormInput/FormInput";
-import { AppStateContext } from "../../components/App/app-state/main";
-import { UserType } from "db";
 
 /**
  * Types.
@@ -22,6 +20,7 @@ interface Props {}
  * ArtiFACT functional component.
  */
 export default function ArtiFACT({}: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing }) => ({
     form: {
       display: "flex",
@@ -37,14 +36,16 @@ export default function ArtiFACT({}: Props) {
       margin: `0 ${spacing}px 0 0`,
     },
   }));
-  const { db, queries } = useDB();
-  const { dispatch } = useContext(AppStateContext);
+  const { db } = useDB();
+  const history = useHistory();
   const [validated, setValidated] = useState(false);
-  const email = useRef("");
-  const password = useRef("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = async () => {
-    const response = await db.signIn(email.current, password.current);
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    const response = await db.signIn(email, password);
 
     if ("error" in response) {
       console.log("sign in error");
@@ -52,52 +53,35 @@ export default function ArtiFACT({}: Props) {
       return;
     }
 
-    const user = await db.selectExact<UserType>("app_users", queries.user, {
-      match: { id: response.id },
-    });
-
-    if ("error" in user) {
-      console.log("fetch user error");
-      console.log(user.error); //N.B. remove this eventually.
-      return;
-    }
-
-    dispatch({ type: "CURRENT_USER", value: user });
+    history.push("/");
   };
 
   return (
-    <section css={css.form}>
+    <form css={css.form} onSubmit={handleSubmit}>
       <FormInput
         type="email"
-        label={"Email"}
-        onChange={(value) => (email.current = value)}
-        onBlur={() =>
-          setValidated(email.current !== "" && password.current !== "")
-        }
+        label={locale.pages.login.email}
+        value={email}
+        onChange={(value) => setEmail(value)}
+        onBlur={() => setValidated(email !== "" && password !== "")}
       />
       <br />
       <FormInput
         type="password"
-        label={"Password"}
-        onChange={(value) => (password.current = value)}
-        onBlur={() =>
-          setValidated(email.current !== "" && password.current !== "")
-        }
+        label={locale.pages.login.password}
+        value={password}
+        onChange={(value) => setPassword(value)}
+        onBlur={() => setValidated(email !== "" && password !== "")}
       />
       <br />
       <div>
-        <Button
-          css={css.button}
-          type="accept"
-          disabled={!validated}
-          onClick={handleSubmit}
-        >
-          {"submit"}
+        <Button css={css.button} type="accept" disabled={!validated}>
+          {locale.components.Button.submit}
         </Button>
         <Link to="/" tabIndex={-1}>
-          <Button> {"cancel"}</Button>
+          <Button>{locale.components.Button.submit}</Button>
         </Link>
       </div>
-    </section>
+    </form>
   );
 }
