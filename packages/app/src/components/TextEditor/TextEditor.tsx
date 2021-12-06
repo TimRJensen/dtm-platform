@@ -15,7 +15,7 @@ import draftParser from "draftjs-to-html";
 /**
  * Custom imports.
  */
-import { useCSS, PropertyValueType } from "../../hooks";
+import { useCSS, PropertyValueType, useLocale } from "../../hooks";
 import Button from "../Button/Button";
 import TextEditorControls from "../TextEditorControls/TextEditorControls";
 
@@ -49,6 +49,7 @@ export default function TextEditor({
 }: Props) {
   if (!toggle) return null;
 
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors }) => ({
     textEditor: [{}, $css.textEditor],
     input: [
@@ -126,10 +127,10 @@ export default function TextEditor({
             )
           }
         >
-          submit
+          {locale.components.Button.submit}
         </Button>
         <Button css={css.buttonCancel} onClick={() => onSubmit(undefined)}>
-          cancel
+          {locale.components.Button.cancel}
         </Button>
       </div>
     </section>

@@ -7,7 +7,7 @@ import { useContext } from "react";
  * Custom imports.
  */
 import { ArtifactType } from "db";
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../App/app-state/main";
 import InfoPanel from "../InfoPanel/InfoPanel";
 import InfoPanelItem from "../InfoPanelItem/InfoPanelItem";
@@ -29,6 +29,7 @@ interface Props {
 export default function Artifact({ doc, onComment }: Props) {
   if (!doc) return null;
 
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     artifact: {
       display: "grid",
@@ -78,14 +79,16 @@ export default function Artifact({ doc, onComment }: Props) {
       <img css={css.image} src={doc.image} />
       <div css={css.content}>{doc.content}</div>
       <InfoPanel>
-        <InfoPanelItem title="Category:">
+        <InfoPanelItem title={locale.components.ArtifactPanel.mainCategory}>
           {doc.mainCategory.label}
         </InfoPanelItem>
-        <InfoPanelItem title="Subcategory:">
+        <InfoPanelItem title={locale.components.ArtifactPanel.subCategory}>
           {doc.subCategory.label}
         </InfoPanelItem>
-        <InfoPanelItem title="Period:">{doc.period.join(" - ")}</InfoPanelItem>
-        <InfoPanelItem title="Tags:">
+        <InfoPanelItem title={locale.components.ArtifactPanel.period}>
+          {doc.period.join(" - ")}
+        </InfoPanelItem>
+        <InfoPanelItem title={locale.components.ArtifactPanel.tags}>
           {doc.tags.map((tag, i) => (
             <Tag key={`${doc.id}-${tag}-${i}`}>{tag}</Tag>
           ))}
@@ -97,7 +100,9 @@ export default function Artifact({ doc, onComment }: Props) {
           onClick={onComment}
           disabled={!state.currentUser}
         >
-          <FontIcon type="chat_bubble">comment</FontIcon>
+          <FontIcon type="chat_bubble">
+            {locale.components.ArtifactPanel.comment}
+          </FontIcon>
         </Button>
       </InfoPanel>
     </section>

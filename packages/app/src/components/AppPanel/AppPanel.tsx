@@ -7,7 +7,7 @@ import { useState, Dispatch, SetStateAction, useRef } from "react";
  * Custom imports.
  */
 import { CategoryType } from "db";
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
 import CategoryList from "../CategoryList/CategoryList";
@@ -27,6 +27,7 @@ export default function AppPanel({ categories }: Props) {
     return null;
   }
 
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors }) => ({
     categoryList: {
       display: "flex",
@@ -80,7 +81,7 @@ export default function AppPanel({ categories }: Props) {
     <section css={css.categoryList} data-toggle={panelToggle}>
       <header css={css.header}>
         <div css={css.label} data-type="title">
-          CATEGORIES
+          {locale.components.AppPanel.categories}
         </div>
         <Button
           css={css.button}
@@ -91,7 +92,11 @@ export default function AppPanel({ categories }: Props) {
         </Button>
       </header>
       <CategoryList
-        doc={{ id: "popular", label: "popular", subCategories: [] }}
+        doc={{
+          id: "popular",
+          label: locale.components.AppPanel.popular,
+          subCategories: [],
+        }}
         toggle={meh}
       />
       {categories.map((doc) => (

@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
  * Custom imports.
  */
 import { ArtifactType } from "db";
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import InfoPanel from "../InfoPanel/InfoPanel";
 import InfoPanelItem from "../InfoPanelItem/InfoPanelItem";
 /*import { useDecorateNode } from "../../hooks/";
@@ -26,6 +26,7 @@ interface Props {
  * SearchResult functional component.
  */
 export default function SearchResult({ /*queries,*/ result, style }: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     searchResult: {
       display: "grid",
@@ -82,13 +83,13 @@ export default function SearchResult({ /*queries,*/ result, style }: Props) {
       </div>
       <div css={css.content}>{result.content}</div>
       <InfoPanel>
-        <InfoPanelItem title="Category:">
+        <InfoPanelItem title={locale.components.SearchResultPanel.mainCategory}>
           {result.mainCategory.label}
         </InfoPanelItem>
-        <InfoPanelItem title="Subcategory:">
+        <InfoPanelItem title={locale.components.SearchResultPanel.subCategory}>
           {result.subCategory.label}
         </InfoPanelItem>
-        <InfoPanelItem title="Period:">
+        <InfoPanelItem title={locale.components.SearchResultPanel.period}>
           {result.period.join(" - ")}
         </InfoPanelItem>
       </InfoPanel>

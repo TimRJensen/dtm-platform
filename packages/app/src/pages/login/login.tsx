@@ -7,12 +7,12 @@ import { Link, generatePath } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
 import FontIcon from "../../components/FontIcon/FontIcon";
 import Button from "../../components/Button/Button";
-import GoogleLogo from "../../public/google-logo.svg";
-import FacebookLogo from "../../public/facebook-logo.svg";
+//import GoogleLogo from "../../public/google-logo.svg";
+//import FacebookLogo from "../../public/facebook-logo.svg";
 
 /**
  * Types.
@@ -25,6 +25,7 @@ interface Props {}
  * login functional component.
  */
 export default function login({}: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors }) => ({
     login: {
       width: "inherit",
@@ -75,15 +76,15 @@ export default function login({}: Props) {
 
   return (
     <section css={css.login}>
-      <div css={css.label}>Login with an existing login:</div>
-      <Link
+      <div css={css.label}>{locale.pages.login.loginExisting}</div>
+      {/*  <Link
         to={generatePath(path, {
           loginId: "google",
         })}
       >
         <Button css={css.button}>
           <GoogleLogo css={css.logo} />
-          Login with Google
+          {locale.pages.login.loginWith("Google")}
         </Button>
       </Link>
       <Link
@@ -93,7 +94,7 @@ export default function login({}: Props) {
       >
         <Button css={css.button}>
           <FacebookLogo css={css.logo} />
-          Login with Facebook
+          {locale.pages.login.loginWith("Facebook")}
         </Button>
       </Link>
       <Link
@@ -107,9 +108,9 @@ export default function login({}: Props) {
             type="auto_fix_high"
             size={38}
           />
-          Login with magiclink
+          {locale.pages.login.loginWith("Magic Link")}
         </Button>
-      </Link>
+      </Link> */}
       <Link
         to={generatePath(path, {
           loginId: "ArtiFACT",
@@ -121,14 +122,14 @@ export default function login({}: Props) {
             type="account_circle"
             size={48}
           />
-          Login with ArtiFACT
+          {locale.pages.login.loginWith("ArtiFACT")}
         </Button>
       </Link>
       <br />
       <div>
-        Don't have an account yet? Create one{" "}
+        {locale.pages.login.create}
         <Link css={css.link} to="/account/new">
-          here
+          {locale.pages.login.link}
         </Link>
         .
       </div>

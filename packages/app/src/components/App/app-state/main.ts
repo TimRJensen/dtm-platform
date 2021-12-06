@@ -49,7 +49,10 @@ export const reducer = function reducer(state: AppState, action: Actions) {
     case "CURRENT_USER":
       return { ...state, currentUser: action.value };
     case "CURRENT_PATH":
-      return { ...state, currentPath: action.value };
+      return {
+        ...state,
+        currentPath: { ...state.currentPath, ...action.value },
+      };
     case "SHOW_EDITOR":
       return { ...state, showEditor: action.value };
     case "ANY":

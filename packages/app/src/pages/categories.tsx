@@ -9,7 +9,7 @@ import arraySort from "array-sort";
  * Custom imports.
  */
 import { GridItemFromCategory, GridItemType } from "db";
-import { useDB, useCSS } from "../hooks";
+import { useDB, useCSS, useLocale } from "../hooks";
 import { AppStateContext } from "../components/App/app-state/main";
 import GridBox from "../components/GridBox/GridBox";
 
@@ -29,6 +29,7 @@ interface Props {}
  * name functional component.
  */
 export default function name({}: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({}) => ({
     scrollable: {
       position: "relative",
@@ -69,8 +70,8 @@ export default function name({}: Props) {
       dispatch({
         type: "CURRENT_PATH",
         value: {
-          section: "category",
-          label: categoryId,
+          section: locale.pages.categories.section,
+          label: locale.components.AppPanel.popular,
         },
       });
 
@@ -108,7 +109,7 @@ export default function name({}: Props) {
       dispatch({
         type: "CURRENT_PATH",
         value: {
-          section: "category",
+          section: locale.pages.categories.section,
           label: response.map((element) => element.label).join(" & "),
         },
       });

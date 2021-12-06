@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
  * Custom imports.
  */
 import { ArtifactType } from "db";
-import { useDB, useCSS } from "../../hooks";
+import { useDB, useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/main";
 import LoadBox from "../../components/LoadBox/LoadBox";
 import SearchPagination from "../../components/SearchPagination/SearchPagination";
@@ -29,6 +29,7 @@ type ResponseType = {
  * search functional component.
  */
 export default function search() {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing }) => ({
     body: {
       display: "flex",
@@ -71,7 +72,10 @@ export default function search() {
 
     dispatch({
       type: "CURRENT_PATH",
-      value: { section: "search", label: query.split("+").join(" & ") },
+      value: {
+        section: locale.pages.search.section,
+        label: query.split("+").join(" & "),
+      },
     });
   };
 

@@ -8,3 +8,4 @@ export { default as useDecorateNode } from "./useDecorateNode";
 export { default as useCSS } from "./useCSS";
 export type { PropertyValueType } from "./useCSS";
 export { default as useDB } from "./useDB";
+export { default as useLocale } from "./useLocale";

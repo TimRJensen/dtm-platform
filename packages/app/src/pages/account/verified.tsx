@@ -7,7 +7,7 @@ import { useLocation } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/context";
 
 /**
@@ -19,6 +19,7 @@ interface Props {}
  * verified functional component.
  */
 export default function verified({}: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing }) => ({
     verified: {
       display: "flex",
@@ -34,21 +35,24 @@ export default function verified({}: Props) {
       textAlign: "center",
     },
   }));
-  const { dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useContext(AppStateContext);
   const loc = useLocation();
 
   useEffect(() => {
     console.log(loc);
     dispatch({
       type: "CURRENT_PATH",
-      value: { section: "account", label: "new" },
+      value: {
+        section: state.currentPath!.section,
+        label: locale.pages.account.verified.label,
+      },
     });
   }, []);
 
   return (
     <section css={css.verified}>
-      <div css={css.label}>{`ヽ(•‿•)ノ`}</div>
-      <div css={css.text}>{`Your account has been verified.`}</div>
+      <div css={css.label}>{locale.pages.account.verified.emoji}</div>
+      <div css={css.text}>{locale.pages.account.verified.verified}</div>
     </section>
   );
 }

@@ -7,7 +7,7 @@ import { useState, useEffect, FormEvent, MouseEvent } from "react";
  * Custom imports.
  */
 import { AccountType, CategoryType, ProfileTable } from "db";
-import { useCSS, useDB } from "../../hooks";
+import { useCSS, useDB, useLocale } from "../../hooks";
 import FormSuggestion from "../../components/FormSuggestion/FormSuggestion";
 import FontIcon from "../../components/FontIcon/FontIcon";
 import Button from "../../components/Button/Button";
@@ -27,6 +27,7 @@ export default function success({ doc }: Props) {
     return null;
   }
 
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors }) => ({
     success: {
       display: "flex",
@@ -135,18 +136,13 @@ export default function success({ doc }: Props) {
 
   return (
     <section css={css.success}>
-      <div css={css.label}>{`(>‿◠)✌`}</div>
+      <div css={css.label}>{locale.pages.account.success.emoji}</div>
       <div css={css.text}>
-        {`Your account was succesfully created, but in order to login, it needs to
-        be verified.`}
+        {locale.pages.account.success.success}
         <br />
-        {`An email has been sent to ${doc?.email} with a verification link.`}
+        {locale.pages.account.success.verify(doc.email)}
       </div>
-      <div css={css.text}>
-        {`While you wait for the email to arrive, consider taking the time to add 
-          some of your interests below:
-        `}
-      </div>
+      <div css={css.text}>{locale.pages.account.success.wait}</div>
       <form css={css.interestsGroup} onSubmit={handleSubmit}>
         <FormSuggestion
           label="Interests"

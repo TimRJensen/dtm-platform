@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 /**
  * Custom imports.
  */
-import { useCSS, useDB } from "../../hooks";
+import { useCSS, useDB, useLocale } from "../../hooks";
 import { AppStateContext } from "../App/app-state/main";
 import Dropdown from "../Dropdown/Dropdown";
 import Searchbar from "../Searchbar/Searchbar";
@@ -22,6 +22,7 @@ import FontIcon from "../FontIcon/FontIcon";
  * AppNavbar functional component.
  */
 export default function AppNavbar() {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors, sizes: { appHeader } }) => ({
     navbar: {
       display: "flex",
@@ -54,7 +55,8 @@ export default function AppNavbar() {
       color: colors.primary,
     },
     button: {
-      height: appHeader.height,
+      //height: appHeader.height,
+      height: "inherit",
       width: "auto",
       borderRadius: 0,
       padding: `0 ${spacing}px 0 ${spacing}px`,
@@ -71,7 +73,6 @@ export default function AppNavbar() {
       height: "inherit",
       width: 325,
       backgroundColor: colors.primary,
-      //color: colors.text.secondary,
       textAlign: "right",
       overflow: "hidden",
       clipPath: "polygon(7% 0%, 101% 0, 101% 101%, 0% 101%)",
@@ -106,7 +107,7 @@ export default function AppNavbar() {
   return (
     <section css={css.navbar}>
       <Link css={[css.artiFACT, css.crumb]} to="/categories/popular">
-        ArtiFACT
+        {locale.components.AppNavBar.ArtiFACT}
       </Link>
       {state.currentPath ? (
         <div>
@@ -131,18 +132,20 @@ export default function AppNavbar() {
           }
           direction="left"
         >
-          <Dropdown.Item css={css.item}>{"dashboard"}</Dropdown.Item>
           <Dropdown.Item css={css.item}>
-            {
-              <Link to="/" css={css.link} onClick={handleSignOut}>
-                {"sign out"}
-              </Link>
-            }
+            <Link css={css.link} /*to="/account"*/ to="/">
+              {locale.components.AppNavBar.dashboard}
+            </Link>
+          </Dropdown.Item>
+          <Dropdown.Item css={css.item}>
+            <Link to="/" css={css.link} onClick={handleSignOut}>
+              {locale.components.AppNavBar.signOut}
+            </Link>
           </Dropdown.Item>
         </Dropdown>
       ) : (
         <Link to="/login" css={css.signIn}>
-          {"sign in"}
+          {locale.components.AppNavBar.signIn}
         </Link>
       )}
     </section>

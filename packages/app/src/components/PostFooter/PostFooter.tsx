@@ -8,7 +8,7 @@ import { useContext } from "react";
  * Custom imports.
  */
 import { PostType } from "db";
-import { useCSS, useUpvoted } from "../../hooks";
+import { useCSS, useLocale, useUpvoted } from "../../hooks";
 import { AppStateContext } from "../App/app-state/context";
 import Button from "../Button/Button";
 import FontIcon from "../FontIcon/FontIcon";
@@ -25,6 +25,7 @@ interface Props {
  * PostFooter functional component.
  */
 export default function PostFooter({ doc, onComment }: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, colors }) => ({
     footer: {
       display: "flex",
@@ -54,7 +55,7 @@ export default function PostFooter({ doc, onComment }: Props) {
         onClick={onComment}
       >
         <FontIcon key="footer-comment-button" type="question_answer">
-          reply
+          {locale.components.PostFooter.reply}
         </FontIcon>
       </Button>
       <Button
@@ -65,7 +66,7 @@ export default function PostFooter({ doc, onComment }: Props) {
         onClick={handleUpvote}
       >
         <FontIcon key="footer-vote-button" type="thumb_up">
-          upvote
+          {locale.components.PostFooter.upvote}
         </FontIcon>
       </Button>
     </div>

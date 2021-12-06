@@ -9,7 +9,7 @@ import arraySort from "array-sort";
  * Custom import.
  */
 import { BlogTable, BlogType } from "db";
-import { useDB, useEditor, useCSS } from "../../hooks";
+import { useDB, useEditor, useCSS, useLocale } from "../../hooks";
 import { AppStateContext } from "../../components/App/app-state/context";
 import LoadBox from "../../components/LoadBox/LoadBox";
 import Artifact from "../../components/Artifact/Artifact";
@@ -27,6 +27,7 @@ interface Props {
  * blog functonal component.
  */
 export default function blog({ blog }: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     textEditor: {
       width: `clamp(650px, 40vw, 100%)`,
@@ -56,7 +57,10 @@ export default function blog({ blog }: Props) {
       type: "ANY",
       value: {
         currentBlog: response,
-        currentPath: { section: "artifact", label: response.artifact.label },
+        currentPath: {
+          section: locale.pages.blogs.section,
+          label: response.artifact.label,
+        },
       },
     });
   };

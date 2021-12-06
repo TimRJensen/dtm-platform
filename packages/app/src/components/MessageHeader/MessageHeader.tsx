@@ -7,7 +7,7 @@ import { useContext } from "react";
  * Custom imports.
  */
 import { PostType, CommentType } from "db";
-import { useCSS } from "../../hooks";
+import { useCSS, useLocale } from "../../hooks";
 import { formatDate } from "../../util/main";
 import { AppStateContext } from "../App/app-state/main";
 import Dropdown from "../Dropdown/Dropdown";
@@ -26,6 +26,7 @@ interface Props {
  * MessageHeader functional component.
  */
 export default function MessageHeader({ doc, onEdit }: Props) {
+  const { locale } = useLocale("dk/DK");
   const { css } = useCSS(({ spacing, borderRadius, colors }) => ({
     messageHeader: {
       display: "flex",
@@ -99,13 +100,19 @@ export default function MessageHeader({ doc, onEdit }: Props) {
         direction="left"
       >
         <Dropdown.Item css={css.item} onClick={onEdit}>
-          <FontIcon type="edit">edit</FontIcon>
+          <FontIcon type="edit">
+            {locale.components.MessageHeader.edit}
+          </FontIcon>
         </Dropdown.Item>
         <Dropdown.Item css={css.item} onClick={undefined}>
-          <FontIcon type="delete">delete</FontIcon>
+          <FontIcon type="delete">
+            {locale.components.MessageHeader.delete}
+          </FontIcon>
         </Dropdown.Item>
         <Dropdown.Item css={css.item} onClick={undefined}>
-          <FontIcon type="not_interested">ban</FontIcon>
+          <FontIcon type="not_interested">
+            {locale.components.MessageHeader.report}
+          </FontIcon>
         </Dropdown.Item>
       </Dropdown>
     </div>
