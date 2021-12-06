@@ -28,6 +28,7 @@ export default function success({ doc }: Props) {
   const { dispatch } = useContext(AppStateContext);
   const history = useHistory();
 
+  console.log(doc);
   if (!doc) {
     dispatch({
       type: "SET_ERROR",

@@ -60,7 +60,7 @@ export default function account({}: Props) {
         />
         <Route
           exact
-          path={"account/new/success"}
+          path={"/account/new/success"}
           render={() => <Success doc={user} />}
         />
         <Route exact path="/account/verified" component={Verified} />
